@@ -1,5 +1,8 @@
+const Register = require("../models/users");
+
 const registerNewUser = (req, res) => {
-  res.send("Home");
+  Register.create(req.body);
+  res.send("New account created!!");
 };
 
 const loginUser = (req, res) => {
