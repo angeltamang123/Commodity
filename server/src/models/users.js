@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const registerSchema = new Schema({
-  name: String,
+  fullName: String,
   address: String,
   emailId: String,
   phoneNumber: Number,
   password: String,
-  rePassword: String,
+
   gender: {
     type: String,
     enum: ["Male", "Female", "Others"],
