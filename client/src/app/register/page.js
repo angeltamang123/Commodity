@@ -2,20 +2,56 @@
 import React from "react";
 import { useFormik } from "formik";
 import axios from "axios";
+import * as Yup from "yup";
 import { Button, Card, Input, Radio, RadioGroup } from "@nextui-org/react";
+import { useState } from "react";
 
 const SignupForm = () => {
+  let [emailTaken, setEmailTaken] = useState("false");
+
+  const registerSchema = Yup.object().shape({
+    emailId: Yup.string().email("Invalid email").required("Required"),
+    password: Yup.string()
+      .min(2, "Too Short!")
+      .max(50, "Too Long!")
+      .required("Required"),
+
+    rePassword: Yup.string()
+      .min(2, "Too Short!")
+      .max(50, "Too Long!")
+      .required("Required")
+      .oneOf([Yup.ref("password"), null], "Passwords must match"),
+
+    phoneNumber: Yup.string()
+      .matches(/^\d{10}$/, "Phone number must be exactly 10 digits")
+      .required("Required"),
+
+    address: Yup.string()
+      .min(2, "Too Short!")
+      .max(50, "Too Long!")
+      .required("Required"),
+
+    fullName: Yup.string()
+      .min(2, "Too Short!")
+      .max(50, "Too Long!")
+      .required("Required"),
+  });
+
   const formik = useFormik({
     initialValues: {
       emailId: "",
       password: "",
+      rePassword: "",
       phoneNumber: "",
       address: "",
       fullName: "",
     },
-    onSubmit: (values) => {
-      registerUser(values);
+    onSubmit: async (values) => {
+      const data = await registerUser(values);
+      debugger;
+      if (data == "Email is taken") setEmailTaken(true);
     },
+    validationSchema: registerSchema,
   });
 
   const registerUser = async (values) => {
@@ -23,66 +59,98 @@ const SignupForm = () => {
       `${process.env.NEXT_PUBLIC_API_URL}/register`,
       values
     );
-    if (data) alert("registered successfully");
+
+    return data;
   };
   return (
-    <Card className="m-4 p-4">
-      <form onSubmit={formik.handleSubmit}>
-        <label htmlFor="emailId">Email</label>
-        <Input
-          id="emailId"
-          name="emailId"
-          type="text"
-          onChange={formik.handleChange}
-          value={formik.values.emailId}
-        />
-        <label htmlFor="lastName">Password</label>
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          onChange={formik.handleChange}
-          value={formik.values.password}
-        />
-        <label htmlFor="email">Phone Number</label>
-        <Input
-          id="phoneNumber"
-          name="phoneNumber"
-          type="text"
-          onChange={formik.handleChange}
-          value={formik.values.phoneNumber}
-        />
-        <label htmlFor="email">Full Name</label>
-        <Input
-          id="fullName"
-          name="fullName"
-          type="text"
-          onChange={formik.handleChange}
-          value={formik.values.fullName}
-        />
-        <label htmlFor="email">Address</label>
-        <Input
-          id="address"
-          name="address"
-          type="text"
-          onChange={formik.handleChange}
-          value={formik.values.address}
-        />
-        <RadioGroup
-          id="gender"
-          label="Select your Gender"
-          onChange={(value) =>
-            formik.setFieldValue("gender", value.target.value)
-          }
-          value={formik.values.gender}
-        >
-          <Radio value="Male">Male</Radio>
-          <Radio value="Female">Female</Radio>
-          <Radio value="Others">Others</Radio>
-        </RadioGroup>
-        <Button type="submit">Submit</Button>
-      </form>
-    </Card>
+    <div className="flex items-center justify-center min-h-screen">
+      <Card className="flex m-4 p-10  ">
+        <form onSubmit={formik.handleSubmit}>
+          <label htmlFor="emailId">Email</label>
+          <Input
+            id="emailId"
+            name="emailId"
+            type="text"
+            onChange={formik.handleChange}
+            value={formik.values.emailId}
+          />
+          <p className="text-sm text-red-600">{formik.errors.email}</p>
+          <br />
+          <label htmlFor="lastName">Password</label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            onChange={formik.handleChange}
+            value={formik.values.password}
+          />
+          <p className="text-sm text-red-600">{formik.errors.password}</p>
+          <br />
+          <label htmlFor="lastName">Re-enter Password</label>
+          <Input
+            id="rePassword"
+            name="rePassword"
+            type="password"
+            onChange={formik.handleChange}
+            value={formik.values.rePassword}
+          />
+          <p className="text-sm text-red-600">{formik.errors.rePassword}</p>
+          <br />
+          <label htmlFor="email">Phone Number</label>
+          <Input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="text"
+            onChange={formik.handleChange}
+            value={formik.values.phoneNumber}
+          />
+          <p className="text-sm text-red-600">{formik.errors.phoneNumber}</p>
+          <br />
+          <label htmlFor="email">Full Name</label>
+          <Input
+            id="fullName"
+            name="fullName"
+            type="text"
+            onChange={formik.handleChange}
+            value={formik.values.fullName}
+          />
+          <p className="text-sm text-red-600">{formik.errors.fullName}</p>
+          <br />
+          <label htmlFor="email">Address</label>
+          <Input
+            id="address"
+            name="address"
+            type="text"
+            onChange={formik.handleChange}
+            value={formik.values.address}
+          />
+          <p className="text-sm text-red-600">{formik.errors.address}</p>
+          <br />
+          <RadioGroup
+            id="gender"
+            label="Select your Gender"
+            onChange={(value) =>
+              formik.setFieldValue("gender", value.target.value)
+            }
+            value={formik.values.gender}
+          >
+            <Radio value="Male">Male</Radio>
+            <Radio value="Female">Female</Radio>
+            <Radio value="Others">Others</Radio>
+          </RadioGroup>
+          <p className="text-sm text-red-600">{formik.errors.gender}</p>
+          <br />
+          {emailTaken && (
+            <div className="flex">
+              <p className="text-sm text-red-600">Email is Taken!!</p>
+            </div>
+          )}
+          <Button className="w-full" type="submit">
+            Submit
+          </Button>
+        </form>
+      </Card>
+    </div>
   );
 };
 
