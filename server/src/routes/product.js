@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const multer = require('multer')
-const { registerNewProduct, getAllProducts } = require("../controllers/products");
+const { registerNewProduct, getAllProducts ,getProductById} = require("../controllers/products");
 const app = Router();
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -13,6 +13,8 @@ const storage = multer.diskStorage({
   
   const upload = multer({ storage: storage })
 app.get("/products", getAllProducts);
+app.get("/products/:productId", getProductById);
+
 app.post("/products", upload.single('image'), registerNewProduct);
 
 

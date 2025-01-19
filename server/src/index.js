@@ -5,6 +5,7 @@ const port = 9000;
 app.use(express.json());
 const userRoute = require("./routes/users");
 const productRoute = require("./routes/product");
+app.use('/uploads', express.static('uploads'))
 
 app.use(cors());
 app.use(userRoute);
