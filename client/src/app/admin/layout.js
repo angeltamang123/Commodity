@@ -1,16 +1,20 @@
-import { Sidebar, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import React from 'react'
+import {
+  Sidebar,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import React from "react";
 
-const AdminLayout = ({children}) => {
+const AdminLayout = ({ children }) => {
   return (
     <SidebarProvider>
-    <Sidebar />
-    <div>
-      <SidebarTrigger />
-     {children}
-    </div>
-  </SidebarProvider>
-  )
-}
+      <Sidebar />
+      <div>
+        <SidebarTrigger />
+        {children}
+      </div>
+    </SidebarProvider>
+  );
+};
 
-export default AdminLayout
+export default AdminLayout;

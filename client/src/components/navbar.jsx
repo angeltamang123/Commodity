@@ -41,15 +41,15 @@ export default function CustomNavbar() {
         </div>
       </div>
       {/* Main Navbar */}
-      <Navbar className="border-b">
-        <NavbarBrand>
-          <Link href="/" className="flex  justify-start items-center gap-2">
-            <CommodityLogo className="text-[#1B4B66]" />
-            <span className="font-bold text-xl text-[#ce2020]">Commodity</span>
+      <Navbar className="border-b flex justify-between bg-[#FEFEFE] ">
+        <NavbarBrand className="ml-10">
+          <Link href="/" className="flex justify-start items-center gap-2">
+            <CommodityLogo className="text-[#FC515B]" />
+            <span className="font-bold text-xl text-[#b6343d]">Commodity</span>
           </Link>
         </NavbarBrand>
 
-        <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        <NavbarContent className="flex ml-64 justify-between gap-4">
           <Dropdown>
             <NavbarItem>
               <DropdownTrigger>
@@ -95,19 +95,11 @@ export default function CustomNavbar() {
           </NavbarItem>
         </NavbarContent>
 
-        <NavbarContent justify="end">
-          <NavbarItem className="hidden lg:flex">
+        <NavbarContent className="ml-32 gap-1">
+          <NavbarItem className="lg:flex w-44 font-normal">
             <Input
-              classNames={{
-                base: "max-w-full sm:max-w-[20rem] h-10",
-                mainWrapper: "h-full",
-                input: "text-small",
-                inputWrapper:
-                  "h-full font-normal text-default-500 bg-default-100",
-              }}
               placeholder="Search Product"
-              size="sm"
-              startContent={<Search size={16} />}
+              startContent={<Search />}
               type="search"
             />
           </NavbarItem>

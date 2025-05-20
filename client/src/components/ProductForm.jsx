@@ -1,77 +1,84 @@
-'use client'
+"use client";
 
-import { useFormik } from 'formik'
-import * as Yup from 'yup'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useState } from 'react'
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 
 const ProductSchema = Yup.object().shape({
-  name: Yup.string().required('Name is required'),
+  name: Yup.string().required("Name is required"),
   description: Yup.string(),
-  price: Yup.number().required('Price is required').min(0, 'Price must be at least 0'),
+  price: Yup.number()
+    .required("Price is required")
+    .min(0, "Price must be at least 0"),
   category: Yup.string().oneOf(
-    ['Electronics', 'Clothing', 'Books', 'Furniture', 'Other'],
-    'Invalid category'
+    ["Electronics", "Clothing", "Books", "Furniture", "Other"],
+    "Invalid category"
   ),
-  stock: Yup.number().min(0, 'Stock must be at least 0'),
+  stock: Yup.number().min(0, "Stock must be at least 0"),
   image: Yup.mixed()
-  .test('fileSize', 'File size is too large', (value) => {
-    if (!value) return true; // Let required handle this
-    return value.size <= 5000000; // 5MB limit
-  })
-  .test('fileType', 'Unsupported file format', (value) => {
-    if (!value) return true; // Let required handle this
-    return ['image/jpeg', 'image/png', 'image/gif'].includes(value.type);
-  }),
-})
+    .test("fileSize", "File size is too large", (value) => {
+      if (!value) return true; // Let required handle this
+      return value.size <= 5000000; // 5MB limit
+    })
+    .test("fileType", "Unsupported file format", (value) => {
+      if (!value) return true; // Let required handle this
+      return ["image/jpeg", "image/png", "image/gif"].includes(value.type);
+    }),
+});
 
 export default function ProductForm() {
-  const [submitStatus, setSubmitStatus] = useState('idle')
-const [image,setImage] = useState(null)
+  const [submitStatus, setSubmitStatus] = useState("idle");
+  const [image, setImage] = useState(null);
   const formik = useFormik({
     initialValues: {
-      name: '',
-      description: '',
-      price: '',
-      category: 'Other',
-      stock: '',
-      image: '',
+      name: "",
+      description: "",
+      price: "",
+      category: "Other",
+      stock: "",
+      image: "",
     },
     validationSchema: ProductSchema,
     onSubmit: async (values) => {
-      
-      setSubmitStatus('loading')
+      setSubmitStatus("loading");
       try {
-        const formData = new FormData()
-        formData.append('name', values.name)
-        formData.append('description', values.description)
-        formData.append('price', values.price.toString())
-        formData.append('category', values.category)
-        formData.append('stock', values.stock.toString())
+        const formData = new FormData();
+        formData.append("name", values.name);
+        formData.append("description", values.description);
+        formData.append("price", values.price.toString());
+        formData.append("category", values.category);
+        formData.append("stock", values.stock.toString());
         if (image) {
-          formData.append('image', image)
+          formData.append("image", image);
         }
 
-        const response = await fetch('http://localhost:9000/products', {
-          method: 'POST',
-          body: formData
-        })
-        if (!response.ok) throw new Error('Failed to submit product')
-        setSubmitStatus('success')
+        const response = await fetch("http://localhost:9000/products", {
+          method: "POST",
+          body: formData,
+        });
+        if (!response.ok) throw new Error("Failed to submit product");
+        setSubmitStatus("success");
       } catch (error) {
-        console.error('Error submitting product:', error)
-        setSubmitStatus('error')
+        console.error("Error submitting product:", error);
+        setSubmitStatus("error");
       }
     },
-  })
+  });
 
   return (
-    (<Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle>Add New Product</CardTitle>
       </CardHeader>
@@ -85,7 +92,8 @@ const [image,setImage] = useState(null)
               type="text"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.name} />
+              value={formik.values.name}
+            />
             {formik.touched.name && formik.errors.name && (
               <p className="text-red-500 text-sm mt-1">{formik.errors.name}</p>
             )}
@@ -98,7 +106,8 @@ const [image,setImage] = useState(null)
               name="description"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.description} />
+              value={formik.values.description}
+            />
           </div>
 
           <div>
@@ -110,7 +119,8 @@ const [image,setImage] = useState(null)
               step="0.01"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.price} />
+              value={formik.values.price}
+            />
             {formik.touched.price && formik.errors.price && (
               <p className="text-red-500 text-sm mt-1">{formik.errors.price}</p>
             )}
@@ -120,8 +130,9 @@ const [image,setImage] = useState(null)
             <Label htmlFor="category">Category</Label>
             <Select
               name="category"
-              onValueChange={(value) => formik.setFieldValue('category', value)}
-              defaultValue={formik.values.category}>
+              onValueChange={(value) => formik.setFieldValue("category", value)}
+              defaultValue={formik.values.category}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
@@ -134,7 +145,9 @@ const [image,setImage] = useState(null)
               </SelectContent>
             </Select>
             {formik.touched.category && formik.errors.category && (
-              <p className="text-red-500 text-sm mt-1">{formik.errors.category}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {formik.errors.category}
+              </p>
             )}
           </div>
 
@@ -146,7 +159,8 @@ const [image,setImage] = useState(null)
               type="number"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.stock} />
+              value={formik.values.stock}
+            />
             {formik.touched.stock && formik.errors.stock && (
               <p className="text-red-500 text-sm mt-1">{formik.errors.stock}</p>
             )}
@@ -158,26 +172,29 @@ const [image,setImage] = useState(null)
               id="image"
               name="image"
               type="file"
-              onChange={(e)=> setImage(e.target.files[0])}
-           />
+              onChange={(e) => setImage(e.target.files[0])}
+            />
             {formik.touched.image && formik.errors.image && (
               <p className="text-red-500 text-sm mt-1">{formik.errors.image}</p>
             )}
           </div>
 
-          <Button type="submit" disabled={submitStatus === 'loading'}>
-            {submitStatus === 'loading' ? 'Submitting...' : 'Submit'}
+          <Button type="submit" disabled={submitStatus === "loading"}>
+            {submitStatus === "loading" ? "Submitting..." : "Submit"}
           </Button>
 
-          {submitStatus === 'success' && (
-            <p className="text-green-500 mt-2">Product submitted successfully!</p>
+          {submitStatus === "success" && (
+            <p className="text-green-500 mt-2">
+              Product submitted successfully!
+            </p>
           )}
-          {submitStatus === 'error' && (
-            <p className="text-red-500 mt-2">Error submitting product. Please try again.</p>
+          {submitStatus === "error" && (
+            <p className="text-red-500 mt-2">
+              Error submitting product. Please try again.
+            </p>
           )}
         </form>
       </CardContent>
-    </Card>)
+    </Card>
   );
 }
-

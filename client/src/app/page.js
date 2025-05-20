@@ -3,10 +3,12 @@ import CustomNavbar from "@/components/navbar";
 import ProductList from "@/components/productList";
 
 const page = () => {
-  return (<div>
-    <CustomNavbar />
-    <ProductList/>
-    </div>);
+  return (
+    <div>
+      <CustomNavbar />
+      <ProductList />
+    </div>
+  );
 };
 
 export default page;
