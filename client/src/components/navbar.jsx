@@ -18,7 +18,7 @@ import Link from "next/link";
 
 export default function CustomNavbar() {
   return (
-    <div className="w-full">
+    <div className="w-full relative z-10">
       {/* Top Bar */}
       <div className="w-full bg-[#960000] text-white px-4 py-2 flex justify-between items-center text-sm">
         <div className="flex items-center gap-2">
