@@ -37,7 +37,6 @@ export default function CustomNavbar() {
         </div>
         <div className="flex items-center gap-2">
           <span>Location</span>
-          <ChevronDown size={16} />
         </div>
       </div>
       {/* Main Navbar */}

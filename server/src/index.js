@@ -2,14 +2,19 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const port = 7000;
-app.use(express.json());
-const userRoute = require("./routes/users");
-const productRoute = require("./routes/product");
+
 app.use("/uploads", express.static("uploads"));
 
 app.use(cors());
-app.use(userRoute);
+
+const productRoute = require("./routes/products");
 app.use(productRoute);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // For form-urlencoded
+
+const userRoute = require("./routes/users");
+app.use(userRoute);
 
 const connect = require("./db/connection"); //importing db
 connect(); //function for connecting db

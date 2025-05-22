@@ -5,6 +5,7 @@ const ProductList = async () => {
   const { data } = await axios.get(
     `${process.env.NEXT_PUBLIC_API_URL}/products`
   );
+  await console.log(data);
 
   return (
     <div className="container mx-auto px-4 py-8">
