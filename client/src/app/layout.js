@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Inter, Roboto } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/redux/reduxProvider";
 
@@ -9,9 +9,15 @@ export const metadata = {
   description: "E-commerce demo",
 };
 
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "500", "700", "900"],
+  variable: "--font-roboto", // CSS variable name for Tailwind
+});
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${roboto.variable}`}>
       <body className={inter.className}>
         <ReduxProvider>{children}</ReduxProvider>
       </body>

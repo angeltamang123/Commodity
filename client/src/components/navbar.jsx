@@ -18,9 +18,9 @@ import Link from "next/link";
 
 export default function CustomNavbar() {
   return (
-    <div className="w-full relative z-10">
+    <div className="w-screen relative z-10">
       {/* Top Bar */}
-      <div className="w-full bg-[#960000] text-white px-4 py-2 flex justify-between items-center text-sm">
+      <div className="w-full bg-[#AF0000] text-[#FFFFFA] px-4 py-2 flex justify-between items-center text-sm">
         <div className="flex items-center gap-2">
           <Phone size={16} />
           <span>+001234567890</span>
@@ -30,7 +30,7 @@ export default function CustomNavbar() {
           <Button
             size="sm"
             variant="bordered"
-            className="text-white border-white hover:bg-white/20"
+            className="text-[#FFFFFA border-white hover:bg-white/20"
           >
             Shop Now
           </Button>
@@ -44,8 +44,8 @@ export default function CustomNavbar() {
       <Navbar className="border-b flex justify-between bg-[#FEFEFE] ">
         <NavbarBrand className="ml-10">
           <Link href="/" className="flex justify-start items-center gap-2">
-            <CommodityLogo className="text-[#FC515B]" />
-            <span className="font-bold text-xl text-[#b6343d]">Commodity</span>
+            <CommodityLogo className="text-[#730000]" />
+            <span className="font-bold text-xl text-[#AF0000]">Commodity</span>
           </Link>
         </NavbarBrand>
 

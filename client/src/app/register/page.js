@@ -186,7 +186,7 @@ export default SignupForm;
 //       <Radio value="sydney">Female</Radio>
 //       <Radio value="san-francisco">Others</Radio>
 //     </RadioGroup>
-//     <button className='bg-black p-2 m-2 text-white '>Register</button><br/>
+//     <button className='bg-black p-2 m-2 text-[#FFFFFA '>Register</button><br/>
 //       </CardBody>
 //       <Divider/>
 //       <CardFooter>

@@ -4,7 +4,7 @@ import React from "react";
 
 const Chat = () => {
   return (
-    <div className=" absolute w-screen flex flex-col flex-1">
+    <div className=" absolute w-screen flex flex-col items-center flex-1">
       <CustomNavbar />
       <ChatCard />
     </div>
