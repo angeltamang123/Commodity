@@ -4,7 +4,7 @@ import ProductList from "@/components/productList";
 
 const page = () => {
   return (
-    <div>
+    <div className="max-w-screen overflow-hidden">
       <CustomNavbar />
       <ProductList />
     </div>

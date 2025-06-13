@@ -1,6 +1,7 @@
 import { Inter, Roboto } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/redux/reduxProvider";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${roboto.variable}`}>
       <body className={inter.className}>
         <ReduxProvider>{children}</ReduxProvider>
+        <Toaster />
       </body>
     </html>
   );

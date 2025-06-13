@@ -24,7 +24,7 @@ export default function ProductCard({ product }) {
           </div>
         )}
         <div className="absolute w-full -mt-3 items-center z-10">
-          <div className="flex gap-1 translate-x-[78%]">
+          <div className="flex gap-1 translate-x-[72%]">
             <Star className="text-yellow-500 fill-yellow-500 size-4" />
             <p className="text-xs font-sans">
               {Math.round(product.rating * 10) / 10}

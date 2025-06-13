@@ -7,7 +7,6 @@ const registerSchema = new Schema({
   emailId: String,
   phoneNumber: Number,
   password: String,
-  rePassword: String,
   gender: {
     type: String,
     enum: ["Male", "Female", "Others"],

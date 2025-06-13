@@ -18,7 +18,7 @@ import Link from "next/link";
 
 export default function CustomNavbar() {
   return (
-    <div className="w-screen relative z-10">
+    <div className="max-w-screen overflow-hidden relative z-10">
       {/* Top Bar */}
       <div className="w-full bg-[#AF0000] text-[#FFFFFA] px-4 py-2 flex justify-between items-center text-sm">
         <div className="flex items-center gap-2">
@@ -40,15 +40,15 @@ export default function CustomNavbar() {
         </div>
       </div>
       {/* Main Navbar */}
-      <Navbar className="border-b flex justify-between bg-[#FEFEFE] ">
-        <NavbarBrand className="ml-10">
+      <Navbar className="border-b flex w-full justify-between bg-[#FEFEFE] ">
+        <NavbarBrand className="ml-4">
           <Link href="/" className="flex justify-start items-center gap-2">
             <CommodityLogo className="text-[#730000]" />
             <span className="font-bold text-xl text-[#AF0000]">Commodity</span>
           </Link>
         </NavbarBrand>
 
-        <NavbarContent className="flex ml-64 justify-between gap-4">
+        <NavbarContent className="flex ml-56 justify-between gap-4">
           <Dropdown>
             <NavbarItem>
               <DropdownTrigger>
@@ -94,7 +94,7 @@ export default function CustomNavbar() {
           </NavbarItem>
         </NavbarContent>
 
-        <NavbarContent className="ml-32 gap-1">
+        <NavbarContent className="ml-16 gap-1">
           <NavbarItem className="lg:flex w-44 font-normal">
             <Input
               placeholder="Search Product"

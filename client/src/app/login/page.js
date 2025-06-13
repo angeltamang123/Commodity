@@ -1,17 +1,24 @@
 "use client";
+
 import React from "react";
 import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
-import { Button, Card, Input } from "@nextui-org/react";
+import { toast } from "sonner";
+import { Toaster } from "sonner";
+import CommodityLogo from "@/components/commodityLogo";
+import Link from "next/link";
+import { Lock, Mail } from "lucide-react";
 
-const login = () => {
+const LoginPage = () => {
   const loginSchema = Yup.object().shape({
-    emailId: Yup.string().email("Invalid email").required("Required"),
+    emailId: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
     password: Yup.string()
-      .min(2, "Too Short!")
-      .max(50, "Too Long!")
-      .required("Required"),
+      .min(8, "Password must be at least 8 characters long")
+      .max(50, "Password is too long!")
+      .required("Password is required"),
   });
 
   const formik = useFormik({
@@ -19,71 +26,126 @@ const login = () => {
       emailId: "",
       password: "",
     },
-    onSubmit: (values) => {
-      loginUser(values);
-    },
     validationSchema: loginSchema,
+    onSubmit: async (values) => {
+      try {
+        // Attempt to log in the user by calling the API
+        const data = await loginUser(values);
+        if (data) {
+          toast.success("Login Successful!", {
+            description: "You have been successfully logged in.",
+          });
+          formik.resetForm(); // Clear the form after successful login
+          // You might want to redirect the user here, e.g., router.push('/dashboard');
+        } else {
+          // This case might be hit if the API returns an empty success response
+          toast.error("Login Failed", {
+            description:
+              "An unexpected issue occurred during login. Please try again.",
+          });
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        toast.error("Login Failed", {
+          description:
+            "Invalid email or password. Please check your credentials.",
+        });
+      }
+    },
   });
 
   const loginUser = async (values) => {
-    try {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/login`,
-        values
-      );
-      if (data) alert(data);
-    } catch (error) {
-      alert("Login failed. Please check your credentials.");
-    }
+    const apiUrl =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+    const response = await axios.post(`${apiUrl}/login`, values);
+    return response.data;
   };
 
+  // Helper function to render input fields
+  const renderInput = (id, name, type, label, placeholder, icon) => (
+    <div>
+      <label
+        htmlFor={id}
+        className="flex gap-2 items-center text-sm font-medium text-gray-700 mb-1"
+      >
+        {icon}
+        {label}
+      </label>
+      <input
+        id={id}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        value={formik.values[name]}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        className={`w-full px-4 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
+          ${
+            formik.touched[name] && formik.errors[name]
+              ? "border-red-500"
+              : "border-gray-300"
+          }
+        `}
+      />
+      {formik.touched[name] && formik.errors[name] && (
+        <p className="mt-1 text-sm text-red-600">{formik.errors[name]}</p>
+      )}
+    </div>
+  );
+
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <Card className="m-4 p-10">
-        <form onSubmit={formik.handleSubmit}>
-          <div className="mb-4">
-            <label
-              htmlFor="emailId"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
-            <Input
-              id="emailId"
-              name="emailId"
-              type="text"
-              onChange={formik.handleChange}
-              value={formik.values.emailId}
-              placeholder="Enter your email"
-            />
-            <p className="mt-1 text-sm text-red-600">{formik.errors.emailId}</p>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 font-inter">
+      <div className="w-full max-w-lg mx-auto p-8 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm">
+        {/* Logo Placeholder */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-center">
+            <CommodityLogo className="text-[#730000]" />
           </div>
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              onChange={formik.handleChange}
-              value={formik.values.password}
-              placeholder="Enter your password"
-            />
-            <p className="mt-1 text-sm text-red-600">
-              {formik.errors.password}
-            </p>
-          </div>
-          <Button type="submit" className="w-full">
-            Login
-          </Button>
+          <h2 className="text-3xl font-bold text-center mr-8 text-gray-800 ">
+            Login to Your Account
+          </h2>
+        </div>
+
+        {/* The login form */}
+        <form onSubmit={formik.handleSubmit} className="space-y-6">
+          {renderInput(
+            "emailId",
+            "emailId",
+            "email",
+            "Email Address",
+            "Enter your email",
+            <Mail className="size-6" />
+          )}
+          {renderInput(
+            "password",
+            "password",
+            "password",
+            "Password",
+            "Enter your password",
+            <Lock className="size-6" />
+          )}
+
+          {/* Submit Button */}
+          <button
+            className="w-full py-1 text-lg font-semibold bg-[#AF0000] text-white rounded-xl hover:bg-[#730000] transition-colors duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            type="submit"
+            disabled={!formik.isValid || formik.isSubmitting} // Disable if form is invalid or submitting
+          >
+            {formik.isSubmitting ? "Logging In..." : "Login"}
+          </button>
         </form>
-      </Card>
+        <p className="text-end mt-4 -mb-4">
+          Don't have an account?{" "}
+          <Link
+            className="text-blue-600 hover:text-blue-950"
+            href={"/register"}
+          >
+            Register now...
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };
 
-export default login;
+export default LoginPage;
