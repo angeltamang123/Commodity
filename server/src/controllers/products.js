@@ -23,8 +23,12 @@ const updateProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  const data = await Product.find();
-  res.send(data);
+  try {
+    const data = await Product.find(req.query);
+    res.send(data);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 };
 
 const getProductById = async (req, res) => {

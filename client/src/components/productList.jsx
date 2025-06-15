@@ -1,17 +1,23 @@
-import axios from "axios";
 import ProductCard from "./ProductCard";
 
-const ProductList = async () => {
-  const { data } = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/products`
-  );
-  await console.log(data);
-
+const ProductList = ({ data, category }) => {
+  const categories = {
+    electronics: "Electronics",
+    clothing: "Clothing",
+    books: "Books",
+    sports: "Sports",
+    furniture: "Furniture",
+    other: "Other",
+  };
   return (
     <div className="container w-full mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Our Products</h1>
+      {!category ? (
+        <h1 className="text-3xl font-bold mb-8">Our Products</h1>
+      ) : (
+        <h1 className="text-3xl font-bold mb-8">{categories[category]}</h1>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {data.map((product) => (
+        {data?.map((product) => (
           <ProductCard id={product._id} key={product._id} product={product} />
         ))}
       </div>

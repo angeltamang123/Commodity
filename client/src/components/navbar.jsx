@@ -15,8 +15,11 @@ import {
 import { ChevronDown, Search, User, ShoppingCart, Phone } from "lucide-react";
 import CommodityLogo from "./commodityLogo";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function CustomNavbar() {
+  const router = useRouter();
+
   return (
     <div className="max-w-screen overflow-hidden relative z-10">
       {/* Top Bar */}
@@ -70,13 +73,14 @@ export default function CustomNavbar() {
                 base: "gap-4",
               }}
             >
-              <DropdownItem key="electronics">Electronics</DropdownItem>
-              <DropdownItem key="fashion">Fashion</DropdownItem>
-              <DropdownItem key="home">Home & Garden</DropdownItem>
-              <DropdownItem key="sports">Sports</DropdownItem>
+              <DropdownItem href="/electronics">Electronics</DropdownItem>
+              <DropdownItem href="/clothing">Clothing</DropdownItem>
+              <DropdownItem href="/books">Books</DropdownItem>
+              <DropdownItem href="/sports">Sports</DropdownItem>
+              <DropdownItem href="/furniture">Furniture</DropdownItem>
+              <DropdownItem href="/other">Other</DropdownItem>
             </DropdownMenu>
           </Dropdown>
-
           <NavbarItem>
             <Link href="/deals" className="text-default-600">
               Deals

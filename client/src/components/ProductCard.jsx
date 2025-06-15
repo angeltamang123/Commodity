@@ -43,22 +43,22 @@ export default function ProductCard({ product }) {
         {}
         {/* <p className="text-sm text-gray-600 mb-2">{product.description}</p> */}
         {!product.discountPrice ? (
-          <p className="text-lg font-bold">
+          <p className="text-md font-bold">
             Rs.
             {product.price.toLocaleString("en-IN", {
               maximumFractionDigits: 2,
             })}
           </p>
         ) : (
-          <div className="flex justify-start gap-6">
-            <p className="text-lg font-bold line-through text-gray-700">
+          <div className="flex justify-start gap-2">
+            <p className="text-md font-bold line-through text-gray-700">
               Rs.
               {product.price.toLocaleString("en-IN", {
                 maximumFractionDigits: 2,
               })}
             </p>
             <p>|</p>
-            <p className="text-lg font-bold text-[#31c05f]">
+            <p className="text-md font-bold text-[#31c05f]">
               Rs.
               {product.discountPrice.toLocaleString("en-IN", {
                 maximumFractionDigits: 2,
@@ -69,7 +69,7 @@ export default function ProductCard({ product }) {
         {/* <p className="text-sm text-gray-600">Category: {product.category}</p> */}
         <p className="text-sm ">Stock: {product.stock}</p>
       </CardContent>
-      <CardFooter className="p-4 flex justify-center gap-4">
+      <CardFooter className="p-4 flex justify-center gap-2">
         <Button className="w-full bg-[#FFFFFA] text-[#AF0000] border-1 rounded-2xl border-[#AF0000] hover:border-[#00232A] hover:bg-[#00232A] hover:text-[#FFFFFA]">
           Add to Cart
         </Button>
