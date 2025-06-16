@@ -2,6 +2,10 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const port = 7000;
+const dotenv = require("dotenv");
+
+// dot env config
+dotenv.config();
 
 app.use("/uploads", express.static("uploads"));
 
