@@ -12,12 +12,21 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@nextui-org/react";
-import { ChevronDown, Search, User, ShoppingCart, Phone } from "lucide-react";
+import {
+  ChevronDown,
+  Search,
+  User,
+  ShoppingCart,
+  Phone,
+  MapPin,
+} from "lucide-react";
 import CommodityLogo from "./commodityLogo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
 export default function CustomNavbar() {
+  const { phoneNumber, address } = useSelector((state) => state.user);
   const router = useRouter();
 
   return (
@@ -26,7 +35,7 @@ export default function CustomNavbar() {
       <div className="w-full bg-[#AF0000] text-[#FFFFFA] px-4 py-2 flex justify-between items-center text-sm">
         <div className="flex items-center gap-2">
           <Phone size={16} />
-          <span>+001234567890</span>
+          <span>{phoneNumber}</span>
         </div>
         <div className="flex items-center gap-4">
           <span>Get 50% Off on Selected Items</span>
@@ -39,7 +48,8 @@ export default function CustomNavbar() {
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <span>Location</span>
+          <MapPin size={16} />
+          <span>{address}</span>
         </div>
       </div>
       {/* Main Navbar */}

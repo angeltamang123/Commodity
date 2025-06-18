@@ -5,12 +5,17 @@ import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
 import { toast } from "sonner";
-import { Toaster } from "sonner";
 import CommodityLogo from "@/components/commodityLogo";
 import Link from "next/link";
 import { Lock, Mail } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { addLoginDetails } from "@/redux/reducerSlices/userSlice";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+
   const loginSchema = Yup.object().shape({
     emailId: Yup.string()
       .email("Invalid email format")
@@ -32,11 +37,12 @@ const LoginPage = () => {
         // Attempt to log in the user by calling the API
         const data = await loginUser(values);
         if (data) {
+          dispatch(addLoginDetails(data));
           toast.success("Login Successful!", {
             description: "You have been successfully logged in.",
           });
           formik.resetForm(); // Clear the form after successful login
-          // You might want to redirect the user here, e.g., router.push('/dashboard');
+          router.push("/");
         } else {
           // This case might be hit if the API returns an empty success response
           toast.error("Login Failed", {

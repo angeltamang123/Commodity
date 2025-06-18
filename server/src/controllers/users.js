@@ -23,8 +23,10 @@ const loginUser = async (req, res) => {
   const secret = process.env.JWT_SECRET;
   const token = jwt.sign({ emailId: req.body.emailId }, secret);
   res.send({
+    message: "logged in successfully",
+    user: user,
+    isLoggedIn: true,
     token,
-    user,
   });
 };
 module.exports = { registerNewUser, loginUser };
