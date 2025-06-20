@@ -42,7 +42,7 @@ const LoginPage = () => {
             description: "You have been successfully logged in.",
           });
           formik.resetForm(); // Clear the form after successful login
-          router.push("/");
+          router.back();
         } else {
           // This case might be hit if the API returns an empty success response
           toast.error("Login Failed", {
@@ -51,7 +51,7 @@ const LoginPage = () => {
           });
         }
       } catch (error) {
-        console.error("Login error:", error);
+        console.warn("Login error:", error);
         toast.error("Login Failed", {
           description:
             "Invalid email or password. Please check your credentials.",

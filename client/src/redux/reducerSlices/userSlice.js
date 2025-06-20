@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { MoveLeft } from "lucide-react";
 
 const initialState = {
   emailId: "",
@@ -16,12 +15,30 @@ export const userSlice = createSlice({
   initialState: initialState,
   reducers: {
     logoutUser: (state) => {
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("userDetails");
+      }
       return initialState;
     },
     addLoginDetails: (state, action) => {
       const { emailId, fullName, phoneNumber, gender, address } =
         action.payload.user;
       const { token, isLoggedIn } = action.payload;
+
+      const userDetails = {
+        emailId,
+        fullName,
+        phoneNumber,
+        gender,
+        address,
+        token,
+        isLoggedIn,
+      };
+
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("userDetails", JSON.stringify(userDetails));
+      }
+
       return {
         ...state,
         emailId: emailId,
@@ -33,10 +50,20 @@ export const userSlice = createSlice({
         gender: gender,
       };
     },
+    loadUserDetailsFromSessionStorage: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { logoutUser, addLoginDetails } = userSlice.actions;
+export const {
+  logoutUser,
+  addLoginDetails,
+  loadUserDetailsFromSessionStorage,
+} = userSlice.actions;
 
 export default userSlice.reducer;

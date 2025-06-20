@@ -23,32 +23,59 @@ import {
 import CommodityLogo from "./commodityLogo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  loadUserDetailsFromSessionStorage,
+  logoutUser,
+} from "@/redux/reducerSlices/userSlice";
+import { useEffect } from "react";
 
 export default function CustomNavbar() {
-  const { phoneNumber, address } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userDetails = sessionStorage.getItem("userDetails");
+      if (userDetails) {
+        try {
+          const parsedUserDetails = JSON.parse(userDetails);
+          // Dispatch the action to update the Redux state
+          dispatch(loadUserDetailsFromSessionStorage(parsedUserDetails));
+        } catch (e) {
+          console.error(
+            "Error parsing userDetails from sessionStorage on client:",
+            e
+          );
+          sessionStorage.removeItem("userDetails");
+        }
+      }
+    }
+  }, [dispatch]);
+
+  const { phoneNumber, address } = useSelector((state) => state.user);
+  const { isLoggedIn } = useSelector((state) => state.user);
 
   return (
     <div className="max-w-screen overflow-hidden relative z-10">
       {/* Top Bar */}
       <div className="w-full bg-[#AF0000] text-[#FFFFFA] px-4 py-2 flex justify-between items-center text-sm">
         <div className="flex items-center gap-2">
-          <Phone size={16} />
+          {isLoggedIn && <Phone size={16} />}
           <span>{phoneNumber}</span>
         </div>
         <div className="flex items-center gap-4">
           <span>Get 50% Off on Selected Items</span>
           <Button
-            size="sm"
+            size="xs"
             variant="bordered"
-            className="text-[#FFFFFA border-white hover:bg-white/20"
+            className="text-[#FFFFFA] text-xs -p-2 h-7 border-white hover:bg-white/20"
           >
             Shop Now
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <MapPin size={16} />
+          {isLoggedIn && <MapPin size={16} />}
           <span>{address}</span>
         </div>
       </div>
@@ -83,12 +110,16 @@ export default function CustomNavbar() {
                 base: "gap-4",
               }}
             >
-              <DropdownItem href="/electronics">Electronics</DropdownItem>
-              <DropdownItem href="/clothing">Clothing</DropdownItem>
-              <DropdownItem href="/books">Books</DropdownItem>
-              <DropdownItem href="/sports">Sports</DropdownItem>
-              <DropdownItem href="/furniture">Furniture</DropdownItem>
-              <DropdownItem href="/other">Other</DropdownItem>
+              <DropdownItem href="/categories/electronics">
+                Electronics
+              </DropdownItem>
+              <DropdownItem href="/categories/clothing">Clothing</DropdownItem>
+              <DropdownItem href="/categories/books">Books</DropdownItem>
+              <DropdownItem href="/categories/sports">Sports</DropdownItem>
+              <DropdownItem href="/categories/furniture">
+                Furniture
+              </DropdownItem>
+              <DropdownItem href="/categories/other">Other</DropdownItem>
             </DropdownMenu>
           </Dropdown>
           <NavbarItem>
@@ -119,17 +150,6 @@ export default function CustomNavbar() {
           <NavbarItem>
             <Button
               className="text-default-600"
-              href="/account"
-              as={Link}
-              variant="light"
-              startContent={<User size={20} />}
-            >
-              Account
-            </Button>
-          </NavbarItem>
-          <NavbarItem>
-            <Button
-              className="text-default-600"
               href="/cart"
               as={Link}
               variant="light"
@@ -138,6 +158,52 @@ export default function CustomNavbar() {
               Cart
             </Button>
           </NavbarItem>
+          {isLoggedIn ? (
+            <Dropdown>
+              <NavbarItem>
+                <DropdownTrigger>
+                  <Button
+                    disableRipple
+                    className="p-0 bg-transparent data-[hover=true]:bg-transparent"
+                    radius="sm"
+                    startContent={<User size={20} />}
+                    variant="light"
+                  >
+                    Account
+                  </Button>
+                </DropdownTrigger>
+              </NavbarItem>
+              <DropdownMenu
+                aria-label="Categories"
+                className="w-[200px]"
+                itemClasses={{
+                  base: "gap-4",
+                }}
+              >
+                <DropdownItem href="/account">Settings</DropdownItem>
+                <DropdownItem
+                  onPress={() => {
+                    dispatch(logoutUser());
+                    window.location.reload();
+                  }}
+                >
+                  Logout
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          ) : (
+            <Button
+              disableRipple
+              className="p-0 bg-transparent border-gray-400 data-[hover=true]:bg-transparent"
+              radius="sm"
+              onPress={() => {
+                router.push("/login");
+              }}
+              variant="bordered"
+            >
+              Login
+            </Button>
+          )}
         </NavbarContent>
       </Navbar>
     </div>
