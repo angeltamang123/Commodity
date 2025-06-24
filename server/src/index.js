@@ -1,11 +1,11 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const port = 7000;
-const dotenv = require("dotenv");
 
+const dotenv = require("dotenv");
 // dot env config
 dotenv.config();
+const port = process.env.PORT || 7000;
 
 app.use("/uploads", express.static("uploads"));
 

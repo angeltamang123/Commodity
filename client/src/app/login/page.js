@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
@@ -8,13 +8,19 @@ import { toast } from "sonner";
 import CommodityLogo from "@/components/commodityLogo";
 import Link from "next/link";
 import { Lock, Mail } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addLoginDetails } from "@/redux/reducerSlices/userSlice";
 import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const { isLoggedIn } = useSelector((state) => state.user);
+
+  // Re-direct if user data in local storage
+  useEffect(() => {
+    if (isLoggedIn) router.push("/");
+  }, []);
 
   const loginSchema = Yup.object().shape({
     emailId: Yup.string()
@@ -42,7 +48,7 @@ const LoginPage = () => {
             description: "You have been successfully logged in.",
           });
           formik.resetForm(); // Clear the form after successful login
-          router.back();
+          router.push("/");
         } else {
           // This case might be hit if the API returns an empty success response
           toast.error("Login Failed", {

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
@@ -9,9 +9,18 @@ import { toast } from "sonner";
 import CommodityLogo from "@/components/commodityLogo";
 import Link from "next/link";
 import { IdCard, Lock, Mail, MapPin, Phone } from "lucide-react";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 const SignupForm = () => {
+  const router = useRouter();
   let [emailTaken, setEmailTaken] = useState(false);
+  const { isLoggedIn } = useSelector((state) => state.user);
+
+  // Re-direct if user data in local storage
+  useEffect(() => {
+    if (isLoggedIn) router.push("/");
+  }, []);
 
   const registerSchema = Yup.object().shape({
     emailId: Yup.string().email("Invalid email").required("Required"),

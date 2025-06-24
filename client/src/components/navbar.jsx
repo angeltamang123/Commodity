@@ -24,34 +24,12 @@ import CommodityLogo from "./commodityLogo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  loadUserDetailsFromSessionStorage,
-  logoutUser,
-} from "@/redux/reducerSlices/userSlice";
+import { logoutUser } from "@/redux/reducerSlices/userSlice";
 import { useEffect } from "react";
 
 export default function CustomNavbar() {
   const dispatch = useDispatch();
   const router = useRouter();
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const userDetails = sessionStorage.getItem("userDetails");
-      if (userDetails) {
-        try {
-          const parsedUserDetails = JSON.parse(userDetails);
-          // Dispatch the action to update the Redux state
-          dispatch(loadUserDetailsFromSessionStorage(parsedUserDetails));
-        } catch (e) {
-          console.error(
-            "Error parsing userDetails from sessionStorage on client:",
-            e
-          );
-          sessionStorage.removeItem("userDetails");
-        }
-      }
-    }
-  }, [dispatch]);
 
   const { phoneNumber, address } = useSelector((state) => state.user);
   const { isLoggedIn } = useSelector((state) => state.user);

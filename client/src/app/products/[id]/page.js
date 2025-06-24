@@ -9,7 +9,7 @@ const page = () => {
   const [productDetails, setProductDetails] = useState({});
   const fetchProductDetails = async () => {
     const { data } = await axios.get(
-      "http://localhost:9000/products/" + params.id
+      "http://localhost:7000/products/" + params.id
     );
     setProductDetails(data);
   };
@@ -20,7 +20,7 @@ const page = () => {
     <div>
       <div className="aspect-square relative mb-4">
         <Image
-          src={"http://localhost:9000/uploads/" + productDetails.image}
+          src={"http://localhost:7000/uploads/" + productDetails.image}
           alt={productDetails.name}
           fill
           className="object-cover rounded-md"

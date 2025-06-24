@@ -1,3 +1,4 @@
+import { AdminSidebar } from "@/components/admin-sidebar";
 import {
   Sidebar,
   SidebarProvider,
@@ -7,13 +8,15 @@ import React from "react";
 
 const AdminLayout = ({ children }) => {
   return (
-    <SidebarProvider>
-      <Sidebar />
-      <div>
-        <SidebarTrigger />
-        {children}
-      </div>
-    </SidebarProvider>
+    <body>
+      <SidebarProvider>
+        <AdminSidebar />
+        <div>
+          <SidebarTrigger className="text-black size-10" />
+          {children}
+        </div>
+      </SidebarProvider>
+    </body>
   );
 };
 
