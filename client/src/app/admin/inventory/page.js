@@ -1,4 +1,3 @@
-// app/admin/inventory/page.jsx
 "use client";
 
 import * as React from "react";
@@ -42,60 +41,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useEffect } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-// --- Mock Data based on your Mongoose Schema ---
-// Replace this with your actual data fetching logic.
-const mockData = [
-  {
-    _id: "prod_1",
-    name: "Fashion-Ka Plzara-mesh Round Neck Black Embroidery",
-    image: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-    price: 374.0,
-    stock: 12,
-    sku: "IN3245DFTU",
-    category: "Clothing",
-  },
-  {
-    _id: "prod_2",
-    name: "Women Floral Print Dress Spaghetti Strap V Neck Mini Dress",
-    image: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-    price: 176.98,
-    stock: 10,
-    sku: "IN3245DFTU",
-    category: "Clothing",
-  },
-  {
-    _id: "prod_3",
-    name: "Men's Poly Cotton Digital Printed Stitched Half Sleeve Shirt",
-    image: "https://i.pravatar.cc/150?u=a092581f4e29026700d",
-    price: 195.38,
-    stock: 0,
-    sku: "IN3245DFTU",
-    category: "Clothing",
-  },
-  {
-    _id: "prod_4",
-    name: "Formal Pants for Men | Stylish Slim-Fit Men's Wear Trousers",
-    image: "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-    price: 134.78,
-    stock: 43,
-    sku: "IN3245DFTU",
-    category: "Clothing",
-  },
-  {
-    _id: "prod_5",
-    name: "Baby Boys & Baby Girl's Jumbo The Elephant Dungaree",
-    image: "https://i.pravatar.cc/150?u=a042581f4e29026708c",
-    price: 324.0,
-    stock: 74,
-    sku: "IN3245DFTU",
-    category: "Clothing",
-  },
-];
-
-// --- Column Definitions for TanStack Table ---
-// The JSDoc comment below provides type hints to your editor
-/** @type {import("@tanstack/react-table").ColumnDef<any>[]} */
 export const columns = [
   {
     id: "select",
@@ -125,7 +74,12 @@ export const columns = [
     cell: ({ row }) => (
       <div className="flex items-center gap-4">
         <Avatar className="hidden h-9 w-9 sm:flex">
-          <AvatarImage src={row.original.image} alt={row.original.name} />
+          <AvatarImage
+            src={
+              process.env.NEXT_PUBLIC_API_URL + "/uploads/" + row.original.image
+            }
+            alt={row.original.name}
+          />
           <AvatarFallback>{row.original.name.charAt(0)}</AvatarFallback>
         </Avatar>
         <div className="grid gap-1">
@@ -142,9 +96,9 @@ export const columns = [
     header: () => <div className="text-right">Price</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("price"));
-      const formatted = new Intl.NumberFormat("en-AE", {
+      const formatted = new Intl.NumberFormat("ne-NP", {
         style: "currency",
-        currency: "AED",
+        currency: "NPR",
       }).format(amount);
 
       return <div className="text-right font-medium">{formatted}</div>;
@@ -168,10 +122,10 @@ export const columns = [
     header: "Inventory",
     cell: ({ row }) => <div>{`${row.getValue("stock")} in stock`}</div>,
   },
-  {
-    accessorKey: "sku",
-    header: "SKU",
-  },
+  // {
+  //   accessorKey: "sku",
+  //   header: "SKU",
+  // },
   {
     id: "actions",
     enableHiding: false,
@@ -206,11 +160,25 @@ export const columns = [
 ];
 
 export default function InventoryPage() {
-  const [data, setData] = React.useState(() => [...mockData]);
+  const [data, setData] = React.useState([]);
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const router = useRouter();
+
+  const fetchData = async () => {
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/products`
+    );
+    if (data) {
+      setData(data);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const table = useReactTable({
     data,
@@ -231,45 +199,42 @@ export default function InventoryPage() {
     },
   });
 
+  const handleProductAdded = () => {
+    setIsDialogOpen(false);
+    fetchData();
+  };
+
   return (
-    <main className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6 w-full">
+      <div className="flex items-center justify-between w-full">
         <h1 className="text-2xl font-bold">Products</h1>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-1">
-            <FileDown className="h-3.5 w-3.5" />
-            <span>Export</span>
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1">
-            <FileUp className="h-3.5 w-3.5" />
-            <span>Import</span>
-          </Button>
-          {/* Using your brand color for the primary action */}
-          <Button
-            size="sm"
-            className="gap-1 bg-[#730000] hover:bg-brand-darkred text-white"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            <span>Add Product</span>
-          </Button>
-        </div>
+        <Button
+          size="sm"
+          className="gap-1 bg-[#A1040B] hover:bg-[#730000] text-white"
+          onClick={() => {
+            router.push("/admin/inventory/add-product");
+          }}
+        >
+          <Plus className="h-3.5 w-3.5" />
+          <span>Add Product</span>
+        </Button>
       </div>
 
-      <Tabs defaultValue="all">
+      <Tabs defaultValue="all" className="w-full">
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="active">Active</TabsTrigger>
           <TabsTrigger value="out_of_stock">Out of stock</TabsTrigger>
         </TabsList>
         <TabsContent value="all">
-          <Card>
+          <Card className="w-full">
             <CardHeader>
               <CardTitle>Inventory</CardTitle>
               <CardDescription>
                 Manage your products and view their sales performance.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="-mt-6">
               <div className="flex items-center py-4">
                 <div className="relative w-full md:w-1/3">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -363,6 +328,6 @@ export default function InventoryPage() {
           </Card>
         </TabsContent>
       </Tabs>
-    </main>
+    </div>
   );
 }

@@ -23,17 +23,19 @@ export default function ProductCard({ product }) {
             <p>{Math.round(discount * 10) / 10}% Off</p>
           </div>
         )}
-        <div className="absolute w-full -mt-3 items-center z-10">
-          <div className="flex gap-1 translate-x-[72%]">
-            <Star className="text-yellow-500 fill-yellow-500 size-4" />
-            <p className="text-xs font-sans">
-              {Math.round(product.rating * 10) / 10}
-            </p>
+        {product.rating && (
+          <div className="absolute w-full -mt-3 items-center z-10">
+            <div className="flex gap-1 translate-x-[78%]">
+              <Star className="text-yellow-500 fill-yellow-500 size-4" />
+              <p className="text-xs font-sans">
+                {Math.round(product?.rating * 10) / 10}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
         <div className="h-52 relative mx-auto mb-4">
           <Image
-            src={"http://localhost:7000/uploads/" + product.image}
+            src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.image}`}
             alt={product.name}
             className="object-contain rounded-md w-full"
             fill

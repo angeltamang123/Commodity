@@ -1,9 +1,66 @@
 const Product = require("../models/products");
 
 const registerNewProduct = async (req, res) => {
-  req.body.image = req.file.filename;
-  Product.create(req.body);
-  res.send("product created!!");
+  try {
+    const {
+      name,
+      description,
+      price, // String from FormData
+      category,
+      stock, // String from FormData
+      status,
+      discountPrice, // String from FormData, or undefined if not sent
+      discountTill, // ISO string from FormData, or undefined if not sent
+    } = req.body;
+
+    // --- Type Conversion ---
+    const parsedPrice = parseFloat(price);
+    const parsedStock = parseInt(stock, 10);
+
+    const parsedDiscountPrice = discountPrice
+      ? parseFloat(discountPrice)
+      : null;
+    const parsedDiscountTill = discountTill ? new Date(discountTill) : null;
+
+    const mainImage =
+      req.files && req.files["image"] && req.files["image"][0]
+        ? req.files["image"][0].filename
+        : null;
+
+    const additionalImages =
+      req.files && req.files["images[]"]
+        ? req.files["images[]"].map((file) => file.filename)
+        : [];
+
+    let finalStatus = status;
+    if (parsedStock === 0 && status === "active") {
+      finalStatus = "inactive";
+    }
+
+    const newProduct = await Product.create({
+      name,
+      description,
+      price: parsedPrice,
+      category,
+      stock: parsedStock,
+      status: finalStatus,
+      image: mainImage,
+      images: additionalImages,
+      ...(parsedDiscountPrice !== null && {
+        discountPrice: parsedDiscountPrice,
+      }),
+      ...(parsedDiscountTill !== null && { discountTill: parsedDiscountTill }),
+    });
+
+    res
+      .status(201)
+      .json({ message: "Product created successfully!!", product: newProduct });
+  } catch (error) {
+    console.error("Error creating product:", error);
+    res
+      .status(400)
+      .json({ message: error.message || "Failed to create product" });
+  }
 };
 
 const updateProduct = async (req, res) => {
@@ -36,9 +93,19 @@ const getProductById = async (req, res) => {
   res.send(data);
 };
 
+const deleteProduct = async (req, res) => {
+  try {
+    const deleted = await Product.findByIdAndDelete(req.params.productId);
+    res.send("Product Deleted!!");
+  } catch (error) {
+    res.send(500).send(error.message);
+  }
+};
+
 module.exports = {
   registerNewProduct,
   getAllProducts,
   getProductById,
   updateProduct,
+  deleteProduct,
 };

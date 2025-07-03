@@ -5,6 +5,7 @@ const {
   getAllProducts,
   getProductById,
   updateProduct,
+  deleteProduct,
 } = require("../controllers/products");
 const app = Router();
 const storage = multer.diskStorage({
@@ -21,7 +22,15 @@ const upload = multer({ storage: storage });
 app.get("/products", getAllProducts);
 app.get("/products/:productId", getProductById);
 app.patch("/products/:productId", updateProduct);
+app.delete("/products/:productId", deleteProduct);
 
-app.post("/products", upload.single("image"), registerNewProduct);
+app.post(
+  "/products",
+  upload.fields([
+    { name: "image", maxCount: 1 }, // For the single main product image
+    { name: "images[]", maxCount: 5 }, // For the array of additional images
+  ]),
+  registerNewProduct
+);
 
 module.exports = app;

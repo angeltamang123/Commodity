@@ -16,13 +16,26 @@ const productSchema = new Schema({
   },
   category: {
     type: String,
-    enum: ["electronics", "clothing", "books", "furniture", "sports", "other"],
-    default: "Other",
+    enum: [
+      "Electronics",
+      "Clothings",
+      "Books",
+      "Furnitures",
+      "Sports",
+      "Others",
+    ],
+    default: "Others",
   },
   stock: {
     type: Number,
     default: 0,
     min: 0,
+  },
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "active",
+    required: true,
   },
   rating: {
     type: Number,
@@ -31,6 +44,10 @@ const productSchema = new Schema({
   },
   image: {
     type: String,
+  },
+  images: {
+    type: [String],
+    default: [],
   },
   discountPrice: {
     type: Number,
@@ -65,6 +82,18 @@ const productSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+productSchema.pre("save", function (next) {
+  if (this.stock === 0) {
+    this.status = "inactive";
+  }
+  // a user might try to set an out-of-stock product to 'active'.
+  if (this.stock === 0 && this.status === "active") {
+    this.status = "inactive";
+  }
+
+  next();
 });
 
 const Product = mongoose.model("Product", productSchema);

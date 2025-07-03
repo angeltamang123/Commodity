@@ -46,7 +46,7 @@ export function AdminSidebar() {
     },
     {
       title: "Payments",
-      url: "#",
+      url: "/admin/payments",
       icon: WalletCards,
     },
   ];
