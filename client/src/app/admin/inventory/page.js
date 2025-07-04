@@ -44,120 +44,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
-export const columns = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: "Product Name",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-4">
-        <Avatar className="hidden h-9 w-9 sm:flex">
-          <AvatarImage
-            src={
-              process.env.NEXT_PUBLIC_API_URL + "/uploads/" + row.original.image
-            }
-            alt={row.original.name}
-          />
-          <AvatarFallback>{row.original.name.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <div className="grid gap-1">
-          <div className="font-medium capitalize">{row.getValue("name")}</div>
-          <div className="text-xs text-muted-foreground">
-            {row.original.category}
-          </div>
-        </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "price",
-    header: () => <div className="text-right">Price</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("price"));
-      const formatted = new Intl.NumberFormat("ne-NP", {
-        style: "currency",
-        currency: "NPR",
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.original.stock > 0 ? "active" : "out_of_stock";
-      const statusText = status === "active" ? "Active" : "Out of stock";
-      return (
-        <Badge variant={status === "active" ? "outline" : "destructive"}>
-          {statusText}
-        </Badge>
-      );
-    },
-  },
-  {
-    accessorKey: "stock",
-    header: "Inventory",
-    cell: ({ row }) => <div>{`${row.getValue("stock")} in stock`}</div>,
-  },
-  // {
-  //   accessorKey: "sku",
-  //   header: "SKU",
-  // },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const product = row.original;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(product._id)}
-            >
-              Copy product ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem>Edit product</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
-              Delete product
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
+import ProductDelete from "@/components/product-delete";
 
 export default function InventoryPage() {
   const [data, setData] = React.useState([]);
@@ -165,6 +52,8 @@ export default function InventoryPage() {
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [productIdToDelete, setProductIdToDelete] = React.useState(null);
   const router = useRouter();
 
   const fetchData = async () => {
@@ -179,6 +68,138 @@ export default function InventoryPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`);
+      fetchData();
+      setIsDeleteDialogOpen(false);
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
+  const columns = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "name",
+      header: "Product Name",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-4">
+          <Avatar className="hidden h-9 w-9 sm:flex">
+            <AvatarImage
+              src={
+                process.env.NEXT_PUBLIC_API_URL +
+                "/uploads/" +
+                row.original.image
+              }
+              alt={row.original.name}
+            />
+            <AvatarFallback>{row.original.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="grid gap-1">
+            <div className="font-medium capitalize">{row.getValue("name")}</div>
+            <div className="text-xs text-muted-foreground">
+              {row.original.category}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "price",
+      header: () => <div className="text-right">Price</div>,
+      cell: ({ row }) => {
+        const amount = parseFloat(row.getValue("price"));
+        const formatted = new Intl.NumberFormat("ne-NP", {
+          style: "currency",
+          currency: "NPR",
+        }).format(amount);
+
+        return <div className="text-right font-medium">{formatted}</div>;
+      },
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.original.stock > 0 ? "active" : "out_of_stock";
+        const statusText = status === "active" ? "Active" : "Out of stock";
+        return (
+          <Badge variant={status === "active" ? "outline" : "destructive"}>
+            {statusText}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessorKey: "stock",
+      header: "Inventory",
+      cell: ({ row }) => <div>{`${row.getValue("stock")} in stock`}</div>,
+    },
+    // {
+    //   accessorKey: "sku",
+    //   header: "SKU",
+    // },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const product = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(product._id)}
+              >
+                Copy product ID
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>View details</DropdownMenuItem>
+              <DropdownMenuItem>Edit product</DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-red-600"
+                onSelect={(e) => {
+                  setProductIdToDelete(product._id);
+                  setIsDeleteDialogOpen(true);
+                }}
+              >
+                Delete Product
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
 
   const table = useReactTable({
     data,
@@ -198,11 +219,6 @@ export default function InventoryPage() {
       rowSelection,
     },
   });
-
-  const handleProductAdded = () => {
-    setIsDialogOpen(false);
-    fetchData();
-  };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6 w-full">
@@ -328,6 +344,13 @@ export default function InventoryPage() {
           </Card>
         </TabsContent>
       </Tabs>
+      {/* Product Delete Dialog */}
+      <ProductDelete
+        id={productIdToDelete}
+        open={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={() => handleDelete(productIdToDelete)}
+      />
     </div>
   );
 }
