@@ -7,9 +7,9 @@ const dotenv = require("dotenv");
 dotenv.config();
 const port = process.env.PORT || 7000;
 
-app.use("/uploads", express.static("uploads"));
-
 app.use(cors());
+
+app.use("/uploads", express.static("uploads"));
 
 const productRoute = require("./routes/products");
 app.use(productRoute);

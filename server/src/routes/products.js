@@ -21,7 +21,14 @@ const upload = multer({ storage: storage });
 
 app.get("/products", getAllProducts);
 app.get("/products/:productId", getProductById);
-app.patch("/products/:productId", updateProduct);
+app.patch(
+  "/products/:productId",
+  upload.fields([
+    { name: "image", maxCount: 1 }, // For the single main product image
+    { name: "images[]", maxCount: 5 }, // For the array of additional images
+  ]),
+  updateProduct
+);
 app.delete("/products/:productId", deleteProduct);
 
 app.post(

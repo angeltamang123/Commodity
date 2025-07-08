@@ -184,7 +184,15 @@ export default function InventoryPage() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>View details</DropdownMenuItem>
-              <DropdownMenuItem>Edit product</DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => {
+                  router.push(
+                    `/admin/inventory/edit-product?id=${product._id}`
+                  );
+                }}
+              >
+                Edit product
+              </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-red-600"
                 onSelect={(e) => {

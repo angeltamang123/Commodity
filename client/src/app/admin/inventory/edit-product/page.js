@@ -33,11 +33,12 @@ import {
   ImageIcon,
   GalleryVerticalIcon,
   FileTextIcon,
+  Loader2Icon,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-
+import { useSearchParams } from "next/navigation";
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
@@ -83,11 +84,11 @@ const ProductSchema = Yup.object().shape({
     .of(
       Yup.mixed()
         .test("fileSize", "Main image size is too large (max 5MB)", (value) => {
-          if (!value) return true;
+          if (!value || typeof value === "string") return true;
           return value.size <= 5000000;
         })
         .test("fileType", "Unsupported main image format", (value) => {
-          if (!value) return true;
+          if (!value || typeof value === "string") return true;
           return ["image/jpeg", "image/png", "image/gif"].includes(value.type);
         })
     )
@@ -102,18 +103,18 @@ const ProductSchema = Yup.object().shape({
           "fileSize",
           "Additional image size is too large (max 5MB)",
           (value) => {
-            if (!value) return true;
+            if (!value || typeof value === "string") return true;
             return value.size <= 5000000;
           }
         )
         .test("fileType", "Unsupported additional image format", (value) => {
-          if (!value) return true;
+          if (!value || typeof value === "string") return true;
           return ["image/jpeg", "image/png", "image/gif"].includes(value.type);
         })
     )
     .nullable(),
 
-  // New discount fields validation
+  // Discount fields validation
   hasDiscount: Yup.boolean(),
   discountPrice: Yup.number().when("hasDiscount", {
     is: true,
@@ -141,26 +142,142 @@ const ProductSchema = Yup.object().shape({
   }),
 });
 
-export default function ProductForm() {
+export default function EditProductForm() {
+  const searchParams = useSearchParams();
+  const productId = searchParams.get("id");
+
+  const [initialProductData, setInitialProductData] = useState(null);
+  const [loadingProduct, setLoadingProduct] = useState(true);
   const [submitStatus, setSubmitStatus] = useState("idle");
   const [mainImagePondFiles, setMainImagePondFiles] = useState([]);
   const [additionalImagePondFiles, setAdditionalImagePondFiles] = useState([]);
 
+  // Fetch product data
+  useEffect(() => {
+    if (!productId) {
+      toast.error("Product ID is missing.");
+      setLoadingProduct(false);
+      return;
+    }
+
+    const fetchProduct = async () => {
+      try {
+        setLoadingProduct(true);
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`
+        );
+        const product = response.data;
+
+        // Prepare FilePond files for existing images
+        const initialMainImage = product.image
+          ? [
+              {
+                source: `${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.image}`,
+                options: { type: "local" }, // 'local' tells FilePond this is an existing file
+              },
+            ]
+          : [];
+
+        const initialAdditionalImages = product.images
+          ? product.images.map((img) => ({
+              source: `${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`,
+              options: { type: "local" },
+            }))
+          : [];
+
+        setMainImagePondFiles(initialMainImage);
+        setAdditionalImagePondFiles(initialAdditionalImages);
+
+        // Set initial formik values
+        setInitialProductData({
+          name: product.name || "",
+          description: product.description || "",
+          price: product.price || "",
+          category: product.category || "Others",
+          stock: product.stock || "",
+          status: product.status || "active",
+          // For images, we'll set the field to an array of sources for validation purposes initially
+          // FilePond handles the actual file objects
+          image: initialMainImage.map((file) => file.source),
+          images: initialAdditionalImages.map((file) => file.source),
+          hasDiscount:
+            product.discountPrice !== null &&
+            product.discountPrice !== undefined,
+          discountPrice: product.discountPrice || null,
+          discountTill: product.discountTill
+            ? new Date(product.discountTill)
+            : null,
+        });
+        setLoadingProduct(false);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        toast.error("Failed to load product data.");
+        setLoadingProduct(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
+
+  // Function to configure FilePond's server property for existing files
+  const filePondServerConfig = {
+    load: (source, load, error, progress, abort, headers) => {
+      const request = new XMLHttpRequest();
+      request.open("GET", source);
+
+      request.responseType = "blob"; // Important for image data
+
+      request.onload = function () {
+        if (request.status >= 200 && request.status < 300) {
+          load(request.response); // Pass the Blob to FilePond
+        } else {
+          error(
+            `Failed to load image: ${request.statusText} (${request.status})`
+          );
+        }
+      };
+
+      request.onerror = function () {
+        error("Network error occurred while loading image.");
+      };
+
+      request.onprogress = (e) => {
+        if (e.lengthComputable) {
+          progress(e.detail, e.loaded, e.total);
+        }
+      };
+
+      request.onabort = function () {
+        abort();
+      };
+
+      request.send();
+
+      return {
+        abort: () => {
+          request.abort();
+        },
+      };
+    },
+  };
+
   const formik = useFormik({
-    initialValues: {
+    initialValues: initialProductData || {
+      // Use initialProductData or fallback empty values
       name: "",
       description: "",
       price: "",
       category: "Others",
       stock: "",
-      status: "active", // Default status
+      status: "active",
       image: [],
       images: [],
-      hasDiscount: false, // New field for discount toggle
+      hasDiscount: false,
       discountPrice: null,
       discountTill: null,
     },
     validationSchema: ProductSchema,
+    enableReinitialize: true,
     onSubmit: async (values) => {
       setSubmitStatus("loading");
       try {
@@ -188,18 +305,41 @@ export default function ProductForm() {
           formData.append("discountTill", "");
         }
 
+        // Handle main image: if it's a new file, append it. If it's an existing string, don't re-append.
         if (mainImagePondFiles.length > 0) {
-          formData.append("image", getFileFromPondFile(mainImagePondFiles[0]));
+          const file = getFileFromPondFile(mainImagePondFiles[0]);
+          if (file instanceof File) {
+            // Only append if it's a new file
+            formData.append("image", file);
+          }
+          // If it's a string (existing URL), it means no change, so don't append.
+          // The backend should handle keeping the existing image if no new file is provided.
         }
 
-        if (additionalImagePondFiles.length > 0) {
-          additionalImagePondFiles.forEach((fileItem) => {
-            formData.append("images[]", getFileFromPondFile(fileItem));
-          });
-        }
+        // Handle additional images: append new files, and signal existing ones.
+        const newImageFiles = [];
+        const existingImageSources = [];
 
-        const response = await axios.post(
-          process.env.NEXT_PUBLIC_API_URL + "/products",
+        additionalImagePondFiles.forEach((fileItem) => {
+          const file = getFileFromPondFile(fileItem);
+          if (file instanceof File) {
+            newImageFiles.push(file);
+          } else if (typeof fileItem.source === "string") {
+            // This is an existing image from the server
+            // We need to send its original filename/path to the backend
+            const fileName = fileItem.source.split("/").pop();
+            existingImageSources.push(fileName);
+          }
+        });
+
+        newImageFiles.forEach((file) => {
+          formData.append("images[]", file);
+        });
+        // Send existing image filenames separately
+        formData.append("existingImages", JSON.stringify(existingImageSources));
+
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`,
           formData,
           {
             headers: {
@@ -208,12 +348,15 @@ export default function ProductForm() {
           }
         );
 
+        toast.success("Product updated successfully!");
         setSubmitStatus("success");
-        formik.resetForm();
-        setMainImagePondFiles([]);
-        setAdditionalImagePondFiles([]);
       } catch (error) {
-        toast.error(`Error adding product: ${error}`);
+        console.error("Error updating product:", error);
+        toast.error(
+          `Error updating product: ${
+            error.response?.data?.message || error.message
+          }`
+        );
         setSubmitStatus("error");
       }
     },
@@ -221,12 +364,26 @@ export default function ProductForm() {
 
   const handleMainImageUpdate = (pondFiles) => {
     setMainImagePondFiles(pondFiles);
-    formik.setFieldValue("image", pondFiles.map(getFileFromPondFile));
+    formik.setFieldValue(
+      "image",
+      pondFiles.map((pf) =>
+        getFileFromPondFile(pf) instanceof File
+          ? getFileFromPondFile(pf)
+          : pf.source
+      )
+    );
   };
 
   const handleAdditionalImagesUpdate = (pondFiles) => {
     setAdditionalImagePondFiles(pondFiles);
-    formik.setFieldValue("images", pondFiles.map(getFileFromPondFile));
+    formik.setFieldValue(
+      "images",
+      pondFiles.map((pf) =>
+        getFileFromPondFile(pf) instanceof File
+          ? getFileFromPondFile(pf)
+          : pf.source
+      )
+    );
   };
 
   // Effect to manage status based on stock
@@ -245,16 +402,33 @@ export default function ProductForm() {
     }
   }, [submitStatus]);
 
+  if (loadingProduct) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <Loader2Icon className="h-8 w-8 animate-spin text-gray-700" />
+        <span className="ml-2 text-gray-700">Loading product...</span>
+      </div>
+    );
+  }
+
+  // If initialProductData is null after loading, display an error or redirect
+  if (!initialProductData && !loadingProduct) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <p className="text-red-500 text-lg">
+          Product not found or an error occurred.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-center p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50">
       <Card className="w-full max-w-lg shadow-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold text-gray-800">
-            Add New Product
+            Edit Product
           </CardTitle>
-          <p className="text-md text-muted-foreground mt-1">
-            Fill in the details to list a new product.
-          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={formik.handleSubmit} className="space-y-6">
@@ -529,6 +703,7 @@ export default function ProductForm() {
                 name="mainImagePond"
                 labelIdle='Drag & Drop main image or <span class="filepond--label-action">Browse</span>'
                 acceptedFileTypes={["image/jpeg", "image/png", "image/gif"]}
+                server={filePondServerConfig}
               />
               {formik.touched.image && formik.errors.image && (
                 <p className="text-red-500 text-xs mt-1">
@@ -555,6 +730,7 @@ export default function ProductForm() {
                 name="additionalImagesPond"
                 labelIdle='Drag & Drop additional images or <span class="filepond--label-action">Browse</span>'
                 acceptedFileTypes={["image/jpeg", "image/png", "image/gif"]}
+                server={filePondServerConfig}
               />
               {formik.touched.images && formik.errors.images && (
                 <p className="text-red-500 text-xs mt-1">
@@ -568,17 +744,17 @@ export default function ProductForm() {
               disabled={submitStatus === "loading"}
               className="w-full"
             >
-              {submitStatus === "loading" ? "Submitting..." : "Add Product"}
+              {submitStatus === "loading" ? "Updating..." : "Update Product"}
             </Button>
 
             {submitStatus === "success" && (
               <p className="text-green-600 text-sm mt-3 text-center">
-                Product submitted successfully!
+                Product updated successfully!
               </p>
             )}
             {submitStatus === "error" && (
               <p className="text-red-500 text-sm mt-3 text-center">
-                Error submitting product. Please try again.
+                Error updating product. Please try again.
               </p>
             )}
           </form>
