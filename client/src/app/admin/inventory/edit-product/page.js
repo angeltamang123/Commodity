@@ -38,7 +38,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
@@ -143,6 +143,7 @@ const ProductSchema = Yup.object().shape({
 });
 
 export default function EditProductForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const productId = searchParams.get("id");
 
@@ -208,6 +209,31 @@ export default function EditProductForm() {
             ? new Date(product.discountTill)
             : null,
         });
+        // IMPORTANT: Workaround for a race condition with shadcn/ui Select and Formik's enableReinitialize.
+        //
+        // PROBLEM:
+        // After initial product data is fetched and `initialProductData` is set,
+        // Formik's `enableReinitialize: true` correctly updates `formik.values.category`.
+        // However, immediately following this, the `shadcn/ui` (Radix UI-based) Select component's
+        // internal `useEffect` (identified as `BubbleSelect.useEffect` in call stack)
+        // sometimes fires its `onValueChange` with an empty string (""),
+        // causing `formik.values.category` to revert to an empty state.
+        //
+        // SOLUTION:
+        // This `setTimeout(..., 0)` defers the `setFieldValue` call to the next microtask queue,
+        // giving the `Select` component's internal state a chance to fully reconcile
+        // with the `value` prop provided by Formik after reinitialization.
+        // This ensures the correct category from `product.category` is re-applied
+        // and persists, overriding the unintended empty string set by the Select's internal logic.
+        setTimeout(() => {
+          if (formik.values.category !== (product.category || "Others")) {
+            formik.setFieldValue("category", product.category || "Others");
+            console.log(
+              "Forced category set after delay:",
+              product.category || "Others"
+            );
+          }
+        }, 0);
         setLoadingProduct(false);
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -350,6 +376,7 @@ export default function EditProductForm() {
 
         toast.success("Product updated successfully!");
         setSubmitStatus("success");
+        router.push("/admin/inventory");
       } catch (error) {
         console.error("Error updating product:", error);
         toast.error(
@@ -492,7 +519,7 @@ export default function EditProductForm() {
                   </p>
                 )}
               </div>
-
+              Category
               <div>
                 <Label htmlFor="stock" className="flex items-center gap-2 mb-2">
                   <BlocksIcon className="h-4 w-4" /> Stock Quantity
@@ -525,9 +552,14 @@ export default function EditProductForm() {
                 </Label>
                 <Select
                   name="category"
-                  onValueChange={(value) =>
-                    formik.setFieldValue("category", value)
-                  }
+                  onValueChange={(value) => {
+                    console.log(
+                      "Category Select onValueChange triggered with:",
+                      value
+                    );
+                    console.trace("Call stack for category onValueChange"); // <-- ADD THIS LINE
+                    formik.setFieldValue("category", value);
+                  }}
                   value={formik.values.category}
                 >
                   <SelectTrigger className="w-full">
