@@ -18,7 +18,7 @@ const productSchema = new Schema({
     type: String,
     enum: [
       "Electronics",
-      "Clothings",
+      "Clothing",
       "Books",
       "Furnitures",
       "Sports",
@@ -36,6 +36,15 @@ const productSchema = new Schema({
     enum: ["active", "inactive"],
     default: "active",
     required: true,
+  },
+  // colors and sizes for clothing category
+  colors: {
+    type: [String],
+    default: undefined,
+  },
+  sizes: {
+    type: [String], // Array of strings for available sizes (e.g., ["XS", "S", "M", "L", "XL"])
+    default: undefined,
   },
   rating: {
     type: Number,
@@ -62,6 +71,7 @@ const productSchema = new Schema({
           // discountPrice not set → discountTill must NOT exist either
           return value === null || value === undefined;
         }
+
         // discountPrice is set → discountTill must be non-null and > tomorrow
         if (!value) return false;
 
@@ -69,7 +79,6 @@ const productSchema = new Schema({
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         tomorrow.setHours(0, 0, 0, 0);
-
         return value > tomorrow;
       },
       message:

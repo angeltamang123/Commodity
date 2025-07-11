@@ -10,9 +10,11 @@ import CommodityLogo from "@/components/commodityLogo";
 import Link from "next/link";
 import { IdCard, Lock, Mail, MapPin, Phone } from "lucide-react";
 import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const SignupForm = () => {
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
   const router = useRouter();
   let [emailTaken, setEmailTaken] = useState(false);
   const { isLoggedIn } = useSelector((state) => state.user);
@@ -72,6 +74,7 @@ const SignupForm = () => {
           description: "Your account has been created. You can now log in.",
         });
         formik.resetForm();
+        router.push(`/login?from=${from}`);
       } catch (error) {
         console.log(error);
         if (error.response.data === "Email is taken") {

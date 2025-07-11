@@ -9,13 +9,13 @@ const port = process.env.PORT || 7000;
 
 app.use(cors());
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // For form-urlencoded
+
 app.use("/uploads", express.static("uploads"));
 
 const productRoute = require("./routes/products");
 app.use(productRoute);
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // For form-urlencoded
 
 const userRoute = require("./routes/users");
 app.use(userRoute);

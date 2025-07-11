@@ -66,7 +66,7 @@ const ProductSchema = Yup.object().shape({
     .required("Price is required")
     .min(0, "Price must be at least 0"),
   category: Yup.string().oneOf(
-    ["Electronics", "Clothings", "Books", "Furnitures", "Sports", "Others"],
+    ["Electronics", "Clothing", "Books", "Furnitures", "Sports", "Others"],
     "Invalid category selected"
   ),
   stock: Yup.number()
@@ -361,7 +361,7 @@ export default function ProductForm() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Electronics">Electronics</SelectItem>
-                    <SelectItem value="Clothings">Clothings</SelectItem>
+                    <SelectItem value="Clothing">Clothing</SelectItem>
                     <SelectItem value="Books">Books</SelectItem>
                     <SelectItem value="Furnitures">Furnitures</SelectItem>
                     <SelectItem value="Sports">Sports</SelectItem>

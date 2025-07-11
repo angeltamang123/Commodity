@@ -10,11 +10,13 @@ import Link from "next/link";
 import { Lock, Mail } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addLoginDetails } from "@/redux/reducerSlices/userSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
   const { isLoggedIn } = useSelector((state) => state.user);
 
   // Re-direct if user data in local storage
@@ -42,13 +44,18 @@ const LoginPage = () => {
       try {
         // Attempt to log in the user by calling the API
         const data = await loginUser(values);
+        console.log(data);
         if (data) {
           dispatch(addLoginDetails(data));
           toast.success("Login Successful!", {
             description: "You have been successfully logged in.",
           });
           formik.resetForm(); // Clear the form after successful login
-          router.push("/");
+          if (from) {
+            router.push(`${from}`);
+          } else {
+            router.push("/");
+          }
         } else {
           // This case might be hit if the API returns an empty success response
           toast.error("Login Failed", {
@@ -67,8 +74,7 @@ const LoginPage = () => {
   });
 
   const loginUser = async (values) => {
-    const apiUrl =
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const response = await axios.post(`${apiUrl}/login`, values);
     return response.data;
   };
@@ -150,7 +156,7 @@ const LoginPage = () => {
           Don't have an account?{" "}
           <Link
             className="text-blue-600 hover:text-blue-950"
-            href={"/register"}
+            href={from ? `/register?from=${from}` : `/register`}
           >
             Register now...
           </Link>

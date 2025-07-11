@@ -67,7 +67,7 @@ const ProductSchema = Yup.object().shape({
     .required("Price is required")
     .min(0, "Price must be at least 0"),
   category: Yup.string().oneOf(
-    ["Electronics", "Clothings", "Books", "Furnitures", "Sports", "Others"],
+    ["Electronics", "Clothing", "Books", "Furnitures", "Sports", "Others"],
     "Invalid category selected"
   ),
   stock: Yup.number()
@@ -210,7 +210,8 @@ export default function EditProductForm() {
             : null,
         });
         // IMPORTANT: Workaround for a race condition with shadcn/ui Select and Formik's enableReinitialize.
-        //
+        // Better solution would be setting formik fields in useEffect after product is available,not during initialization itself,
+        // for now we stick with current structure
         // PROBLEM:
         // After initial product data is fetched and `initialProductData` is set,
         // Formik's `enableReinitialize: true` correctly updates `formik.values.category`.
@@ -228,10 +229,10 @@ export default function EditProductForm() {
         setTimeout(() => {
           if (formik.values.category !== (product.category || "Others")) {
             formik.setFieldValue("category", product.category || "Others");
-            console.log(
-              "Forced category set after delay:",
-              product.category || "Others"
-            );
+          }
+
+          if (formik.values.status !== product.status) {
+            formik.setFieldValue("status", product.status);
           }
         }, 0);
         setLoadingProduct(false);
@@ -322,9 +323,11 @@ export default function EditProductForm() {
         formData.append("status", finalStatus);
 
         if (values.hasDiscount) {
-          formData.append("discountPrice", values.discountPrice.toString());
+          formData.append("discountPrice", values.discountPrice);
+          console.log(values.discountPrice);
           if (values.discountTill) {
             formData.append("discountTill", values.discountTill.toISOString()); // Send ISO string for date
+            console.log(values.discountTill.toISOString());
           }
         } else {
           formData.append("discountPrice", "");
@@ -519,7 +522,7 @@ export default function EditProductForm() {
                   </p>
                 )}
               </div>
-              Category
+
               <div>
                 <Label htmlFor="stock" className="flex items-center gap-2 mb-2">
                   <BlocksIcon className="h-4 w-4" /> Stock Quantity
@@ -553,11 +556,6 @@ export default function EditProductForm() {
                 <Select
                   name="category"
                   onValueChange={(value) => {
-                    console.log(
-                      "Category Select onValueChange triggered with:",
-                      value
-                    );
-                    console.trace("Call stack for category onValueChange"); // <-- ADD THIS LINE
                     formik.setFieldValue("category", value);
                   }}
                   value={formik.values.category}
@@ -567,7 +565,7 @@ export default function EditProductForm() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Electronics">Electronics</SelectItem>
-                    <SelectItem value="Clothings">Clothings</SelectItem>
+                    <SelectItem value="Clothing">Clothing</SelectItem>
                     <SelectItem value="Books">Books</SelectItem>
                     <SelectItem value="Furnitures">Furnitures</SelectItem>
                     <SelectItem value="Sports">Sports</SelectItem>
@@ -587,6 +585,7 @@ export default function EditProductForm() {
                 >
                   <CheckCircle2Icon className="h-4 w-4" /> Product Status
                 </Label>
+
                 <Select
                   name="status"
                   onValueChange={(value) =>
@@ -600,12 +599,7 @@ export default function EditProductForm() {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem
-                      value="active"
-                      disabled={formik.values.stock === 0}
-                    >
-                      Active
-                    </SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>

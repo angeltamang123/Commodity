@@ -8,6 +8,8 @@ const initialState = {
   address: "",
   phoneNumber: null,
   gender: "",
+  userId: null,
+  wishlist: [],
 };
 
 export const userSlice = createSlice({
@@ -18,14 +20,16 @@ export const userSlice = createSlice({
       return initialState;
     },
     addLoginDetails: (state, action) => {
-      const { emailId, fullName, phoneNumber, gender, address } =
+      const { emailId, fullName, phoneNumber, gender, address, _id, wishlist } =
         action.payload.user;
       const { token, isLoggedIn } = action.payload;
 
       return {
         ...state,
+        userId: _id,
         emailId: emailId,
         token: token,
+        wishlist: wishlist,
         isLoggedIn: isLoggedIn,
         address: address,
         fullName: fullName,
@@ -33,10 +37,26 @@ export const userSlice = createSlice({
         gender: gender,
       };
     },
+
+    addToWishList: (state, action) => {
+      state.wishlist.push(action.payload);
+    },
+
+    removeFromWishList: (state, action) => {
+      const currentList = state.wishlist;
+      state.wishlist = currentList.filter((item) => {
+        return item !== action.payload;
+      });
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { logoutUser, addLoginDetails } = userSlice.actions;
+export const {
+  logoutUser,
+  addLoginDetails,
+  addToWishList,
+  removeFromWishList,
+} = userSlice.actions;
 
 export default userSlice.reducer;

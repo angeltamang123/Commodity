@@ -81,7 +81,7 @@ const registerNewProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const productId = req.params.productId;
-    const updates = req.body;
+    const updates = { ...req.body }; // new object from req.body
 
     const existingProduct = await Product.findById(productId);
     if (!existingProduct) {
@@ -111,9 +111,9 @@ const updateProduct = async (req, res) => {
 
     // Get existing additional images that the frontend explicitly sent to KEEP
     let keptExistingAdditionalImagesFromFrontend = [];
-    if (updates.existingImages) {
+    if (updates?.existingImages) {
       try {
-        const parsedImages = JSON.parse(updates.existingImages);
+        const parsedImages = JSON.parse(updates?.existingImages);
         if (Array.isArray(parsedImages)) {
           keptExistingAdditionalImagesFromFrontend = parsedImages.filter(
             (img) => typeof img === "string" && img.length > 0
@@ -137,53 +137,50 @@ const updateProduct = async (req, res) => {
 
     imagesToDelete.forEach(deleteFile);
 
-    // Prepare update object for Mongoose ---
-    const updateFields = { ...updates };
+    if (updates.name) existingProduct.name = updates.name;
+    if (updates.description) existingProduct.description = updates.description;
+    if (updates.category) existingProduct.category = updates.category;
+    if (updates.status) existingProduct.status = updates.status;
 
     // Set main image field
-    updateFields.image = newMainImageFilename;
+    existingProduct.image = newMainImageFilename;
 
     // Set additional images field
-    updateFields.images = newAdditionalImageFilenames;
+    existingProduct.images = newAdditionalImageFilenames;
 
     // --- Type Conversions for other fields ---
-    if (updateFields.price) {
-      updateFields.price = parseFloat(updateFields.price);
+    if (updates.hasOwnProperty("price")) {
+      existingProduct.price = parseFloat(updates.price);
     }
-    if (updateFields.stock) {
-      updateFields.stock = parseInt(updateFields.stock, 10);
+    if (updates.hasOwnProperty("stock")) {
+      const stock = parseInt(updates.stock, 10);
+      existingProduct.stock = stock;
+      if (stock === 0 && existingProduct.status === "active") {
+        existingProduct.status = "inactive";
+      }
     }
-    if (updateFields.discountPrice) {
-      updateFields.discountPrice = parseFloat(updateFields.discountPrice);
+    if (updates.hasOwnProperty("discountPrice")) {
+      existingProduct.discountPrice =
+        updates.discountPrice === "" || updates.discountPrice == null
+          ? null
+          : parseFloat(updates.discountPrice);
     }
-    if (updateFields.discountTill) {
-      updateFields.discountTill = new Date(updateFields.discountTill);
-    }
-    // Handle status change if stock goes to 0
-    if (updateFields.stock === 0 && updateFields.status === "active") {
-      updateFields.status = "inactive";
+    if (updates.hasOwnProperty("discountTill")) {
+      existingProduct.discountTill =
+        updates.discountTill === "" || updates.discountTill == null
+          ? null
+          : new Date(updates.discountTill);
     }
 
     // Perform the Mongoose update
-    const updatedProduct = await Product.findByIdAndUpdate(
-      productId,
-      updateFields,
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedProduct) {
-      return res.status(404).json({
-        message: "Product not found or not updated",
-        product: updatedProduct,
-      });
-    }
+    const updatedProduct = await existingProduct.save();
 
     res.status(200).json({
       message: "Product updated successfully!!",
       product: updatedProduct,
     });
   } catch (err) {
-    console.error("Error updating product:", err);
+    console.error("Error updating product:", err.message);
     // If files were uploaded during this update but an error occurred,
     // delete the newly uploaded files to prevent orphans.
     if (req.files && req.files["image"]) {
@@ -242,10 +239,18 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const toggleStatus = async (req, res) => {
+  const data = await Product.findById(req.params.productId);
+  data.status = req.body.status;
+  await data.save();
+  res.status(200).json({ message: "Status Toggled" });
+};
+
 module.exports = {
   registerNewProduct,
   getAllProducts,
   getProductById,
   updateProduct,
   deleteProduct,
+  toggleStatus,
 };

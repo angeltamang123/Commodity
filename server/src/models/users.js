@@ -12,6 +12,12 @@ const registerSchema = new Schema({
     enum: ["Male", "Female", "Others"],
     default: "Male",
   },
+  wishlist: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Product",
+    },
+  ],
 });
 
 const Register = mongoose.model("Register", registerSchema);

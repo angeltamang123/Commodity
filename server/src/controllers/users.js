@@ -29,4 +29,46 @@ const loginUser = async (req, res) => {
     token,
   });
 };
-module.exports = { registerNewUser, loginUser };
+
+const addToWishList = async (req, res) => {
+  try {
+    const user = await Register.findById(req.params.userId);
+    user.wishlist.push(req.body.product);
+    user.save();
+    res.status(204).json({ message: "Product added in Wishlist" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const removeFromWishList = async (req, res) => {
+  try {
+    const user = await Register.findById(req.params.userId);
+    const productId = req.body.product;
+    const initialWishlistLength = user.wishlist.length;
+    user.wishlist = user.wishlist.filter(
+      (item) => item.toString() !== productId
+    );
+
+    if (user.wishlist.length === initialWishlistLength) {
+      return res
+        .status(404)
+        .json({ message: "Product not found in wishlist." });
+    }
+
+    await user.save();
+
+    res.status(200).json({ message: "Product removed from Wishlist." });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || "Server error while removing from wishlist.",
+    });
+  }
+};
+
+module.exports = {
+  registerNewUser,
+  loginUser,
+  addToWishList,
+  removeFromWishList,
+};

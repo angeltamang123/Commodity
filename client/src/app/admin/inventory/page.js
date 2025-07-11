@@ -45,6 +45,25 @@ import { useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import ProductDelete from "@/components/product-delete";
+import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import ProductDetail from "@/components/productDetails";
+import ProductDetailsDialog from "@/components/productDetailsDialog";
 
 export default function InventoryPage() {
   const [data, setData] = React.useState([]);
@@ -54,6 +73,8 @@ export default function InventoryPage() {
   const [rowSelection, setRowSelection] = React.useState({});
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [productIdToDelete, setProductIdToDelete] = React.useState(null);
+  const [showStatusChangeDialog, setShowStatusChangeDialog] =
+    React.useState(false);
   const router = useRouter();
 
   const fetchData = async () => {
@@ -76,6 +97,36 @@ export default function InventoryPage() {
       setIsDeleteDialogOpen(false);
     } catch (error) {
       console.error("Error deleting product:", error);
+    }
+  };
+
+  const handleStatusChange = async (productToToggle) => {
+    const currentStatus = productToToggle.status;
+
+    // Prevent changing status if inactive and stock is 0 (as per your logic)
+    if (currentStatus === "inactive" && productToToggle.stock === 0) {
+      setShowStatusChangeDialog(true);
+      return;
+    }
+    const toggledStatus = currentStatus === "active" ? "inactive" : "active";
+
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/products/${productToToggle._id}/toggleStatus`,
+        {
+          status: toggledStatus,
+        }
+      );
+
+      setData((prevData) =>
+        prevData.map((p) =>
+          p._id === productToToggle._id ? { ...p, status: toggledStatus } : p
+        )
+      );
+
+      toast.success(`Product status toggled to ${toggledStatus}`);
+    } catch (error) {
+      toast.error(`Failed to toggle product status. ${error}`);
     }
   };
 
@@ -144,12 +195,34 @@ export default function InventoryPage() {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
-        const status = row.original.stock > 0 ? "active" : "out_of_stock";
-        const statusText = status === "active" ? "Active" : "Out of stock";
+        const status = row.original.status;
         return (
-          <Badge variant={status === "active" ? "outline" : "destructive"}>
-            {statusText}
-          </Badge>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Badge
+                className={cn(
+                  "cursor-pointer",
+                  status === "active" ? "bg-green-300" : "bg-yellow-200"
+                )}
+                variant={status === "active" && "outline"}
+              >
+                {status}
+              </Badge>
+            </PopoverTrigger>
+            <PopoverContent>
+              <Button
+                onClick={() => {
+                  handleStatusChange(row.original);
+                }}
+                className={cn(
+                  "w-full text-black hover:bg-gray-400",
+                  status === "active" ? "bg-yellow-200" : "bg-green-300"
+                )}
+              >
+                Toggle to {status === "active" ? "Inactive" : "Active"}
+              </Button>
+            </PopoverContent>
+          </Popover>
         );
       },
     },
@@ -183,7 +256,9 @@ export default function InventoryPage() {
                 Copy product ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>View details</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <ProductDetailsDialog product={product} />
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={() => {
                   router.push(
@@ -359,6 +434,22 @@ export default function InventoryPage() {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={() => handleDelete(productIdToDelete)}
       />
+      <AlertDialog
+        open={showStatusChangeDialog}
+        onOpenChange={setShowStatusChangeDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Invalid Action</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cannot make an item active with no stock in inventory!!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Ok</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

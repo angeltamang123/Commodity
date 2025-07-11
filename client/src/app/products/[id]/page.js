@@ -1,40 +1,73 @@
 "use client";
-import axios from "axios";
-import Image from "next/image";
-import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
 
-const page = () => {
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import axios from "axios";
+import { Loader2Icon } from "lucide-react";
+import ProductDetail from "@/components/productDetails";
+import CustomNavbar from "@/components/navbar";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+export default function ProductDetailPage() {
   const params = useParams();
-  const [productDetails, setProductDetails] = useState({});
-  const fetchProductDetails = async () => {
-    const { data } = await axios.get(
-      "http://localhost:7000/products/" + params.id
-    );
-    setProductDetails(data);
-  };
+  const productId = params.id;
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    fetchProductDetails();
-  });
+    if (!productId) return;
+
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `${API_BASE_URL}/products/${productId}`
+        );
+        setProduct(response.data);
+      } catch (err) {
+        console.error("Failed to fetch product:", err);
+        setError("Failed to load product data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <Loader2Icon className="h-8 w-8 animate-spin text-gray-700" />
+        <span className="ml-2 text-gray-700">Loading product details...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <p className="text-red-500 text-lg">{error}</p>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <p className="text-gray-600 text-lg">Product not found.</p>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div className="aspect-square relative mb-4">
-        <Image
-          src={"http://localhost:7000/uploads/" + productDetails.image}
-          alt={productDetails.name}
-          fill
-          className="object-cover rounded-md"
-        />
+      <CustomNavbar />
+      <div className="border-b-2 border-gray-200">
+        <ProductDetail product={product} />
       </div>
-      <h2 className="text-lg font-semibold mb-2">{productDetails.name}</h2>
-      {}
-      <p className="text-sm text-gray-600 mb-2">{productDetails.description}</p>
-      <p className="text-sm text-gray-600">
-        Category: {productDetails.category}
-      </p>
-      <p className="text-sm text-gray-600">Stock: {productDetails.stock}</p>
     </div>
   );
-};
-
-export default page;
+}

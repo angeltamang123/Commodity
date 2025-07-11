@@ -6,6 +6,7 @@ const {
   getProductById,
   updateProduct,
   deleteProduct,
+  toggleStatus,
 } = require("../controllers/products");
 const app = Router();
 const storage = multer.diskStorage({
@@ -39,5 +40,7 @@ app.post(
   ]),
   registerNewProduct
 );
+
+app.patch("/products/:productId/toggleStatus", toggleStatus);
 
 module.exports = app;
