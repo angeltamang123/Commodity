@@ -118,14 +118,14 @@ export default function CustomNavbar() {
         </NavbarContent>
 
         <NavbarContent className="ml-16 gap-1">
-          <NavbarItem className="lg:flex w-44 font-normal">
+          <NavbarItem className="lg:flex w-64 font-normal">
             <Input
               placeholder="Search Product"
               startContent={<Search />}
               type="search"
             />
           </NavbarItem>
-          <NavbarItem>
+          <NavbarItem className="ml-16">
             <Button
               className="text-default-600"
               href="/cart"

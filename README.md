@@ -77,9 +77,9 @@
 - ✅ User Registration/Login with JWT
 - ✅ Display product list on landing page
 - ⬜ View product detail page
-- ⬜ Admin login/authentication
+- ✅ Admin login/authentication
 - ⬜ Add-to-cart and cart management
-- ⬜ Admin: Add/Edit/Delete products
+- ✅ Admin: Add/Edit/Delete products
 - ⬜ Inventory count update post-order
 
 ---

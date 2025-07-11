@@ -79,7 +79,6 @@ const registerNewProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  // We
   try {
     const productId = req.params.productId;
     const updates = req.body;

@@ -20,13 +20,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import CommodityLogo from "./commodityLogo";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 export function AdminSidebar() {
+  const pathName = usePathname();
   // Menu items.
   const items = [
     {
@@ -65,33 +68,42 @@ export function AdminSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader
         className={cn(
-          "bg-[#A1040B] overflow-clip",
+          "bg-[#111B25] overflow-clip",
           state === "collapsed" && "p-0"
         )}
       >
-        <Link
-          href="/"
-          className={cn(
-            state !== "collapsed" && `flex justify-between items-center mx-2`
-          )}
-        >
-          <CommodityLogo className="text-[#730000]" />
-          <span
-            className={cn(
-              `font-bold text-xl text-black`,
-              state === "collapsed" && `hidden`
-            )}
-          >
-            Commodity
-          </span>
-        </Link>
+        {state !== "collapsed" ? (
+          <div className="flex justify-between items-center mx-2">
+            <Link
+              href="/"
+              className={cn(
+                state !== "collapsed" &&
+                  `flex justify-between items-center mx-2`
+              )}
+            >
+              <CommodityLogo className="text-[#730000] size-16" />
+            </Link>
+            <SidebarTrigger className="text-white text-2xl" />
+          </div>
+        ) : (
+          <CommodityLogo
+            onClick={toggleSidebar}
+            className="text-[#730000] cursor-pointer"
+          />
+        )}
       </SidebarHeader>
-      <SidebarContent className="bg-[#111B25] text-white pt-2">
+      <SidebarContent className="bg-[#111B25] text-white -mt-2 pt-2">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem
+                  key={item.title}
+                  className={cn(
+                    pathName === item.url &&
+                      `bg-[#730000] border-[#730000] rounded-md`
+                  )}
+                >
                   <SidebarMenuButton asChild>
                     <Link href={item.url}>
                       <item.icon />
