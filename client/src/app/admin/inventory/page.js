@@ -94,6 +94,10 @@ export default function InventoryPage() {
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [productIdToDelete, setProductIdToDelete] = React.useState(null);
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] =
+    React.useState(false);
+  const [selectedForBulkDelete, setSelectedForBulkDelete] = React.useState({});
+  const [currentTable, setCurrentTable] = React.useState(null);
   const [showStatusChangeDialog, setShowStatusChangeDialog] =
     React.useState(false);
 
@@ -154,7 +158,7 @@ export default function InventoryPage() {
         }
       );
 
-      setData((prevData) =>
+      setAllProducts((prevData) =>
         prevData.map((p) =>
           p._id === productToToggle._id ? { ...p, status: toggledStatus } : p
         )
@@ -163,6 +167,26 @@ export default function InventoryPage() {
       toast.success(`Product status toggled to ${toggledStatus}`);
     } catch (error) {
       toast.error(`Failed to toggle product status. ${error}`);
+    }
+  };
+
+  const handleDeleteSelected = async (selectedRows, tableInstance) => {
+    try {
+      const selectedIds = Object.keys(selectedRows).map(
+        (rowIndex) => tableInstance.getRowModel().rows[rowIndex].original._id
+      );
+
+      await Promise.all(
+        selectedIds.map((id) =>
+          axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`)
+        )
+      );
+
+      fetchData();
+      toast.success("Selected products deleted successfully");
+    } catch (error) {
+      console.error("Error deleting selected products:", error);
+      toast.error("Failed to delete selected products");
     }
   };
 
@@ -478,6 +502,19 @@ export default function InventoryPage() {
                   {table.getFilteredSelectedRowModel().rows.length} of{" "}
                   {table.getFilteredRowModel().rows.length} row(s) selected.
                 </div>
+                {table.getFilteredSelectedRowModel().rows.length > 0 && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedForBulkDelete(table.getState().rowSelection);
+                      setCurrentTable(table);
+                      setIsBulkDeleteDialogOpen(true);
+                    }}
+                  >
+                    Delete Selected
+                  </Button>
+                )}
                 <div className="space-x-2">
                   <Button
                     variant="outline"
@@ -582,6 +619,22 @@ export default function InventoryPage() {
                   {inactiveTable.getFilteredRowModel().rows.length} row(s)
                   selected.
                 </div>
+                {inactiveTable.getFilteredSelectedRowModel().rows.length >
+                  0 && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedForBulkDelete(
+                        inactiveTable.getState().rowSelection
+                      );
+                      setCurrentTable(inactiveTable);
+                      setIsBulkDeleteDialogOpen(true);
+                    }}
+                  >
+                    Delete Selected
+                  </Button>
+                )}
                 <div className="space-x-2">
                   <Button
                     variant="outline"
@@ -686,6 +739,22 @@ export default function InventoryPage() {
                   {outOfStockTable.getFilteredRowModel().rows.length} row(s)
                   selected.
                 </div>
+                {outOfStockTable.getFilteredSelectedRowModel().rows.length >
+                  0 && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedForBulkDelete(
+                        outOfStockTable.getState().rowSelection
+                      );
+                      setCurrentTable(outOfStockTable);
+                      setIsBulkDeleteDialogOpen(true);
+                    }}
+                  >
+                    Delete Selected
+                  </Button>
+                )}
                 <div className="space-x-2">
                   <Button
                     variant="outline"
@@ -729,6 +798,32 @@ export default function InventoryPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Ok</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog
+        open={isBulkDeleteDialogOpen}
+        onOpenChange={setIsBulkDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete{" "}
+              {Object.keys(selectedForBulkDelete).length} selected products.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                handleDeleteSelected(selectedForBulkDelete, currentTable);
+                setIsBulkDeleteDialogOpen(false);
+              }}
+            >
+              Delete
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

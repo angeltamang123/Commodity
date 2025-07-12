@@ -37,15 +37,15 @@ const productSchema = new Schema({
     default: "active",
     required: true,
   },
-  // colors and sizes for clothing category
-  colors: {
-    type: [String],
-    default: undefined,
-  },
-  sizes: {
-    type: [String], // Array of strings for available sizes (e.g., ["XS", "S", "M", "L", "XL"])
-    default: undefined,
-  },
+  // // colors and sizes for clothing category
+  // colors: {
+  //   type: [String],
+  //   default: undefined,
+  // },
+  // sizes: {
+  //   type: [String], // Array of strings for available sizes (e.g., ["XS", "S", "M", "L", "XL"])
+  //   default: undefined,
+  // },
   rating: {
     type: Number,
     min: 0,

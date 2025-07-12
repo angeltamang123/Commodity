@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Star } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function ProductCard({ product }) {
   const discount =
@@ -13,26 +14,33 @@ export default function ProductCard({ product }) {
     router.push("/products/" + product._id);
   };
   return (
-    <Card
-      onClick={handleClick}
-      className="flex flex-col h-full cursor-pointer "
-    >
-      <CardContent className="p-4 flex-grow flex-col relative overflow-hidden">
-        {product.discountPrice && (
-          <div className="text-center absolute w-32 -ml-14 text-xs bg-[#31c05f] rotate-[-45deg] z-10">
-            <p>{Math.round(discount * 10) / 10}% Off</p>
-          </div>
-        )}
-        {product.rating && (
-          <div className="absolute w-full -mt-3 items-center z-10">
-            <div className="flex gap-1 translate-x-[78%]">
-              <Star className="text-yellow-500 fill-yellow-500 size-4" />
-              <p className="text-xs font-sans">
-                {Math.round(product?.rating * 10) / 10}
-              </p>
+    <Card className="flex flex-col h-full cursor-pointer ">
+      <CardContent
+        onClick={handleClick}
+        className="p-4 flex-grow flex-col relative overflow-hidden"
+      >
+        <div
+          className={cn(
+            "flex justify-between w-full",
+            !product.discountPrice && "justify-end"
+          )}
+        >
+          {product.discountPrice && (
+            <div className="text-center border border-[#AF0000] rounded-lg  w-16 text-white font-sans text-xs bg-[#AF0000] z-1">
+              <p>{Math.round(discount * 10) / 10}% Off</p>
             </div>
-          </div>
-        )}
+          )}
+          {product.rating && (
+            <div className="w-16 z-10">
+              <div className="flex border w-14 justify-center border-[#AF0000] bg-[#AF0000] rounded-lg gap-1">
+                <Star className="text-[#AF0000] fill-yellow-500 size-4" />
+                <p className="text-xs text-white font-sans">
+                  {Math.round(product?.rating * 10) / 10}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="h-52 relative mx-auto mb-4">
           <Image
             src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.image}`}
@@ -41,6 +49,17 @@ export default function ProductCard({ product }) {
             fill
           />
         </div>
+        {product.status === "inactive" ? (
+          product.stock === 0 ? (
+            <div className="w-full bg-[#111B25] border-t-2 border-b-2 h-10 py-1 border-white text-white text-center z-20 left-0 absolute -mt-32">
+              <p>Out Of Stock !!</p>
+            </div>
+          ) : (
+            <div className="w-full bg-[#111B25] border-t-2 border-b-2 h-10 py-1 border-white text-white text-center z-20 left-0 absolute -mt-32">
+              <p>Not Available !!</p>
+            </div>
+          )
+        ) : null}
         <h2 className="text-lg font-semibold mb-2">{product.name}</h2>
         {}
         {/* <p className="text-sm text-gray-600 mb-2">{product.description}</p> */}
@@ -72,10 +91,19 @@ export default function ProductCard({ product }) {
         <p className="text-sm ">Stock: {product.stock}</p>
       </CardContent>
       <CardFooter className="p-4 flex justify-center gap-2">
-        <Button className="w-full bg-[#FFFFFA] text-[#AF0000] border-1 rounded-2xl border-[#AF0000] hover:border-[#00232A] hover:bg-[#00232A] hover:text-[#FFFFFA]">
+        <Button
+          disabled={product.status === "inactive"}
+          className="w-full bg-[#FFFFFA] text-[#AF0000] border-1 rounded-2xl border-[#AF0000] hover:border-[#00232A] hover:bg-[#00232A] hover:text-[#FFFFFA]"
+        >
           Add to Cart
         </Button>
-        <Button className="w-full bg-[#AF0000] rounded-2xl hover:bg-[#730000]">
+        <Button
+          disabled={product.status === "inactive"}
+          className="w-full bg-[#AF0000] rounded-2xl hover:bg-[#730000]"
+          onClick={() => {
+            alert("sadsad");
+          }}
+        >
           Buy now
         </Button>
       </CardFooter>
