@@ -66,15 +66,37 @@ import ProductDetail from "@/components/productDetails";
 import ProductDetailsDialog from "@/components/productDetailsDialog";
 
 export default function InventoryPage() {
-  const [data, setData] = React.useState([]);
-  const [sorting, setSorting] = React.useState([]);
-  const [columnFilters, setColumnFilters] = React.useState([]);
-  const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [allProducts, setAllProducts] = React.useState([]);
+  const [inactiveProducts, setInactiveProducts] = React.useState([]);
+  const [outOfStockProducts, setOutOfStockProducts] = React.useState([]);
+  // States for all products table
+  const [allSorting, setAllSorting] = React.useState([]);
+  const [allColumnFilters, setAllColumnFilters] = React.useState([]);
+  const [allColumnVisibility, setAllColumnVisibility] = React.useState({});
+  const [allRowSelection, setAllRowSelection] = React.useState({});
+
+  // States for inactive products table
+  const [inactiveSorting, setInactiveSorting] = React.useState([]);
+  const [inactiveColumnFilters, setInactiveColumnFilters] = React.useState([]);
+  const [inactiveColumnVisibility, setInactiveColumnVisibility] =
+    React.useState({});
+  const [inactiveRowSelection, setInactiveRowSelection] = React.useState({});
+
+  // States for out of stock products table
+  const [outOfStockSorting, setOutOfStockSorting] = React.useState([]);
+  const [outOfStockColumnFilters, setOutOfStockColumnFilters] = React.useState(
+    []
+  );
+  const [outOfStockColumnVisibility, setOutOfStockColumnVisibility] =
+    React.useState({});
+  const [outOfStockRowSelection, setOutOfStockRowSelection] = React.useState(
+    {}
+  );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [productIdToDelete, setProductIdToDelete] = React.useState(null);
   const [showStatusChangeDialog, setShowStatusChangeDialog] =
     React.useState(false);
+
   const router = useRouter();
 
   const fetchData = async () => {
@@ -82,13 +104,27 @@ export default function InventoryPage() {
       `${process.env.NEXT_PUBLIC_API_URL}/products`
     );
     if (data) {
-      setData(data);
+      setAllProducts(data);
     }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (allProducts) {
+      const inactive = allProducts.filter((product) => {
+        return product.status === "inactive";
+      });
+      const outOfStock = allProducts.filter((product) => {
+        return product.stock === 0;
+      });
+
+      setInactiveProducts(inactive);
+      setOutOfStockProducts(outOfStock);
+    }
+  }, [allProducts]);
 
   const handleDelete = async (id) => {
     try {
@@ -285,21 +321,59 @@ export default function InventoryPage() {
   ];
 
   const table = useReactTable({
-    data,
+    data: allProducts,
     columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onSortingChange: setAllSorting,
+    onColumnFiltersChange: setAllColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setAllColumnVisibility,
+    onRowSelectionChange: setAllRowSelection,
     state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
+      sorting: allSorting,
+      columnFilters: allColumnFilters,
+      columnVisibility: allColumnVisibility,
+      rowSelection: allRowSelection,
+    },
+  });
+
+  const inactiveTable = useReactTable({
+    data: inactiveProducts,
+    columns,
+    onSortingChange: setInactiveSorting,
+    onColumnFiltersChange: setInactiveColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setInactiveColumnVisibility,
+    onRowSelectionChange: setInactiveRowSelection,
+    state: {
+      sorting: inactiveSorting,
+      columnFilters: inactiveColumnFilters,
+      columnVisibility: inactiveColumnVisibility,
+      rowSelection: inactiveRowSelection,
+    },
+  });
+
+  const outOfStockTable = useReactTable({
+    data: outOfStockProducts,
+    columns,
+    onSortingChange: setOutOfStockSorting,
+    onColumnFiltersChange: setOutOfStockColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setOutOfStockColumnVisibility,
+    onRowSelectionChange: setOutOfStockRowSelection,
+    state: {
+      sorting: outOfStockSorting,
+      columnFilters: outOfStockColumnFilters,
+      columnVisibility: outOfStockColumnVisibility,
+      rowSelection: outOfStockRowSelection,
     },
   });
 
@@ -322,7 +396,7 @@ export default function InventoryPage() {
       <Tabs defaultValue="all" className="w-full">
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="active">Active</TabsTrigger>
+          <TabsTrigger value="inactive">Inactive</TabsTrigger>
           <TabsTrigger value="out_of_stock">Out of stock</TabsTrigger>
         </TabsList>
         <TabsContent value="all">
@@ -418,6 +492,214 @@ export default function InventoryPage() {
                     size="sm"
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="inactive">
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Inventory</CardTitle>
+              <CardDescription>
+                Manage your products and view their sales performance.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="-mt-6">
+              <div className="flex items-center py-4">
+                <div className="relative w-full md:w-1/3">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Filter products by name..."
+                    value={
+                      inactiveTable.getColumn("name")?.getFilterValue() ?? ""
+                    }
+                    onChange={(event) =>
+                      inactiveTable
+                        .getColumn("name")
+                        ?.setFilterValue(event.target.value)
+                    }
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    {inactiveTable.getHeaderGroups().map((headerGroup) => (
+                      <TableRow key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => {
+                          return (
+                            <TableHead key={header.id}>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                            </TableHead>
+                          );
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableHeader>
+                  <TableBody>
+                    {inactiveTable.getRowModel().rows?.length ? (
+                      inactiveTable.getRowModel().rows.map((row) => (
+                        <TableRow
+                          key={row.id}
+                          data-state={row.getIsSelected() && "selected"}
+                        >
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={columns.length}
+                          className="h-24 text-center"
+                        >
+                          No results.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="flex-1 text-sm text-muted-foreground">
+                  {inactiveTable.getFilteredSelectedRowModel().rows.length} of{" "}
+                  {inactiveTable.getFilteredRowModel().rows.length} row(s)
+                  selected.
+                </div>
+                <div className="space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => inactiveTable.previousPage()}
+                    disabled={!inactiveTable.getCanPreviousPage()}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => inactiveTable.nextPage()}
+                    disabled={!inactiveTable.getCanNextPage()}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="out_of_stock">
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Inventory</CardTitle>
+              <CardDescription>
+                Manage your products and view their sales performance.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="-mt-6">
+              <div className="flex items-center py-4">
+                <div className="relative w-full md:w-1/3">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Filter products by name..."
+                    value={
+                      outOfStockTable.getColumn("name")?.getFilterValue() ?? ""
+                    }
+                    onChange={(event) =>
+                      outOfStockTable
+                        .getColumn("name")
+                        ?.setFilterValue(event.target.value)
+                    }
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    {outOfStockTable.getHeaderGroups().map((headerGroup) => (
+                      <TableRow key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => {
+                          return (
+                            <TableHead key={header.id}>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                            </TableHead>
+                          );
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableHeader>
+                  <TableBody>
+                    {outOfStockTable.getRowModel().rows?.length ? (
+                      outOfStockTable.getRowModel().rows.map((row) => (
+                        <TableRow
+                          key={row.id}
+                          data-state={row.getIsSelected() && "selected"}
+                        >
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={columns.length}
+                          className="h-24 text-center"
+                        >
+                          No results.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="flex-1 text-sm text-muted-foreground">
+                  {outOfStockTable.getFilteredSelectedRowModel().rows.length} of{" "}
+                  {outOfStockTable.getFilteredRowModel().rows.length} row(s)
+                  selected.
+                </div>
+                <div className="space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => outOfStockTable.previousPage()}
+                    disabled={!outOfStockTable.getCanPreviousPage()}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => outOfStockTable.nextPage()}
+                    disabled={!outOfStockTable.getCanNextPage()}
                   >
                     Next
                   </Button>

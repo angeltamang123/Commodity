@@ -117,7 +117,7 @@ export default function CustomNavbar() {
           </NavbarItem>
         </NavbarContent>
 
-        <NavbarContent className="ml-16 gap-1">
+        <NavbarContent className={`ml-16 ${isLoggedIn ? "gap-1" : "gap-4"}`}>
           <NavbarItem className="lg:flex w-64 font-normal">
             <Input
               placeholder="Search Product"
@@ -127,7 +127,7 @@ export default function CustomNavbar() {
           </NavbarItem>
           <NavbarItem className="ml-16">
             <Button
-              className="text-default-600"
+              className={`text-default-600 ${!isLoggedIn && "hidden"}`}
               href="/cart"
               as={Link}
               variant="light"
@@ -172,7 +172,7 @@ export default function CustomNavbar() {
           ) : (
             <Button
               disableRipple
-              className="p-0 bg-transparent border-gray-400 data-[hover=true]:bg-transparent"
+              className="p-0 bg-transparent border-1 w-40 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent"
               radius="sm"
               onPress={() => {
                 router.push("/login");
