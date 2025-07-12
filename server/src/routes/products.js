@@ -7,6 +7,8 @@ const {
   updateProduct,
   deleteProduct,
   toggleStatus,
+  getLatest,
+  getDiscountedProducts,
 } = require("../controllers/products");
 const app = Router();
 const storage = multer.diskStorage({
@@ -20,7 +22,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.get("/products", getAllProducts);
+app.get("/products", (req, res) => {
+  if (req.query.latest === "true") {
+    return getLatest(req, res);
+  } else if (req.query.deals === "true") {
+    return getDiscountedProducts(req, res);
+  }
+  return getAllProducts(req, res);
+});
 app.get("/products/:productId", getProductById);
 app.patch(
   "/products/:productId",

@@ -246,6 +246,56 @@ const toggleStatus = async (req, res) => {
   res.status(200).json({ message: "Status Toggled" });
 };
 
+const getLatest = async (req, res) => {
+  try {
+    // Calculate date 1 month ago from now
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    const latestProducts = await Product.find({
+      createdAt: {
+        $gte: oneMonthAgo, // Greater than or equal to one month ago
+      },
+      status: "active",
+    }).sort({ createdAt: -1 }); // Sort by newest first
+
+    res.status(200).json({
+      message: "Latest products found",
+      count: latestProducts.length,
+      data: latestProducts,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching latest products",
+    });
+  }
+};
+
+const getDiscountedProducts = async (req, res) => {
+  try {
+    const discountedProducts = await Product.find({
+      discountPrice: { $exists: true, $gt: 0 },
+      status: "active",
+    })
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    res.status(200).json({
+      success: true,
+      count: discountedProducts.length,
+      data: discountedProducts,
+    });
+  } catch (error) {
+    console.error("Error in getDiscountedProducts:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching discounted products",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   registerNewProduct,
   getAllProducts,
@@ -253,4 +303,6 @@ module.exports = {
   updateProduct,
   deleteProduct,
   toggleStatus,
+  getLatest,
+  getDiscountedProducts,
 };

@@ -88,16 +88,16 @@ export default function CustomNavbar() {
                 base: "gap-4",
               }}
             >
-              <DropdownItem href="/categories/electronics">
+              <DropdownItem href="/categories/Electronics">
                 Electronics
               </DropdownItem>
-              <DropdownItem href="/categories/clothing">Clothing</DropdownItem>
-              <DropdownItem href="/categories/books">Books</DropdownItem>
-              <DropdownItem href="/categories/sports">Sports</DropdownItem>
-              <DropdownItem href="/categories/furniture">
-                Furniture
+              <DropdownItem href="/categories/Clothing">Clothing</DropdownItem>
+              <DropdownItem href="/categories/Books">Books</DropdownItem>
+              <DropdownItem href="/categories/Sports">Sports</DropdownItem>
+              <DropdownItem href="/categories/Furnitures">
+                Furnitures
               </DropdownItem>
-              <DropdownItem href="/categories/other">Other</DropdownItem>
+              <DropdownItem href="/categories/Others">Others</DropdownItem>
             </DropdownMenu>
           </Dropdown>
           <NavbarItem>
@@ -106,7 +106,7 @@ export default function CustomNavbar() {
             </Link>
           </NavbarItem>
           <NavbarItem>
-            <Link href="/whats-new" className="text-default-600">
+            <Link href="/latest" className="text-default-600">
               What&apos;s New
             </Link>
           </NavbarItem>

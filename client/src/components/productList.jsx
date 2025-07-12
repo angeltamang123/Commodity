@@ -8,6 +8,8 @@ const ProductList = ({ data, category }) => {
     sports: "Sports",
     furniture: "Furniture",
     other: "Other",
+    new: "What's New",
+    hot: "Hot Deals",
   };
   return (
     <div className="container w-full mx-auto px-4 py-8">

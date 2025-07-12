@@ -41,7 +41,11 @@ export default function ProductCard({ product }) {
             </div>
           )}
         </div>
-        <div className="h-52 relative mx-auto mb-4">
+        <div
+          className={`h-52 relative mx-auto mb-4 ${
+            !product.rating && !product.discountPrice && "mt-5"
+          }`}
+        >
           <Image
             src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.image}`}
             alt={product.name}
