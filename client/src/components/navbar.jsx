@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/redux/reducerSlices/userSlice";
 import { useEffect } from "react";
+import { SearchBar } from "./searchBar";
 
 export default function CustomNavbar() {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ export default function CustomNavbar() {
   const { isLoggedIn } = useSelector((state) => state.user);
 
   return (
-    <div className="max-w-screen overflow-hidden relative z-10">
+    <div className="max-w-screen overflow-visible relative z-10">
       {/* Top Bar */}
       <div className="w-full bg-[#AF0000] text-[#FFFFFA] px-4 py-2 flex justify-between items-center text-sm">
         <div className="flex items-center gap-2">
@@ -58,7 +59,7 @@ export default function CustomNavbar() {
         </div>
       </div>
       {/* Main Navbar */}
-      <Navbar className="border-b flex w-full justify-between bg-[#FEFEFE] ">
+      <Navbar className="border-b flex w-full justify-between overflow-visible bg-[#FEFEFE] ">
         <NavbarBrand className="ml-4">
           <Link href="/" className="flex justify-start items-center gap-2">
             <CommodityLogo className="text-[#730000]" />
@@ -119,11 +120,12 @@ export default function CustomNavbar() {
 
         <NavbarContent className={`ml-16 ${isLoggedIn ? "gap-1" : "gap-4"}`}>
           <NavbarItem className="lg:flex w-64 font-normal">
-            <Input
+            {/* <Input
               placeholder="Search Product"
               startContent={<Search />}
               type="search"
-            />
+            /> */}
+            <SearchBar />
           </NavbarItem>
           <NavbarItem className="ml-16">
             <Button

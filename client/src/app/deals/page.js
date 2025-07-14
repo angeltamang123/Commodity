@@ -5,7 +5,8 @@ import axios from "axios";
 import { ProductPagination } from "@/components/productPagination";
 
 const Deals = async ({ searchParams }) => {
-  const page = (await searchParams.page) ?? "1";
+  searchParams = await searchParams;
+  const page = searchParams?.page || "1";
 
   try {
     const { data } = await axios.get(

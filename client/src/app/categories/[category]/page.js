@@ -5,8 +5,10 @@ import axios from "axios";
 import { ProductPagination } from "@/components/productPagination";
 
 const Category = async ({ params, searchParams }) => {
-  const category = await params.category;
-  const page = (await searchParams.page) ?? "1";
+  params = await params;
+  searchParams = await searchParams;
+  const category = params?.category;
+  const page = searchParams?.page || "1";
   try {
     const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/products?category=${category}&page=${page}`
