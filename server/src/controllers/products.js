@@ -197,10 +197,74 @@ const updateProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const data = await Product.find(req.query);
-    res.send(data);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 16;
+    const skip = (page - 1) * limit;
+
+    // Master Filter Object
+    let filters = {};
+
+    // Text Search
+    if (req.query.q) {
+      filters.$text = { $search: req.query.q };
+    }
+
+    // Category Filter
+    if (req.query.category) {
+      filters.category = req.query.category;
+    }
+
+    // Price Range Filter
+    if (req.query.minPrice || req.query.maxPrice) {
+      filters.price = {};
+      if (req.query.minPrice) {
+        filters.price.$gte = parseFloat(req.query.minPrice);
+      }
+      if (req.query.maxPrice) {
+        filters.price.$lte = parseFloat(req.query.maxPrice);
+      }
+    }
+
+    // "Has Discount" Filter
+    if (req.query.hasDiscount === "true") {
+      filters.discountPrice = { $exists: true, $ne: null, $gt: 0 };
+    }
+
+    // Minimum Rating Filter
+    if (req.query.minRating) {
+      filters["rating.average"] = { $gte: parseFloat(req.query.minRating) };
+    }
+
+    const totalProducts = await Product.countDocuments(filters);
+
+    const findOptions = {};
+
+    // Only include text score when actually searching
+    if (req.query.q) {
+      findOptions.projection = { score: { $meta: "textScore" } };
+      findOptions.sort = { score: { $meta: "textScore" } };
+    } else {
+      findOptions.sort = { createdAt: 1 }; // Default sort
+    }
+
+    const products = await Product.find(filters, findOptions.projection)
+      .sort(findOptions.sort)
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      products: products,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalProducts / limit),
+        totalProducts: totalProducts,
+      },
+    });
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error("Error fetching products:", error);
+    res
+      .status(500)
+      .json({ message: error.message || "Failed to fetch products" });
   }
 };
 
@@ -248,25 +312,37 @@ const toggleStatus = async (req, res) => {
 
 const getLatest = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 16;
+    const skip = (page - 1) * limit;
+
     // Calculate date 1 month ago from now
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-    const latestProducts = await Product.find({
-      createdAt: {
-        $gte: oneMonthAgo, // Greater than or equal to one month ago
-      },
+    const filter = {
+      createdAt: { $gte: oneMonthAgo },
       status: "active",
-    }).sort({ createdAt: -1 }); // Sort by newest first
+    };
+
+    const totalProducts = await Product.countDocuments(filter);
+
+    const latestProducts = await Product.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     res.status(200).json({
-      message: "Latest products found",
-      count: latestProducts.length,
-      data: latestProducts,
+      products: latestProducts,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalProducts / limit),
+        totalProducts: totalProducts,
+      },
     });
   } catch (error) {
+    console.error("Error in getLatest:", error);
     res.status(500).json({
-      success: false,
       message: "Server error while fetching latest products",
     });
   }
@@ -274,24 +350,34 @@ const getLatest = async (req, res) => {
 
 const getDiscountedProducts = async (req, res) => {
   try {
-    const discountedProducts = await Product.find({
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 16;
+    const skip = (page - 1) * limit;
+
+    const filter = {
       discountPrice: { $exists: true, $gt: 0 },
       status: "active",
-    })
-      .sort({ createdAt: -1 })
-      .limit(50);
+    };
+
+    const totalProducts = await Product.countDocuments(filter);
+
+    const discountedProducts = await Product.find(filter)
+      .sort({ updatedAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     res.status(200).json({
-      success: true,
-      count: discountedProducts.length,
-      data: discountedProducts,
+      products: discountedProducts,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalProducts / limit),
+        totalProducts: totalProducts,
+      },
     });
   } catch (error) {
     console.error("Error in getDiscountedProducts:", error);
     res.status(500).json({
-      success: false,
       message: "Server error while fetching discounted products",
-      error: error.message,
     });
   }
 };

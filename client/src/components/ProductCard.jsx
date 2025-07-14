@@ -14,7 +14,7 @@ export default function ProductCard({ product }) {
     router.push("/products/" + product._id);
   };
   return (
-    <Card className="flex flex-col h-full cursor-pointer ">
+    <Card className="flex flex-col h-full cursor-pointer hover:shadow-sm hover:shadow-black">
       <CardContent
         onClick={handleClick}
         className="p-4 flex-grow flex-col relative overflow-hidden"
@@ -30,12 +30,12 @@ export default function ProductCard({ product }) {
               <p>{Math.round(discount * 10) / 10}% Off</p>
             </div>
           )}
-          {product.rating && (
+          {product.rating.average && (
             <div className="w-16 z-10">
               <div className="flex border w-14 justify-center border-[#AF0000] bg-[#AF0000] rounded-lg gap-1">
                 <Star className="text-[#AF0000] fill-yellow-500 size-4" />
                 <p className="text-xs text-white font-sans">
-                  {Math.round(product?.rating * 10) / 10}
+                  {Math.round(product?.rating?.average * 10) / 10}
                 </p>
               </div>
             </div>
@@ -92,7 +92,11 @@ export default function ProductCard({ product }) {
           </div>
         )}
         {/* <p className="text-sm text-gray-600">Category: {product.category}</p> */}
-        <p className="text-sm ">Stock: {product.stock}</p>
+        {product.status === "active" ? (
+          <p className="text-sm ">Stock: {product.stock}</p>
+        ) : (
+          <p className="text-sm ">Product not Available</p>
+        )}
       </CardContent>
       <CardFooter className="p-4 flex justify-center gap-2">
         <Button
