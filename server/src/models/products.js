@@ -87,7 +87,7 @@ const productSchema = new Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 // A text index on the fields to search
@@ -103,6 +103,20 @@ productSchema.pre("save", function (next) {
   }
 
   next();
+});
+
+// A virtual property to check if the product is currently on sale
+productSchema.virtual("isOnSale").get(function () {
+  return (
+    this.discountPrice != null &&
+    this.discountTill &&
+    this.discountTill > new Date()
+  );
+});
+
+// Define a virtual property for the final, effective price
+productSchema.virtual("effectivePrice").get(function () {
+  return this.isOnSale ? this.discountPrice : this.price;
 });
 
 const Product = mongoose.model("Product", productSchema);

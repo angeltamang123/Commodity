@@ -216,13 +216,28 @@ const getAllProducts = async (req, res) => {
 
     // Price Range Filter
     if (req.query.minPrice || req.query.maxPrice) {
-      filters.price = {};
+      const priceCondition = {};
       if (req.query.minPrice) {
-        filters.price.$gte = parseFloat(req.query.minPrice);
+        priceCondition.$gte = parseFloat(req.query.minPrice);
       }
       if (req.query.maxPrice) {
-        filters.price.$lte = parseFloat(req.query.maxPrice);
+        priceCondition.$lte = parseFloat(req.query.maxPrice);
       }
+
+      // $or to check against the effective price
+      filters.$or = [
+        // Case A: The product is on sale, so check its discountPrice
+        { discountPrice: priceCondition, discountTill: { $gt: new Date() } },
+
+        // Case B: The product is NOT on sale, so check its regular price
+        {
+          price: priceCondition,
+          $or: [
+            { discountPrice: { $in: [null, undefined] } },
+            { discountTill: { $lte: new Date() } },
+          ],
+        },
+      ];
     }
 
     // "Has Discount" Filter
@@ -357,6 +372,7 @@ const getDiscountedProducts = async (req, res) => {
     const filter = {
       discountPrice: { $exists: true, $gt: 0 },
       status: "active",
+      discountTill: { $gt: new Date() },
     };
 
     const totalProducts = await Product.countDocuments(filter);

@@ -10,6 +10,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import Image from "next/image";
 
@@ -71,6 +72,7 @@ export function SearchBar() {
 
     if (document.activeElement?.getAttribute("role") !== "option") {
       setIsOpen(false);
+      setQuery("");
       router.push(`/search?q=${query}`);
     }
   };
@@ -78,6 +80,7 @@ export function SearchBar() {
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && query) {
       handleFormSubmit(e);
+      inputRef.current.blur();
     }
   };
 
@@ -91,6 +94,7 @@ export function SearchBar() {
           <CommandInput
             placeholder="Search for products"
             value={query}
+            ref={inputRef}
             onValueChange={setQuery}
             onFocus={() => setIsOpen(query.length > 0)}
             onKeyDown={handleKeyDown}
@@ -126,6 +130,17 @@ export function SearchBar() {
                       </div>
                     </CommandItem>
                   ))}
+                  <CommandSeparator />
+                  <div
+                    onClick={() => {
+                      router.push(`/search?q=${query}`);
+                      setIsOpen(false);
+                      setQuery("");
+                    }}
+                    className="relative flex gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none bg-[#AF0000] hover:bg-[#730000] data-[selected]:bg-[#730000] text-white data-[selected]:text-white cursor-pointer"
+                  >
+                    View all Results
+                  </div>
                 </CommandGroup>
               ) : (
                 <CommandEmpty className="p-4 text-sm text-center">

@@ -22,10 +22,10 @@ export default function ProductCard({ product }) {
         <div
           className={cn(
             "flex justify-between w-full",
-            !product.discountPrice && "justify-end"
+            !product.isOnSale && "justify-end"
           )}
         >
-          {product.discountPrice && (
+          {product.isOnSale && (
             <div className="text-center border border-[#AF0000] rounded-lg  w-16 text-white font-sans text-xs bg-[#AF0000] z-1">
               <p>{Math.round(discount * 10) / 10}% Off</p>
             </div>
@@ -43,7 +43,7 @@ export default function ProductCard({ product }) {
         </div>
         <div
           className={`h-52 relative mx-auto mb-4 ${
-            !product.rating && !product.discountPrice && "mt-5"
+            !product.rating.average && !product.isOnSale && "mt-5"
           }`}
         >
           <Image
@@ -67,7 +67,7 @@ export default function ProductCard({ product }) {
         <h2 className="text-lg font-semibold mb-2">{product.name}</h2>
         {}
         {/* <p className="text-sm text-gray-600 mb-2">{product.description}</p> */}
-        {!product.discountPrice ? (
+        {!product.isOnSale ? (
           <p className="text-md font-bold">
             Rs.
             {product.price.toLocaleString("en-IN", {
