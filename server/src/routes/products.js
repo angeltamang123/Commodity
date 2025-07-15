@@ -10,6 +10,8 @@ const {
   getLatest,
   getDiscountedProducts,
 } = require("../controllers/products");
+const authMiddleware = require("../utils/authMiddleware");
+
 const app = Router();
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -33,16 +35,18 @@ app.get("/products", (req, res) => {
 app.get("/products/:productId", getProductById);
 app.patch(
   "/products/:productId",
+  authMiddleware.protect,
   upload.fields([
     { name: "image", maxCount: 1 }, // For the single main product image
     { name: "images[]", maxCount: 5 }, // For the array of additional images
   ]),
   updateProduct
 );
-app.delete("/products/:productId", deleteProduct);
+app.delete("/products/:productId", authMiddleware.protect, deleteProduct);
 
 app.post(
   "/products",
+  authMiddleware.protect,
   upload.fields([
     { name: "image", maxCount: 1 }, // For the single main product image
     { name: "images[]", maxCount: 5 }, // For the array of additional images
@@ -50,6 +54,10 @@ app.post(
   registerNewProduct
 );
 
-app.patch("/products/:productId/toggleStatus", toggleStatus);
+app.patch(
+  "/products/:productId/toggleStatus",
+  authMiddleware.protect,
+  toggleStatus
+);
 
 module.exports = app;
