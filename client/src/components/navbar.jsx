@@ -174,7 +174,7 @@ export default function CustomNavbar() {
           ) : (
             <Button
               disableRipple
-              className="p-0 bg-transparent border-1 w-40 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent"
+              className="p-0 -ml-20 bg-transparent border-1 w-56 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent"
               radius="sm"
               onPress={() => {
                 router.push("/login");

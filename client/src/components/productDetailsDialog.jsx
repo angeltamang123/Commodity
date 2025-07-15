@@ -24,7 +24,7 @@ export default function ProductDetailsDialog({ product }) {
           View details
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-7xl max-h-[95vh] overflow-y-auto p-0">
         <DialogHeader>
           {/*  Wrap DialogTitle with VisuallyHidden */}
           <VisuallyHidden.Root>

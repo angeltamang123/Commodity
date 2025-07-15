@@ -46,6 +46,7 @@ import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import axios from "axios";
 import { toast } from "sonner";
+import api from "@/lib/axiosInstance";
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
@@ -164,9 +165,7 @@ export default function EditProductForm() {
     const fetchProduct = async () => {
       try {
         setLoadingProduct(true);
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`
-        );
+        const response = await api.get(`/products/${productId}`);
         const product = response.data;
 
         // Prepare FilePond files for existing images
@@ -367,15 +366,11 @@ export default function EditProductForm() {
         // Send existing image filenames separately
         formData.append("existingImages", JSON.stringify(existingImageSources));
 
-        const response = await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        const response = await api.patch(`/products/${productId}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
         toast.success("Product updated successfully!");
         setSubmitStatus("success");

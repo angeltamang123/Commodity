@@ -61,9 +61,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import ProductDetail from "@/components/productDetails";
 import ProductDetailsDialog from "@/components/productDetailsDialog";
+import api from "@/lib/axiosInstance";
 
 export default function InventoryPage() {
   const [allProducts, setAllProducts] = React.useState([]);
@@ -100,16 +99,17 @@ export default function InventoryPage() {
   const [currentTable, setCurrentTable] = React.useState(null);
   const [showStatusChangeDialog, setShowStatusChangeDialog] =
     React.useState(false);
+  const [loading, setLoading] = React.useState(true);
 
   const router = useRouter();
 
   const fetchData = async () => {
-    const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/products`
-    );
+    setLoading(true);
+    const { data } = await api.get(`/products`);
     if (data) {
-      setAllProducts(data);
+      setAllProducts(data.products);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export default function InventoryPage() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`);
+      await api.delete(`/products/${id}`);
       fetchData();
       setIsDeleteDialogOpen(false);
     } catch (error) {
@@ -151,12 +151,9 @@ export default function InventoryPage() {
     const toggledStatus = currentStatus === "active" ? "inactive" : "active";
 
     try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/products/${productToToggle._id}/toggleStatus`,
-        {
-          status: toggledStatus,
-        }
-      );
+      await api.patch(`/products/${productToToggle._id}/toggleStatus`, {
+        status: toggledStatus,
+      });
 
       setAllProducts((prevData) =>
         prevData.map((p) =>
@@ -176,11 +173,7 @@ export default function InventoryPage() {
         (rowIndex) => tableInstance.getRowModel().rows[rowIndex].original._id
       );
 
-      await Promise.all(
-        selectedIds.map((id) =>
-          axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`)
-        )
-      );
+      await Promise.all(selectedIds.map((id) => api.delete(`/products/${id}`)));
 
       fetchData();
       toast.success("Selected products deleted successfully");
@@ -225,6 +218,7 @@ export default function InventoryPage() {
                 "/uploads/" +
                 row.original.image
               }
+              className="object-contain"
               alt={row.original.name}
             />
             <AvatarFallback>{row.original.name.charAt(0)}</AvatarFallback>
@@ -490,7 +484,7 @@ export default function InventoryPage() {
                           colSpan={columns.length}
                           className="h-24 text-center"
                         >
-                          No results.
+                          {loading ? "Loading data" : "No results."}
                         </TableCell>
                       </TableRow>
                     )}
@@ -606,7 +600,7 @@ export default function InventoryPage() {
                           colSpan={columns.length}
                           className="h-24 text-center"
                         >
-                          No results.
+                          {loading ? "Loading data" : "No results."}
                         </TableCell>
                       </TableRow>
                     )}
@@ -726,7 +720,7 @@ export default function InventoryPage() {
                           colSpan={columns.length}
                           className="h-24 text-center"
                         >
-                          No results.
+                          {loading ? "Loading data" : "No results."}
                         </TableCell>
                       </TableRow>
                     )}

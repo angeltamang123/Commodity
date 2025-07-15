@@ -28,6 +28,7 @@ import {
   addToWishList,
   removeFromWishList,
 } from "@/redux/reducerSlices/userSlice";
+import api from "@/lib/axiosInstance";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -73,11 +74,19 @@ export default function ProductDetail({ product }) {
 
   // Placeholder for add to cart / buy item logic
   const handleAddToCart = () => {
+    if (!isLoggedIn) {
+      setLoginDialog(true);
+      return;
+    }
     console.log("Added to cart:", product.name, selectedColor, selectedSize);
     // Implement actual add to cart logic here
   };
 
   const handleBuyNow = () => {
+    if (!isLoggedIn) {
+      setLoginDialog(true);
+      return;
+    }
     console.log("Buying item:", product.name, selectedColor, selectedSize);
     // Implement actual buy now logic here
   };
@@ -89,18 +98,16 @@ export default function ProductDetail({ product }) {
     }
     try {
       if (inWishList) {
-        await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/user/${userId}/remove-wishlist`,
-          { product: product._id }
-        );
+        await api.patch(`/user/${userId}/remove-wishlist`, {
+          product: product._id,
+        });
         dispatch(removeFromWishList(product._id));
         setInWishList(false);
         toast.success("Item removed from Wishlist");
       } else {
-        await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/user/${userId}/add-wishlist`,
-          { product: product._id }
-        );
+        await api.patch(`/user/${userId}/add-wishlist`, {
+          product: product._id,
+        });
         dispatch(addToWishList(product._id));
         setInWishList(true);
         toast.success("Item added to Wishlist");
@@ -193,9 +200,9 @@ export default function ProductDetail({ product }) {
 
           {/* Rating */}
           <div className="flex items-center gap-2">
-            {product.rating !== null &&
-            product.rating !== undefined &&
-            product.rating > 0 ? (
+            {product.rating.average !== null &&
+            product.rating.average !== undefined &&
+            product.rating.average > 0 ? (
               <>
                 <div className="flex items-center">
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -211,7 +218,8 @@ export default function ProductDetail({ product }) {
                   ))}
                 </div>
                 <span className="text-sm text-gray-600">
-                  {product.rating.toFixed(1)} ({product.rating * 100}+ reviews)
+                  {product?.rating?.average.toFixed(1)} ({product.rating.count}+
+                  reviews)
                 </span>
               </>
             ) : (

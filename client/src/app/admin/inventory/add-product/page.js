@@ -45,6 +45,7 @@ import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import axios from "axios";
 import { toast } from "sonner";
+import api from "@/lib/axiosInstance";
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
@@ -198,15 +199,11 @@ export default function ProductForm() {
           });
         }
 
-        const response = await axios.post(
-          process.env.NEXT_PUBLIC_API_URL + "/products",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        const response = await api.post("/products", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
         setSubmitStatus("success");
         formik.resetForm();

@@ -21,10 +21,12 @@ const loginUser = async (req, res) => {
   );
   if (!passwordMatched) return res.status(401).send("Invalid Password");
   const secret = process.env.JWT_SECRET;
-  const token = jwt.sign({ emailId: req.body.emailId }, secret);
+  const token = jwt.sign({ id: user._id }, secret);
+  const userToSend = user.toObject();
+  delete userToSend.password;
   res.send({
     message: "logged in successfully",
-    user: user,
+    user: userToSend,
     isLoggedIn: true,
     token,
   });
