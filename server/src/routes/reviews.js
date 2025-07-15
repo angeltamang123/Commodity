@@ -6,29 +6,17 @@ const {
   checkUserReview,
   updateReview,
   deleteReview,
+  likeReview,
 } = require("../controllers/reviews");
 
-// // By setting mergeParams: true, we can access :productId from the parent router.
-// const router = express.Router({ mergeParams: true });
+// By setting mergeParams: true, we can access :productId from the parent router.
+const router = Router({ mergeParams: true });
 
-const router = Router();
-
-router.get("/reviews/:productId", getAllReviewsForProduct);
-router.post("/reviews/:productId", authMiddleware.protect, createReview);
-router.get(
-  "/reviews/:productId/my-review",
-  authMiddleware.protect,
-  checkUserReview
-);
-router.patch(
-  "/reviews/:productId/:reviewId",
-  authMiddleware.protect,
-  updateReview
-);
-router.delete(
-  "/reviews/:productId/:reviewId",
-  authMiddleware.protect,
-  deleteReview
-);
+router.get("/", getAllReviewsForProduct);
+router.post("/", authMiddleware.protect, createReview);
+router.get("/my-review", authMiddleware.protect, checkUserReview);
+router.patch("/:reviewId", authMiddleware.protect, updateReview);
+router.delete("/:reviewId", authMiddleware.protect, deleteReview);
+router.patch("/:reviewId/like", authMiddleware.protect, likeReview);
 
 module.exports = router;

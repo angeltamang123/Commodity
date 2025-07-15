@@ -26,7 +26,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/redux/reducerSlices/userSlice";
 import { useEffect } from "react";
-import { SearchBar } from "./searchBar";
+import { SearchBar } from "./search/searchBar";
 
 export default function CustomNavbar() {
   const dispatch = useDispatch();

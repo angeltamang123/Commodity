@@ -20,9 +20,6 @@ app.use(productRoute);
 const userRoute = require("./routes/users");
 app.use(userRoute);
 
-const reviewRoute = require("./routes/reviews");
-app.use(reviewRoute);
-
 const connect = require("./db/connection"); //importing db
 connect(); //function for connecting db
 

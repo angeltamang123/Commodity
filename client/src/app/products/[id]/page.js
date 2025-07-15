@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { Loader2Icon } from "lucide-react";
-import ProductDetail from "@/components/productDetails";
+import ProductDetail from "@/components/productComponents/productDetails";
 import CustomNavbar from "@/components/navbar";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;

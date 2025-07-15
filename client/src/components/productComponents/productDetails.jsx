@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   StarIcon,
+  StarHalf,
   ShoppingCartIcon,
   Share2Icon,
   HeartIcon,
+  Star,
 } from "lucide-react";
 import {
   Carousel,
@@ -29,6 +31,7 @@ import {
   removeFromWishList,
 } from "@/redux/reducerSlices/userSlice";
 import api from "@/lib/axiosInstance";
+import ProductReviews from "../reviews/ProductReviews";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -46,7 +49,11 @@ export default function ProductDetail({ product }) {
   const { isLoggedIn, wishlist, userId } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  // Create array of all images (main image + additional images)
+  const averageRating = parseFloat(product.rating.average.toFixed(1));
+  const numFullStars = Math.floor(averageRating);
+  const hasHalfStar = averageRating % 1 !== 0;
+
+  // Array of all images (main image + additional images)
   const allImages = [product.image, ...(product.images || [])].filter(Boolean);
 
   useEffect(() => {
@@ -205,17 +212,30 @@ export default function ProductDetail({ product }) {
             product.rating.average > 0 ? (
               <>
                 <div className="flex items-center">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <StarIcon
-                      key={i}
-                      className={cn(
-                        "h-4 w-4",
-                        i < product.rating
-                          ? "text-yellow-400 fill-yellow-400"
-                          : "text-gray-300"
-                      )}
-                    />
-                  ))}
+                  {Array.from({ length: 5 }).map((_, i) => {
+                    const starPosition = i + 1; // 1st, 2nd, 3rd, 4th, 5th star
+
+                    if (starPosition < numFullStars) {
+                      // Render full yellow star
+                      return (
+                        <Star
+                          key={i}
+                          className="h-4 w-4 text-yellow-400 fill-yellow-400"
+                        />
+                      );
+                    } else if (starPosition === numFullStars && hasHalfStar) {
+                      // Render half yellow star
+                      return (
+                        <StarHalf
+                          key={i}
+                          className="h-4 w-4 text-yellow-400 fill-yellow-400"
+                        />
+                      );
+                    } else {
+                      // Render empty gray star
+                      return <Star key={i} className="h-4 w-4 text-gray-300" />;
+                    }
+                  })}
                 </div>
                 <span className="text-sm text-gray-600">
                   {product?.rating?.average.toFixed(1)} ({product.rating.count}+
@@ -365,6 +385,16 @@ export default function ProductDetail({ product }) {
           )}
         </div>
       </div>
+
+      {!isAdminPath && (
+        <div className="mt-12 md:mt-16">
+          <ProductReviews
+            productId={product._id}
+            productRating={product.rating}
+          />
+        </div>
+      )}
+
       <LoginAlert
         open={loginDialog}
         onOpenChange={setLoginDialog}

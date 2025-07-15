@@ -44,7 +44,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import ProductDelete from "@/components/product-delete";
+import ProductDelete from "@/components/admin/product-delete";
 import { cn } from "@/lib/utils";
 import {
   Popover,
@@ -61,7 +61,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import ProductDetailsDialog from "@/components/productDetailsDialog";
+import ProductDetailsDialog from "@/components/admin/productDetailsDialog";
 import api from "@/lib/axiosInstance";
 
 export default function InventoryPage() {

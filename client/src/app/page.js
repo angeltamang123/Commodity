@@ -1,8 +1,8 @@
 import React from "react";
 import CustomNavbar from "@/components/navbar";
-import ProductList from "@/components/productList";
+import ProductList from "@/components/productComponents/productList";
 import axios from "axios";
-import { ProductPagination } from "@/components/productPagination";
+import { ProductPagination } from "@/components/productComponents/productPagination";
 
 const page = async ({ searchParams }) => {
   searchParams = await searchParams;
@@ -17,7 +17,7 @@ const page = async ({ searchParams }) => {
       <main>
         <CustomNavbar />
         <ProductList data={data.products} />
-        <div className="mt-8">
+        <div className="mt-1">
           <ProductPagination totalPages={data.pagination.totalPages} />
         </div>
       </main>

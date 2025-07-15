@@ -7,8 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import ProductDetail from "./productDetails";
-import { Button } from "./ui/button";
+import ProductDetail from "../productComponents/productDetails";
+import { Button } from "../ui/button";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 export default function ProductDetailsDialog({ product }) {

@@ -10,9 +10,12 @@ const {
   getLatest,
   getDiscountedProducts,
 } = require("../controllers/products");
+
 const authMiddleware = require("../utils/authMiddleware");
 
-const app = Router();
+const reviewRouter = require("./reviews");
+
+const router = Router();
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads");
@@ -24,7 +27,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.get("/products", (req, res) => {
+router.get("/products", (req, res) => {
   if (req.query.latest === "true") {
     return getLatest(req, res);
   } else if (req.query.deals === "true") {
@@ -32,8 +35,8 @@ app.get("/products", (req, res) => {
   }
   return getAllProducts(req, res);
 });
-app.get("/products/:productId", getProductById);
-app.patch(
+router.get("/products/:productId", getProductById);
+router.patch(
   "/products/:productId",
   authMiddleware.protect,
   upload.fields([
@@ -42,9 +45,9 @@ app.patch(
   ]),
   updateProduct
 );
-app.delete("/products/:productId", authMiddleware.protect, deleteProduct);
+router.delete("/products/:productId", authMiddleware.protect, deleteProduct);
 
-app.post(
+router.post(
   "/products",
   authMiddleware.protect,
   upload.fields([
@@ -54,10 +57,12 @@ app.post(
   registerNewProduct
 );
 
-app.patch(
+router.patch(
   "/products/:productId/toggleStatus",
   authMiddleware.protect,
   toggleStatus
 );
 
-module.exports = app;
+router.use("/products/:productId/reviews", reviewRouter);
+
+module.exports = router;

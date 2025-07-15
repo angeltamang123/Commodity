@@ -1,8 +1,8 @@
 import React from "react";
 import CustomNavbar from "@/components/navbar";
-import ProductList from "@/components/productList";
+import ProductList from "@/components/productComponents/productList";
 import axios from "axios";
-import { ProductPagination } from "@/components/productPagination";
+import { ProductPagination } from "@/components/productComponents/productPagination";
 
 const Category = async ({ params, searchParams }) => {
   params = await params;

@@ -21,10 +21,18 @@ const createReview = async (req, res) => {
     };
 
     const newReview = await Review.create(reviewData);
+    const updatedProduct = await Product.findById(req.params.productId).select(
+      "rating"
+    );
+
+    const populatedReview = await newReview.populate("user", "fullName");
 
     res.status(201).json({
       status: "success",
-      data: newReview,
+      data: {
+        review: populatedReview,
+        updatedProductRating: updatedProduct.rating,
+      },
     });
   } catch (error) {
     // Potential duplicate key error (if user tries to review same product twice)
@@ -138,9 +146,18 @@ const updateReview = async (req, res) => {
       }
     ).populate("user", "fullName ");
 
+    const updatedProduct = await Product.findById(req.params.productId).select(
+      "rating"
+    );
+
+    await updatedReview.populate("user", "fullName");
+
     res.status(200).json({
       status: "success",
-      data: updatedReview,
+      data: {
+        review: updatedReview,
+        updatedProductRating: updatedProduct.rating,
+      },
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -166,15 +183,58 @@ const deleteReview = async (req, res) => {
       });
     }
 
-    await review.deleteOne();
+    const productId = review.product.toString();
 
-    res.status(204).json({
+    await Review.findByIdAndDelete(req.params.reviewId);
+
+    const updatedProduct = await Product.findById(productId).select("rating");
+
+    res.status(200).json({
       status: "success",
-      data: null,
+      data: {
+        updatedProductRating: updatedProduct.rating,
+      },
     });
   } catch (error) {
     console.error("Error deleting review:", error);
     res.status(500).json({ status: "fail", message: error.message });
+  }
+};
+
+const likeReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const userId = req.user.id;
+
+    const review = await Review.findById(reviewId);
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found." });
+    }
+
+    const isLiked = review.likes.includes(userId);
+
+    if (isLiked) {
+      // If already liked, remove the like
+      review.likes.pull(userId);
+    } else {
+      // If not liked, add the like
+      review.likes.push(userId);
+    }
+
+    await review.save();
+
+    await review.populate("user", "fullName ");
+
+    res.status(200).json({
+      status: "success",
+      data: review,
+    });
+  } catch (error) {
+    console.error("Error liking review:", error);
+    res
+      .status(500)
+      .json({ status: "fail", message: "Failed to update like status." });
   }
 };
 
@@ -184,4 +244,5 @@ module.exports = {
   checkUserReview,
   updateReview,
   deleteReview,
+  likeReview,
 };

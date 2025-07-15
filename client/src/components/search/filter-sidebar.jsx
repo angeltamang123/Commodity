@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 const SLIDER_MAX_VISUAL_VALUE = 1000; // Internal linear scale for the slider
 const LOW_PRICE_THRESHOLD = 100000; // The price point where the sensitivity changes

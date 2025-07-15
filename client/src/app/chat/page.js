@@ -1,4 +1,4 @@
-import ChatCard from "@/components/chat-card";
+import ChatCard from "@/components/chat/chat-card";
 import CustomNavbar from "@/components/navbar";
 import React from "react";
 

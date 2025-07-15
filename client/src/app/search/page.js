@@ -1,7 +1,7 @@
-import { FilterSidebar } from "@/components/filter-sidebar";
+import { FilterSidebar } from "@/components/search/filter-sidebar";
 import CustomNavbar from "@/components/navbar";
-import ProductCard from "@/components/ProductCard";
-import { ProductPagination } from "@/components/productPagination";
+import ProductCard from "@/components/productComponents/ProductCard";
+import { ProductPagination } from "@/components/productComponents/productPagination";
 import axios from "axios";
 
 export default async function SearchPage({ searchParams }) {
