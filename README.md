@@ -76,7 +76,7 @@
 
 - ✅ User Registration/Login with JWT
 - ✅ Display product list on landing page
-- ⬜ View product detail page
+- ✅ View product detail page
 - ✅ Admin login/authentication
 - ⬜ Add-to-cart and cart management
 - ✅ Admin: Add/Edit/Delete products
@@ -95,7 +95,7 @@
 
 - ⬜ Payment gateway integration (e.g., Stripe/Khalti)
 - ⬜ Interactive maps for delivery address input (e.g., Google Maps API)
-- ⬜ Advanced search with filters (category, price, etc.)
+- ✅ Advanced search with filters (category, price, etc.)
 
 ---
 

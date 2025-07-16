@@ -49,9 +49,14 @@ export default function ProductDetail({ product }) {
   const { isLoggedIn, wishlist, userId } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  const averageRating = parseFloat(product.rating.average.toFixed(1));
-  const numFullStars = Math.floor(averageRating);
-  const hasHalfStar = averageRating % 1 !== 0;
+  let averageRating;
+  let numFullStars;
+  let hasHalfStar;
+  if (product.rating.average) {
+    averageRating = parseFloat(product?.rating?.average.toFixed(1));
+    numFullStars = Math.floor(averageRating);
+    hasHalfStar = averageRating % 1 !== 0;
+  }
 
   // Array of all images (main image + additional images)
   const allImages = [product.image, ...(product.images || [])].filter(Boolean);
@@ -215,7 +220,7 @@ export default function ProductDetail({ product }) {
                   {Array.from({ length: 5 }).map((_, i) => {
                     const starPosition = i + 1; // 1st, 2nd, 3rd, 4th, 5th star
 
-                    if (starPosition < numFullStars) {
+                    if (starPosition <= numFullStars) {
                       // Render full yellow star
                       return (
                         <Star
@@ -223,7 +228,10 @@ export default function ProductDetail({ product }) {
                           className="h-4 w-4 text-yellow-400 fill-yellow-400"
                         />
                       );
-                    } else if (starPosition === numFullStars && hasHalfStar) {
+                    } else if (
+                      starPosition === numFullStars + 1 &&
+                      hasHalfStar
+                    ) {
                       // Render half yellow star
                       return (
                         <StarHalf
@@ -238,8 +246,11 @@ export default function ProductDetail({ product }) {
                   })}
                 </div>
                 <span className="text-sm text-gray-600">
-                  {product?.rating?.average.toFixed(1)} ({product.rating.count}+
-                  reviews)
+                  {product?.rating?.average.toFixed(1)} (
+                  {product.rating.count > 1
+                    ? `${product.rating.count} reviews`
+                    : `${product.rating.count} review`}
+                  )
                 </span>
               </>
             ) : (

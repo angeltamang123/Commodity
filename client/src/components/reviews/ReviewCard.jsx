@@ -50,11 +50,18 @@ export default function ReviewCard({ review, onLike }) {
               <ThumbsUpIcon
                 className={cn(
                   "h-4 w-4",
-                  isLikedByCurrentUser && "fill-blue-500 text-blue-500"
+                  isLikedByCurrentUser && "fill-[#AF0000] text-[#111B25]"
                 )}
               />
             </Button>
-            <span className="text-xs text-gray-600">{review.likes.length}</span>
+            <span className="text-xs text-gray-600">
+              {review.likes.length}{" "}
+              {review.likes.length > 1
+                ? "people found this helpful"
+                : review.likes.length === 1
+                ? "person found this helpful"
+                : null}{" "}
+            </span>
           </div>
         </div>
       </div>

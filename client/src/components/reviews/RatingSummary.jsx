@@ -21,9 +21,14 @@ export default function RatingSummary({ rating }) {
     { star: 1, count: rating["1"] || 0 },
   ];
 
-  const averageRating = parseFloat(rating.average.toFixed(1));
-  const numFullStars = Math.floor(averageRating);
-  const hasHalfStar = averageRating % 1 !== 0;
+  let averageRating;
+  let numFullStars;
+  let hasHalfStar;
+  if (rating.average) {
+    averageRating = parseFloat(rating?.average.toFixed(1));
+    numFullStars = Math.floor(averageRating);
+    hasHalfStar = averageRating % 1 !== 0;
+  }
 
   return (
     <div className="p-6 border rounded-lg">
@@ -32,7 +37,7 @@ export default function RatingSummary({ rating }) {
           {Array.from({ length: 5 }).map((_, i) => {
             const starPosition = i + 1; // 1st, 2nd, 3rd, 4th, 5th star
 
-            if (starPosition < numFullStars) {
+            if (starPosition <= numFullStars) {
               // Render full yellow star
               return (
                 <Star
@@ -40,7 +45,7 @@ export default function RatingSummary({ rating }) {
                   className="h-5 w-5 text-yellow-400 fill-yellow-400"
                 />
               );
-            } else if (starPosition === numFullStars && hasHalfStar) {
+            } else if (starPosition === numFullStars + 1 && hasHalfStar) {
               // Render half yellow star
               return (
                 <StarHalf

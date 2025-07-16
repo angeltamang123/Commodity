@@ -35,7 +35,8 @@ export default function ProductCard({ product }) {
               <div className="flex border w-14 justify-center border-[#AF0000] bg-[#AF0000] rounded-lg gap-1">
                 <Star className="text-[#AF0000] fill-yellow-500 size-4" />
                 <p className="text-xs text-white font-sans">
-                  {Math.round(product?.rating?.average * 10) / 10}
+                  {Math.round(product?.rating?.average * 10) / 10} (
+                  {product?.rating?.count})
                 </p>
               </div>
             </div>
