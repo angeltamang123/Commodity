@@ -32,7 +32,7 @@ export default function ProductCard({ product }) {
           )}
           {product.rating.average && (
             <div className="w-16 z-10">
-              <div className="flex border w-14 justify-center border-[#AF0000] bg-[#AF0000] rounded-lg gap-1">
+              <div className="flex border w-auto justify-center border-[#AF0000] bg-[#AF0000] rounded-lg gap-1">
                 <Star className="text-[#AF0000] fill-yellow-500 size-4" />
                 <p className="text-xs text-white font-sans">
                   {Math.round(product?.rating?.average * 10) / 10} (
@@ -99,7 +99,7 @@ export default function ProductCard({ product }) {
           <p className="text-sm ">Product not Available</p>
         )}
       </CardContent>
-      <CardFooter className="p-4 flex justify-center gap-2">
+      <CardFooter className="p-4 -mt-4 flex justify-center gap-2">
         <Button
           disabled={product.status === "inactive"}
           className="w-full bg-[#FFFFFA] text-[#AF0000] border-1 rounded-2xl border-[#AF0000] hover:border-[#00232A] hover:bg-[#00232A] hover:text-[#FFFFFA]"

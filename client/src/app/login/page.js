@@ -117,7 +117,12 @@ const LoginPage = () => {
         {/* Logo Placeholder */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex justify-center">
-            <CommodityLogo className="text-[#730000]" />
+            <CommodityLogo
+              onClick={() => {
+                router.push("/");
+              }}
+              className="text-[#730000] cursor-pointer"
+            />
           </div>
           <h2 className="text-3xl font-bold text-center mr-8 text-gray-800 ">
             Login to Your Account

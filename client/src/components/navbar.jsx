@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import CommodityLogo from "./commodityLogo";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/redux/reducerSlices/userSlice";
 import { useEffect } from "react";
@@ -31,6 +31,7 @@ import { SearchBar } from "./search/searchBar";
 export default function CustomNavbar() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const pathName = usePathname();
 
   const { phoneNumber, address } = useSelector((state) => state.user);
   const { isLoggedIn } = useSelector((state) => state.user);
@@ -177,7 +178,11 @@ export default function CustomNavbar() {
               className="p-0 -ml-20 bg-transparent border-1 w-56 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent"
               radius="sm"
               onPress={() => {
-                router.push("/login");
+                if (pathName === "/") {
+                  router.push("/login");
+                } else {
+                  router.push(`/login?from=${pathName}`);
+                }
               }}
               variant="bordered"
             >

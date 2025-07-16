@@ -80,7 +80,7 @@
 - ✅ Admin login/authentication
 - ⬜ Add-to-cart and cart management
 - ✅ Admin: Add/Edit/Delete products
-- ⬜ Inventory count update post-order
+- ⬜ Inventory count update, post-order
 
 ---
 
@@ -93,7 +93,7 @@
 
 **Planned**:
 
-- ⬜ Payment gateway integration (e.g., Stripe/Khalti)
+- ⬜ Simulate Payment
 - ⬜ Interactive maps for delivery address input (e.g., Google Maps API)
 - ✅ Advanced search with filters (category, price, etc.)
 

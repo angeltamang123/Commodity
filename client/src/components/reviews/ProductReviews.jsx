@@ -185,7 +185,7 @@ export default function ProductReviews({ productId, productRating }) {
         <div className="flex items-center gap-4">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="ml-auto">
                 <MoreVertical className="h-4 w-4" />
                 <span className="sr-only">Open review actions</span>
               </Button>
@@ -249,7 +249,9 @@ export default function ProductReviews({ productId, productRating }) {
           onReviewSubmitted={handleReviewSubmitted}
           existingReview={null}
         >
-          <Button variant="outline">Write a Review</Button>
+          <Button variant="outline" className="ml-auto w-44">
+            Write a Review
+          </Button>
         </WriteReviewDialog>
       );
     }
@@ -259,36 +261,39 @@ export default function ProductReviews({ productId, productRating }) {
     <section className="w-full pt-8 border-t">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 lg:gap-x-16">
         {/* Left Side: Reviews List */}
-        <div className="md:col-span-2">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold">
-              Reviews ({reviewsWithComments.length} total)
-            </h2>
-            <Select onValueChange={setSortBy} defaultValue="latest">
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="latest">Latest</SelectItem>
-                <SelectItem value="helpful">Most Helpful</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Review submission section */}
-          <div className="flex justify-end gap-8 items-center p-1 border rounded-md mb-6 bg-gray-50">
-            {userReview ? (
-              <div>
-                <p>
-                  You have rated this product with{" "}
-                  <span className="text-yellow-400">{userReview.rating}</span>{" "}
-                  stars
+        <div className="md:col-span-2 ">
+          <div className="border rounded-md px-6 py-4 mb-6 bg-gray-50">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">
+                Reviews ({reviewsWithComments.length} total)
+              </h2>
+              <Select onValueChange={setSortBy} defaultValue="latest">
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="latest">Latest</SelectItem>
+                  <SelectItem value="helpful">Most Helpful</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Review submission section */}
+            <div className="flex justify-end gap-8 items-center p-1 ">
+              {userReview ? (
+                <div>
+                  <p className="text-sm text-gray-700">
+                    You have rated this product with{" "}
+                    <span className="text-yellow-400">{userReview.rating}</span>{" "}
+                    stars
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-700">
+                  You haven't rated this product yet
                 </p>
-              </div>
-            ) : (
-              <div>You haven't rated this product yet</div>
-            )}
-            {renderReviewButton()}
+              )}
+              {renderReviewButton()}
+            </div>
           </div>
 
           <div className="space-y-6">

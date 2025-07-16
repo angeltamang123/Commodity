@@ -4,7 +4,17 @@ const { Schema } = mongoose;
 const registerSchema = new Schema(
   {
     fullName: { type: String, trim: true },
-    address: { type: String, trim: true },
+    location: {
+      address: { type: String, trim: true },
+      street: { type: String },
+      city: { type: String },
+      postalCode: { type: String },
+      country: { type: String },
+      coordinates: {
+        lat: { type: Number },
+        lng: { type: Number },
+      },
+    },
     emailId: { type: String, trim: true },
     phoneNumber: Number,
     password: {
@@ -26,7 +36,7 @@ const registerSchema = new Schema(
       },
     ],
   },
-  (timestamps = true)
+  { timestamps: true }
 );
 
 const Register = mongoose.model("Register", registerSchema);
