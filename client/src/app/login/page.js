@@ -44,18 +44,20 @@ const LoginPage = () => {
       try {
         // Attempt to log in the user by calling the API
         const data = await loginUser(values);
-        console.log(data);
         if (data) {
           dispatch(addLoginDetails(data));
           toast.success("Login Successful!", {
             description: "You have been successfully logged in.",
           });
           formik.resetForm(); // Clear the form after successful login
-          if (from) {
-            router.push(`${from}`);
-          } else {
-            router.push("/");
-          }
+          // Quick fix for latest react version 19.1.0 with concurrent rendering
+          // useEffect to redirect logged in users works before following redirection below
+          // Due to which this component is unmounted before following redirection works
+          // setTimeout(..., 0) defers execution until the current call stack and React's rendering lifecycle are complete,
+          // avoiding race conditions and allowing routing to happen after the component has stabilized.
+          setTimeout(() => {
+            router.push(from || "/");
+          }, 0);
         } else {
           // This case might be hit if the API returns an empty success response
           toast.error("Login Failed", {
@@ -158,7 +160,7 @@ const LoginPage = () => {
           </button>
         </form>
         <p className="text-end mt-4 -mb-4">
-          Don&apsos;t have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link
             className="text-blue-600 hover:text-blue-950"
             href={from ? `/register?from=${from}` : `/register`}
