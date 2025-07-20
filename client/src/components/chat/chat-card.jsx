@@ -11,9 +11,9 @@ import React, { useState } from "react";
 import Sidebar from "./chat-sidebar";
 import { Input } from "../ui/input";
 import { SendHorizonal } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Textarea } from "../ui/textarea";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const ChatCard = () => {
   const [focusUser, setFocusUser] = useState(null);

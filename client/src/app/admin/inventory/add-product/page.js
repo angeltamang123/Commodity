@@ -231,7 +231,7 @@ export default function ProductForm() {
     if (formik.values.stock === 0 && formik.values.status === "active") {
       formik.setFieldValue("status", "inactive");
     }
-  }, [formik.values.stock, formik.values.status]);
+  }, [formik.values.stock, formik.values.status, formik]);
 
   // Effect to return submit status to idle after success
   useEffect(() => {
@@ -407,7 +407,7 @@ export default function ProductForm() {
                 )}
                 {formik.values.stock === 0 && (
                   <p className="text-orange-500 text-xs mt-1">
-                    Status must be 'Inactive' for 0 stock.
+                    Status must be &apos;Inactive&apos; for 0 stock.
                   </p>
                 )}
               </div>

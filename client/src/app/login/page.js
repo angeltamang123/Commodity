@@ -22,7 +22,7 @@ const LoginPage = () => {
   // Re-direct if user data in local storage
   useEffect(() => {
     if (isLoggedIn) router.push("/");
-  }, []);
+  }, [isLoggedIn, router]);
 
   const loginSchema = Yup.object().shape({
     emailId: Yup.string()
@@ -158,7 +158,7 @@ const LoginPage = () => {
           </button>
         </form>
         <p className="text-end mt-4 -mb-4">
-          Don't have an account?{" "}
+          Don&apsos;t have an account?{" "}
           <Link
             className="text-blue-600 hover:text-blue-950"
             href={from ? `/register?from=${from}` : `/register`}

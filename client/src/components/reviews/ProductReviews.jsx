@@ -289,7 +289,7 @@ export default function ProductReviews({ productId, productRating }) {
                 </div>
               ) : (
                 <p className="text-sm text-gray-700">
-                  You haven't rated this product yet
+                  You haven&apos;t rated this product yet
                 </p>
               )}
               {renderReviewButton()}

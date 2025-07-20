@@ -144,7 +144,7 @@ export function SearchBar() {
                 </CommandGroup>
               ) : (
                 <CommandEmpty className="p-4 text-sm text-center">
-                  No results found for "{query}"
+                  No results found for &quot;{query}&quot;
                 </CommandEmpty>
               )}
             </CommandList>

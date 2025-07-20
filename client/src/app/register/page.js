@@ -11,18 +11,41 @@ import Link from "next/link";
 import { IdCard, Lock, Mail, MapPin, Phone } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useRouter, useSearchParams } from "next/navigation";
+import LocationPicker from "@/components/LocationPicker";
 
 const SignupForm = () => {
   const searchParams = useSearchParams();
   const from = searchParams.get("from");
   const router = useRouter();
   let [emailTaken, setEmailTaken] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const { isLoggedIn } = useSelector((state) => state.user);
 
   // Re-direct if user data in local storage
   useEffect(() => {
     if (isLoggedIn) router.push("/");
-  }, []);
+  }, [isLoggedIn, router]);
+
+  const locationSchema = Yup.object().shape({
+    formattedAddress: Yup.string().required("Formatted address is required"),
+    name: Yup.string().nullable(),
+    street: Yup.string().nullable(),
+    suburb: Yup.string().nullable(),
+    district: Yup.string().nullable(),
+    city: Yup.string().required("City is required"),
+    county: Yup.string().nullable(),
+    state: Yup.string().nullable(),
+    country: Yup.string().required("Country is required"),
+    postcode: Yup.string().nullable(),
+    coordinates: Yup.object()
+      .shape({
+        lat: Yup.number().required("Latitude is required"),
+        lon: Yup.number().required("Longitude is required"),
+      })
+      .required("Coordinates are required"),
+    result_type: Yup.string().nullable(),
+    place_id: Yup.string().nullable(),
+  });
 
   const registerSchema = Yup.object().shape({
     emailId: Yup.string().email("Invalid email").required("Required"),
@@ -41,10 +64,7 @@ const SignupForm = () => {
       .matches(/^\d{10}$/, "Phone number must be exactly 10 digits")
       .required("Required"),
 
-    address: Yup.string()
-      .min(2, "Too Short!")
-      .max(50, "Too Long!")
-      .required("Required"),
+    location: locationSchema.nullable(),
 
     fullName: Yup.string()
       .min(2, "Too Short!")
@@ -62,7 +82,7 @@ const SignupForm = () => {
       password: "",
       rePassword: "",
       phoneNumber: "",
-      address: "",
+      location: null,
       fullName: "",
       gender: "",
     },
@@ -135,6 +155,17 @@ const SignupForm = () => {
     </div>
   );
 
+  const handleLocationSelected = (locationData) => {
+    formik.setFieldValue("location", locationData);
+    formik.setFieldTouched("location", true, false);
+    setShowLocationPicker(false);
+  };
+
+  const clearLocation = () => {
+    formik.setFieldValue("location", null);
+    formik.setFieldTouched("location", true, false);
+  };
+
   return (
     // Main container for centering the form
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 font-inter">
@@ -194,14 +225,48 @@ const SignupForm = () => {
             "Enter your full name",
             <IdCard className="size-6" />
           )}
-          {renderInput(
-            "address",
-            "address",
-            "text",
-            "Address",
-            "Enter your address",
-            <MapPin className="size-6" />
-          )}
+
+          {/* Location Picker */}
+          <div>
+            <label className="flex gap-2 items-center text-sm font-medium text-gray-700 mb-1">
+              <MapPin className="size-6" />
+              Default Delivery Location{" "}
+              <span className="text-gray-500">(Optional)</span>
+            </label>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setShowLocationPicker(true)}
+                className={`flex-1 px-4 py-2 border rounded-xl shadow-sm text-left justify-start
+                  ${
+                    formik.touched.location &&
+                    formik.errors.location &&
+                    !formik.values.location?.formattedAddress
+                      ? "border-red-500 bg-red-50 text-red-800"
+                      : "border-gray-300 bg-white"
+                  }
+                `}
+                variant="bordered"
+              >
+                {formik.values.location?.formattedAddress ||
+                  "Select your default delivery location on map"}
+              </Button>
+              {formik.values.location && ( // Show clear button only if location is set
+                <Button
+                  onClick={clearLocation}
+                  className="px-4 py-2 border rounded-xl shadow-sm text-red-600 border-red-300 hover:bg-red-50"
+                  variant="bordered"
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
+            {formik.touched.location &&
+              typeof formik.errors.location === "string" && (
+                <p className="mt-1 text-sm text-red-600">
+                  {formik.errors.location}
+                </p>
+              )}
+          </div>
 
           {/* Gender Radio Group */}
           <div
@@ -259,6 +324,13 @@ const SignupForm = () => {
           </Link>
         </p>
       </div>
+      {showLocationPicker && (
+        <LocationPicker
+          onConfirm={handleLocationSelected}
+          onCancel={() => setShowLocationPicker(false)}
+          apiKey={process.env.NEXT_PUBLIC_GEOAPIFY_KEY}
+        />
+      )}
     </div>
   );
 };
