@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
-import { Button, Card, Input, Radio, RadioGroup } from "@nextui-org/react";
+
 import { useState } from "react";
 import { toast } from "sonner";
 import CommodityLogo from "@/components/commodityLogo";
@@ -12,6 +12,7 @@ import { IdCard, Lock, Mail, MapPin, Phone } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useRouter, useSearchParams } from "next/navigation";
 import LocationPicker from "@/components/LocationPicker";
+import { Button } from "@/components/ui/button";
 
 const SignupForm = () => {
   const searchParams = useSearchParams();

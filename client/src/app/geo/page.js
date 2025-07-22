@@ -1,47 +1,109 @@
+// pages/cart.js (or a component within it)
 "use client";
-import LocationPicker from "@/components/LocationPicker";
-import { useState } from "react";
+import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import CheckoutDialog from "@/components/productComponents/CheckoutDialog";
+import { Button } from "@/components/ui/button";
 
-export default function ParentComponent() {
-  const [showMap, setShowMap] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState(null);
+const CartPage = () => {
+  const router = useRouter();
+  const [showCheckout, setShowCheckout] = useState(false);
 
-  const handleLocationConfirm = (location) => {
-    setSelectedLocation(location);
-    setShowMap(false);
-    // You can use the location data here
-    console.log("Selected location:", location);
+  // --- Mock Cart State ---
+  // In a real app, this would come from Redux, Context, or local storage
+  const [cartItems, setCartItems] = useState([
+    { productId: "prod123", name: "iPhone 16 pro", price: 200000, quantity: 1 },
+    {
+      productId: "prod456",
+      name: "iPhone 14 Covers",
+      price: 1200,
+      quantity: 2,
+    },
+  ]);
+  const totalAmount = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+  // --- End Mock Cart State ---
+
+  // Dummy user address (fetch from Redux/context in real app)
+  const [userDeliveryAddress, setUserDeliveryAddress] = useState(null); // e.g., fetched from user profile
+
+  const handleCheckoutClick = () => {
+    setShowCheckout(true);
+  };
+
+  const handlePlaceOrder = async (items, deliveryAddress) => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
+        {
+          cartItems: items, // This will be the cartItems array
+          deliveryAddress: deliveryAddress,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      toast.success("Order Placed Successfully!");
+      setShowCheckout(false);
+      // Clear cart here after successful order
+      setCartItems([]); // For mock, clear
+      router.push("/my-orders");
+    } catch (error) {
+      console.error("Order placement failed:", error);
+      toast.error("Order Failed", {
+        description:
+          error.response?.data?.message ||
+          "An error occurred while placing your order.",
+      });
+    }
   };
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Location Picker Demo</h1>
-
-      <button
-        onClick={() => setShowMap(true)}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        {selectedLocation ? "Change Location" : "Select Location"}
-      </button>
-
-      {selectedLocation && (
-        <div className="mt-4 p-4 border rounded">
-          <h2 className="text-xl font-semibold">Selected Location</h2>
-          <p>{selectedLocation.address}</p>
-          <p>
-            Coordinates: {selectedLocation.lat.toFixed(6)},{" "}
-            {selectedLocation.lng.toFixed(6)}
-          </p>
+    <div>
+      <h1 className="text-3xl font-bold mb-6">Your Shopping Cart</h1>
+      {cartItems.length === 0 ? (
+        <p className="text-gray-600">Your cart is empty.</p>
+      ) : (
+        <div>
+          {cartItems.map((item, index) => (
+            <div
+              key={index}
+              className="flex justify-between items-center border-b py-2"
+            >
+              <p className="font-semibold">
+                {item.name} x {item.quantity}
+              </p>
+              <p>Rs.{item.price * item.quantity}</p>
+            </div>
+          ))}
+          <div className="flex justify-between font-bold text-xl mt-4 pt-4 border-t-2">
+            <span>Subtotal:</span>
+            <span>Rs.{totalAmount}</span>
+          </div>
+          <Button
+            onClick={handleCheckoutClick}
+            className="mt-6 bg-blue-600 text-white px-8 py-3 rounded-lg text-lg"
+          >
+            Proceed to Checkout
+          </Button>
         </div>
       )}
 
-      {showMap && (
-        <LocationPicker
-          onConfirm={handleLocationConfirm}
-          onCancel={() => setShowMap(false)}
-          apiKey={process.env.NEXT_PUBLIC_GEOAPIFY_KEY}
+      {showCheckout && (
+        <CheckoutDialog
+          cartItems={cartItems}
+          totalAmount={totalAmount}
+          onClose={() => setShowCheckout(false)}
+          onPlaceOrder={handlePlaceOrder}
+          initialDeliveryAddress={userDeliveryAddress} // Pass user's existing address
         />
       )}
     </div>
   );
-}
+};
+
+export default CartPage;

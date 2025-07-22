@@ -5,7 +5,7 @@ const initialState = {
   token: "",
   isLoggedIn: false,
   fullName: "",
-  address: "",
+  location: {},
   phoneNumber: null,
   gender: "",
   userId: null,
@@ -20,8 +20,15 @@ export const userSlice = createSlice({
       return initialState;
     },
     addLoginDetails: (state, action) => {
-      const { emailId, fullName, phoneNumber, gender, address, _id, wishlist } =
-        action.payload.user;
+      const {
+        emailId,
+        fullName,
+        phoneNumber,
+        gender,
+        location,
+        _id,
+        wishlist,
+      } = action.payload.user;
       const { token, isLoggedIn } = action.payload;
 
       return {
@@ -31,7 +38,7 @@ export const userSlice = createSlice({
         token: token,
         wishlist: wishlist,
         isLoggedIn: isLoggedIn,
-        address: address,
+        location: location,
         fullName: fullName,
         phoneNumber: phoneNumber,
         gender: gender,
@@ -51,7 +58,6 @@ export const userSlice = createSlice({
   },
 });
 
-// Action creators are generated for each case reducer function
 export const {
   logoutUser,
   addLoginDetails,

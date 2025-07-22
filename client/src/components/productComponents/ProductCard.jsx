@@ -8,9 +8,17 @@ import { cn } from "@/lib/utils";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import LoginAlert from "./loginAlert";
+import QuantityPickerModal from "./BuyNowQuantityPicker";
+import CheckoutDialog from "./CheckoutDialog";
+import api from "@/lib/axiosInstance";
+import { toast } from "sonner";
 
 export default function ProductCard({ product }) {
   const [loginDialog, setLoginDialog] = useState(false);
+  const [showQuantityPicker, setShowQuantityPicker] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [buyNowItemDetails, setBuyNowItemDetails] = useState(null);
+
   const discount =
     ((product.price - product.discountPrice) / product.price) * 100;
   const router = useRouter();
@@ -25,6 +33,45 @@ export default function ProductCard({ product }) {
     if (!isLoggedIn) {
       setLoginDialog(true);
       return;
+    }
+    setShowQuantityPicker(true);
+  };
+
+  const handleQuantityConfirmed = (quantity) => {
+    const effectivePrice = product.isOnSale
+      ? product.discountPrice
+      : product.price;
+    const itemDetails = {
+      productId: product._id,
+      name: product.name,
+      price: effectivePrice,
+      quantity: quantity,
+    };
+    setBuyNowItemDetails(itemDetails);
+    setShowQuantityPicker(false);
+    setShowCheckout(true);
+  };
+
+  const handlePlaceOrder = async (items, deliveryAddress) => {
+    try {
+      const response = await api.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
+        {
+          cartItems: items,
+          deliveryAddress: deliveryAddress,
+        }
+      );
+
+      toast.success("Order Placed Successfully!");
+      setShowCheckout(false);
+      setBuyNowItemDetails(null);
+      // router.push("/my-orders");
+    } catch (error) {
+      console.error("Order placement failed:", error);
+      toast.error("Order Failed", {
+        description:
+          error.message || "An error occurred while placing your order.",
+      });
     }
   };
 
@@ -138,6 +185,23 @@ export default function ProductCard({ product }) {
         onOpenChange={setLoginDialog}
         from={pathname}
       />
+
+      {showQuantityPicker && (
+        <QuantityPickerModal
+          product={product}
+          onClose={() => setShowQuantityPicker(false)}
+          onConfirm={handleQuantityConfirmed}
+        />
+      )}
+
+      {showCheckout && buyNowItemDetails && (
+        <CheckoutDialog
+          cartItems={[buyNowItemDetails]}
+          totalAmount={buyNowItemDetails.price * buyNowItemDetails.quantity}
+          onClose={() => setShowCheckout(false)}
+          onPlaceOrder={handlePlaceOrder}
+        />
+      )}
     </div>
   );
 }

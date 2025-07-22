@@ -199,10 +199,10 @@ const LocationPicker = ({
           <div className="p-4 border-t">
             <p className="font-medium">Selected Location:</p>
             <p>{locationData.formattedAddress}</p>
-            <p>
+            {/* <p>
               Lat: {locationData.coordinates.lat.toFixed(6)}, Lng:{" "}
               {locationData.coordinates.lon.toFixed(6)}
-            </p>
+            </p> */}
           </div>
         )}
       </div>

@@ -28,15 +28,26 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     deliveryAddress: {
-      address: { type: String, required: true },
-      street: { type: String, required: true },
-      city: { type: String, required: true },
-      postalCode: { type: String, required: true },
-      country: { type: String, required: true },
+      // Primary display address (most complete human-readable form)
+      formattedAddress: { type: String, trim: true },
+
+      name: { type: String }, // For specific entities
+      street: { type: String },
+      suburb: { type: String },
+      district: { type: String },
+      city: { type: String },
+      county: { type: String },
+      state: { type: String },
+      country: { type: String },
+      postcode: { type: String },
+
       coordinates: {
         lat: { type: Number },
-        lng: { type: Number },
+        lon: { type: Number },
       },
+
+      result_type: { type: String }, // e.g., 'suburb', 'amenity', 'street', 'house'
+      place_id: { type: String }, // Unique ID from Geoapify
     },
     paymentDetails: {
       paymentId: { type: String },
