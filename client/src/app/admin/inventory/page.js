@@ -258,7 +258,7 @@ export default function InventoryPage() {
                   "cursor-pointer",
                   status === "active" ? "bg-green-300" : "bg-yellow-200"
                 )}
-                variant={status === "active" && "outline"}
+                variant={status === "active" && "outline-solid"}
               >
                 {status}
               </Badge>

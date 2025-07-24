@@ -99,7 +99,7 @@ const LoginPage = () => {
         value={formik.values[name]}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        className={`w-full px-4 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
+        className={`w-full px-4 py-2 border rounded-xl shadow-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500
           ${
             formik.touched[name] && formik.errors[name]
               ? "border-red-500"
@@ -114,8 +114,8 @@ const LoginPage = () => {
   );
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 font-inter">
-      <div className="w-full max-w-lg mx-auto p-8 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm">
+    <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 p-4 font-inter">
+      <div className="w-full max-w-lg mx-auto p-8 shadow-lg rounded-2xl bg-white/90 backdrop-blur-xs">
         {/* Logo Placeholder */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex justify-center">

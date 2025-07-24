@@ -137,17 +137,19 @@ export default function CustomNavbar() {
           <NavbarItem className="lg:flex w-64 font-normal">
             <SearchBar />
           </NavbarItem>
-          <NavbarItem className="ml-16">
+          <NavbarItem className="ml-12">
             <Sheet>
               <SheetTrigger asChild>
                 <Button
-                  className={`text-default-600 ${!isLoggedIn && "hidden"}`}
+                  className={`text-default-600 overflow-visible cursor-pointer ${
+                    !isLoggedIn && "hidden"
+                  }`}
                   variant="light"
-                  startContent={<ShoppingCart size={20} />}
+                  startContent={<ShoppingCart size={22} />}
                 >
                   Cart
                   {totalCartQuantity > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[#AF0000] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    <span className="absolute -top-1 left-5 bg-[#AF0000] text-white text-xs rounded-4xl h-4.5 w-5 flex items-center justify-center">
                       {totalCartQuantity}
                     </span>
                   )}
@@ -170,7 +172,7 @@ export default function CustomNavbar() {
                 <DropdownTrigger>
                   <Button
                     disableRipple
-                    className="p-0 bg-transparent data-[hover=true]:bg-transparent"
+                    className="p-0 bg-transparent data-[hover=true]:bg-transparent cursor-pointer"
                     radius="sm"
                     startContent={<User size={20} />}
                     variant="light"
@@ -200,7 +202,7 @@ export default function CustomNavbar() {
           ) : (
             <Button
               disableRipple
-              className="p-0 -ml-20 bg-transparent border-1 w-56 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent"
+              className="p-0 -ml-16 bg-transparent border-1 rounded-md w-56 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent cursor-pointer"
               radius="sm"
               onPress={() => {
                 if (pathName === "/") {

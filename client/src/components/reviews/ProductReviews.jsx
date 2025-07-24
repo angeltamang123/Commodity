@@ -230,7 +230,7 @@ export default function ProductReviews({ productId, productRating }) {
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={handleDeleteReview}
-                        className="bg-[#AF0000] hover:bg-[#730000] text-white font-semibold py-2 px-4 rounded-md shadow-sm transition-colors duration-200"
+                        className="bg-[#AF0000] hover:bg-[#730000] text-white font-semibold py-2 px-4 rounded-md shadow-xs transition-colors duration-200"
                       >
                         Continue
                       </AlertDialogAction>
@@ -249,7 +249,7 @@ export default function ProductReviews({ productId, productRating }) {
           onReviewSubmitted={handleReviewSubmitted}
           existingReview={null}
         >
-          <Button variant="outline" className="ml-auto w-44">
+          <Button variant="outline" className="ml-auto w-44 cursor-pointer">
             Write a Review
           </Button>
         </WriteReviewDialog>

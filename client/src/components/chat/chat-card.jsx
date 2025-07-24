@@ -99,7 +99,7 @@ const ChatCard = () => {
         <div className="flex gap-0 w-full border-[#00232A] border-2 shadow-md shadow-[#00232A] rounded-xl h-full overflow-hidden">
           <Sidebar users={userDetails} userClicked={userClicked} />
           <div className="h-full w-full">
-            <CardHeader className="flex flex-row bg-[#00232A] border-b-1 border-[#00232A] p-1 pl-6">
+            <CardHeader className="flex flex-row bg-[#00232A] border-b border-[#00232A] p-1 pl-6">
               {focusUser ? (
                 <div className="flex items-center">
                   <Avatar>
@@ -132,7 +132,7 @@ const ChatCard = () => {
                     item.sender == "me" ? (
                       <div
                         key={index}
-                        className="flex flex-col w-[70%] border-[#00232A] border-1 rounded-2xl ml-44 text-small font-roboto font-light bg-[#206094] "
+                        className="flex flex-col w-[70%] border-[#00232A] border rounded-2xl ml-44 text-small font-roboto font-light bg-[#206094] "
                       >
                         <p className="p-2">{item.text}</p>
                       </div>
@@ -145,7 +145,7 @@ const ChatCard = () => {
                           />
                           <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
-                        <p className="border-1 border-[#00232A] rounded-md w-full p-2 text-sm font-light font-roboto bg-gray-500">
+                        <p className="border border-[#00232A] rounded-md w-full p-2 text-sm font-light font-roboto bg-gray-500">
                           {item.text}
                         </p>
                       </div>
@@ -153,7 +153,7 @@ const ChatCard = () => {
                   )
                 : null}
             </CardContent>
-            <CardFooter className="flex gap-2 border-t-1 p-2 text-[#FFFFFA] border-[#00232A] bg-[#00232A]">
+            <CardFooter className="flex gap-2 border-t p-2 text-[#FFFFFA] border-[#00232A] bg-[#00232A]">
               {focusUser ? (
                 <div className="flex gap-2 w-full items-center px-2">
                   <Textarea

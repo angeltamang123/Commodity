@@ -122,7 +122,7 @@ export default function WriteReviewDialog({
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-[#AF0000] hover:bg-[#730000] text-white font-semibold py-2 px-4 rounded-md shadow-sm transition-colors duration-200"
+              className="bg-[#AF0000] hover:bg-[#730000] text-white font-semibold py-2 px-4 rounded-md shadow-xs transition-colors duration-200"
             >
               {isLoading ? "Submitting..." : "Submit Review"}
             </Button>

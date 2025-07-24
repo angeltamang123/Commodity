@@ -354,7 +354,7 @@ export default function ProductDetail({ product }) {
             <div className="space-y-3 pt-4">
               <div className="flex flex-col gap-3">
                 <Button
-                  className="flex-1 border rounded-lg border-[#AF0000] bg-white hover:bg-[#111B25] hover:border-[#111B25]  hover:text-white text-[#AF0000] py-2.5 font-semibold transition-colors"
+                  className="flex-1 border rounded-lg border-[#AF0000] bg-white hover:bg-[#111B25] hover:border-[#111B25] hover:text-white text-[#AF0000] py-2.5 font-semibold transition-colors cursor-pointer"
                   onClick={handleAddToCart}
                   disabled={!isProductAvailable}
                 >
@@ -362,7 +362,7 @@ export default function ProductDetail({ product }) {
                   Add to Cart
                 </Button>
                 <Button
-                  className="flex-1 rounded-lg bg-[#AF0000] hover:bg-[#730000] text-white py-2.5 font-semibold transition-colors"
+                  className="flex-1 rounded-lg bg-[#AF0000] hover:bg-[#730000] text-white py-2.5 font-semibold transition-colors cursor-pointer"
                   onClick={handleBuyNow}
                   disabled={!isProductAvailable}
                 >
@@ -373,7 +373,7 @@ export default function ProductDetail({ product }) {
                 <Button
                   variant="outline"
                   size="sm"
-                  className={`flex-1 h-10 border-gray-400 text-gray-700 hover:bg-gray-100 hover:text-[#730000] transition-colors bg-transparent ${
+                  className={`flex-1 h-10 border-gray-400 text-gray-700 hover:bg-gray-100 hover:text-[#730000] cursor-pointer transition-colors bg-transparent ${
                     inWishList && "text-[#AF0000]"
                   }`}
                   onClick={handleWishlist}
@@ -387,7 +387,7 @@ export default function ProductDetail({ product }) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 h-10 border-gray-400 text-gray-700 hover:bg-gray-100 hover:text-[#730000] transition-colors bg-transparent"
+                    className="flex-1 h-10 border-gray-400 text-gray-700 hover:bg-gray-100 hover:text-[#730000] cursor-pointer transition-colors bg-transparent"
                   >
                     <Share2Icon className="h-4 w-4 mr-1" />
                     Share

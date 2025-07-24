@@ -32,7 +32,7 @@ const QuantityPickerModal = ({ product, onClose, onConfirm }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-60 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg w-full max-w-xs mx-auto p-6 shadow-lg relative">
         {" "}
         <h2 className="text-xl font-bold mb-4 text-center">
@@ -78,13 +78,13 @@ const QuantityPickerModal = ({ product, onClose, onConfirm }) => {
           <Button
             onClick={onClose}
             variant="ghost"
-            className="px-4 py-2 rounded-lg"
+            className="px-4 py-2 rounded-lg cursor-pointer"
           >
             Cancel
           </Button>
           <Button
             onClick={handleConfirm}
-            className="px-4 py-2 rounded-lg bg-[#AF0000] text-white hover:bg-[#730000]"
+            className="px-4 py-2 rounded-lg bg-[#AF0000] text-white hover:bg-[#730000] cursor-pointer"
             disabled={quantity < 1 || quantity > product.stock}
           >
             Confirm

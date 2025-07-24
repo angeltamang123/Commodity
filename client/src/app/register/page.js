@@ -142,7 +142,7 @@ const SignupForm = () => {
         value={formik.values[name]}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        className={`w-full px-4 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
+        className={`w-full px-4 py-2 border rounded-xl shadow-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500
           ${
             formik.touched[name] && formik.errors[name]
               ? "border-red-500"
@@ -169,8 +169,8 @@ const SignupForm = () => {
 
   return (
     // Main container for centering the form
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 font-inter">
-      <div className="w-full max-w-lg mx-auto p-8 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm">
+    <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 p-4 font-inter">
+      <div className="w-full max-w-lg mx-auto p-8 shadow-lg rounded-2xl bg-white/90 backdrop-blur-xs">
         {/* Logo */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex justify-center">
@@ -237,7 +237,7 @@ const SignupForm = () => {
             <div className="flex gap-2">
               <Button
                 onClick={() => setShowLocationPicker(true)}
-                className={`flex-1 px-4 py-2 border rounded-xl shadow-sm text-left justify-start
+                className={`flex-1 px-4 py-2 border rounded-xl shadow-xs text-left justify-start
                   ${
                     formik.touched.location &&
                     formik.errors.location &&
@@ -254,7 +254,7 @@ const SignupForm = () => {
               {formik.values.location && ( // Show clear button only if location is set
                 <Button
                   onClick={clearLocation}
-                  className="px-4 py-2 border rounded-xl shadow-sm text-red-600 border-red-300 hover:bg-red-50"
+                  className="px-4 py-2 border rounded-xl shadow-xs text-red-600 border-red-300 hover:bg-red-50"
                   variant="bordered"
                 >
                   Clear

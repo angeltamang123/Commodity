@@ -129,19 +129,22 @@ const CartSheet = () => {
     // Until then I will leave it as it is
     <div className="flex flex-col h-[94%] w-full overflow-hidden">
       {/* Cart Items List */}
-      <div className="flex-1 overflow-y-auto py-4 pr-2 min-h-0">
+      <div
+        className="flex-1 overflow-y-auto py-4 pr-2 min-h-0  scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 [&::-webkit-scrollbar-button]:hidden
+  [scrollbar-width:thin]"
+      >
         {" "}
         {/* Added pr-2 for scrollbar space */}
         {cartItems.length === 0 ? (
           <p className="text-center text-gray-500 mt-8">Your cart is empty.</p>
         ) : (
-          <div className="space-y-4 overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+          <div className="space-y-4 overflow-x-hidden">
             {cartItems.map((item) => (
               <div
                 key={item.productId}
                 className="flex items-center gap-2 border-b pb-4"
               >
-                <div className="relative w-20 h-20 flex-shrink-0">
+                <div className="relative w-20 h-20 shrink-0">
                   <Image
                     src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                     alt={item.name}
@@ -160,7 +163,7 @@ const CartSheet = () => {
                       disabled={item.quantity <= 1}
                       size="icon"
                       variant="outline"
-                      className="h-7 w-4 rounded-full flex-shrink-0"
+                      className="h-7 w-4 rounded-full shrink-0"
                     >
                       <Minus size={14} />
                     </Button>
@@ -179,14 +182,14 @@ const CartSheet = () => {
                                  [appearance:textfield]
                                  [&::-webkit-outer-spin-button]:appearance-none
                                  [&::-webkit-inner-spin-button]:appearance-none
-                                 flex-shrink-0"
+                                 shrink-0"
                     />
                     <Button
                       onClick={() => handleIncrement(item.productId)}
                       disabled={item.quantity >= (item.stock || 999)} // Use actual stock
                       size="icon"
                       variant="outline"
-                      className="h-7 w-4 rounded-full flex-shrink-0"
+                      className="h-7 w-4 rounded-full shrink-0"
                     >
                       <Plus size={14} />
                     </Button>
@@ -194,7 +197,7 @@ const CartSheet = () => {
                       size={30}
                       type="button"
                       onClick={() => handleRemoveItem(item.productId)}
-                      className="text-red-500 hover:bg-red-50 px-1 flex-shrink-0 cursor-pointer"
+                      className="text-red-500 hover:bg-red-50 px-1 shrink-0 cursor-pointer"
                     />
                   </div>
                 </div>
@@ -214,14 +217,14 @@ const CartSheet = () => {
           <Button
             onClick={handleClearCart}
             variant="outline"
-            className="w-full bg-[#FFFFFA] text-[#AF0000] border-1 rounded-2xl border-[#AF0000] hover:border-[#00232A] hover:bg-[#00232A] hover:text-[#FFFFFA] cursor-pointer"
+            className="w-full bg-[#FFFFFA] text-sm text-[#AF0000] border rounded-2xl border-[#AF0000] hover:border-[#00232A] hover:bg-[#00232A] hover:text-[#FFFFFA] cursor-pointer"
             disabled={cartItems.length === 0}
           >
             Clear Cart
           </Button>
           <Button
             onClick={handleCheckoutClick}
-            className="w-full bg-[#AF0000] rounded-2xl hover:bg-[#730000] text-white cursor-pointer"
+            className="w-full bg-[#AF0000] text-sm rounded-2xl hover:bg-[#730000] text-white cursor-pointer"
             disabled={cartItems.length === 0}
           >
             Proceed to Checkout

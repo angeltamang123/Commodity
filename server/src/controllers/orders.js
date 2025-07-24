@@ -62,7 +62,14 @@ const createOrder = async (req, res) => {
     res.status(201).json({ status: "success", data: order });
   } catch (error) {
     await session.abortTransaction();
-    res.status(400).json({ status: "fail", message: error.message });
+    console.error("Order creation transaction failed:", error);
+    if (error.name === "ValidationError") {
+      console.error("Mongoose Validation Error Details:", error.errors);
+    }
+    res.status(400).json({
+      status: "fail",
+      message: error.message || "An unknown error occurred",
+    });
   } finally {
     session.endSession();
   }

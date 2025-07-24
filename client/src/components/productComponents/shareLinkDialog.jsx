@@ -47,12 +47,12 @@ export default function ShareLinkDialog({ urlToShare, children }) {
             id="link"
             defaultValue={urlToShare}
             readOnly
-            className="flex-1 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#AF0000]"
+            className="flex-1 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#AF0000]"
           />
           <Button
             type="button"
             onClick={handleCopyLink}
-            className="bg-[#AF0000] hover:bg-[#730000] text-white font-semibold py-2 px-4 rounded-md shadow-sm transition-colors duration-200"
+            className="bg-[#AF0000] hover:bg-[#730000] text-white font-semibold py-2 px-4 rounded-md shadow-xs transition-colors duration-200"
           >
             <Copy className="mr-2 h-4 w-4" /> Copy link
           </Button>

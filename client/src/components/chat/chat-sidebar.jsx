@@ -45,7 +45,7 @@ const Sidebar = ({ users, userClicked }) => {
   });
 
   return (
-    <div className="flex flex-col bg-[#00232A] -mt-1 w-1/4  font-bold border-r-1 border-[#00232A] z-10 -mx-1 p-5 justify-start gap-2">
+    <div className="flex flex-col bg-[#00232A] -mt-1 w-1/4  font-bold border-r border-[#00232A] z-10 -mx-1 p-5 justify-start gap-2">
       <p className="font-bold text-[#AF0000] text-center text-lg underline underline-offset-4">
         Commodity
       </p>

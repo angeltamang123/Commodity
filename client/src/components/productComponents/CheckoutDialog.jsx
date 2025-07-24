@@ -98,7 +98,7 @@ const CheckoutDialog = ({ cartItems, totalAmount, onClose, onPlaceOrder }) => {
           </label>
           <Button
             onClick={() => setShowLocationPicker(true)}
-            className={`w-full px-4 py-6 border rounded-xl shadow-sm text-left whitespace-normal break-words justify-start
+            className={`w-full px-4 py-6 border rounded-xl shadow-xs text-left whitespace-normal break-words justify-start
               ${
                 formik.touched.deliveryAddress && formik.errors.deliveryAddress
                   ? "border-red-500 bg-red-50 text-red-800"
@@ -135,14 +135,14 @@ const CheckoutDialog = ({ cartItems, totalAmount, onClose, onPlaceOrder }) => {
           <Button
             onClick={onClose}
             variant="ghost"
-            className="px-6 py-2 rounded-lg"
+            className="px-6 py-2 rounded-lg cursor-pointer"
           >
             Cancel
           </Button>
           <Button
             onClick={formik.handleSubmit}
             color="primary"
-            className="px-6 py-2 rounded-lg bg-[#AF0000] text-white hover:bg-[#730000]"
+            className="px-6 py-2 rounded-lg bg-[#AF0000] text-white hover:bg-[#730000] cursor-pointer"
             disabled={!formik.isValid || formik.isSubmitting}
           >
             {formik.isSubmitting ? "Placing Order..." : "Place Order"}

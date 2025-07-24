@@ -75,7 +75,6 @@ export default function ProductCard({ product }) {
       setShowCheckout(true);
     } else {
       dispatch(addItemToCart(itemDetails));
-      toast.success(`${quantity} x ${product.name} added to cart!`);
     }
   };
 
@@ -104,10 +103,10 @@ export default function ProductCard({ product }) {
 
   return (
     <div>
-      <Card className="flex flex-col h-full cursor-pointer hover:shadow-sm hover:shadow-black">
+      <Card className="flex flex-col h-full cursor-pointer hover:shadow-xs hover:shadow-black">
         <CardContent
           onClick={handleClick}
-          className="p-4 flex-grow flex-col relative overflow-hidden"
+          className="p-4 grow flex-col relative overflow-hidden"
         >
           <div
             className={cn(
@@ -194,14 +193,14 @@ export default function ProductCard({ product }) {
         <CardFooter className="p-4 -mt-4 flex justify-center gap-2">
           <Button
             disabled={product.status === "inactive"}
-            className="w-full bg-[#FFFFFA] text-[#AF0000] border-1 rounded-2xl border-[#AF0000] hover:border-[#00232A] hover:bg-[#00232A] hover:text-[#FFFFFA]"
+            className="w-full bg-[#FFFFFA] text-[#AF0000] border rounded-2xl border-[#AF0000] hover:border-[#00232A] hover:bg-[#00232A] hover:text-[#FFFFFA] cursor-pointer"
             onClick={handleAddToCart}
           >
             Add to Cart
           </Button>
           <Button
             disabled={product.status === "inactive"}
-            className="w-full bg-[#AF0000] rounded-2xl hover:bg-[#730000]"
+            className="w-full bg-[#AF0000] rounded-2xl hover:bg-[#730000] cursor-pointer"
             onClick={handleBuyNow}
           >
             Buy now

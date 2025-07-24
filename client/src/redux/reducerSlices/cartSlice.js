@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { toast } from "sonner";
 
 const initialState = {
   items: [], // Array of cart items: { productId, name, price, quantity, image }
@@ -11,19 +12,45 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addItemToCart: (state, action) => {
-      const newItem = action.payload; // Expects { productId, name, price, quantity, image }
+      const newItem = action.payload; // Expects { productId, name, price, quantity, image, stock }
       const existingItem = state.items.find(
         (item) => item.productId === newItem.productId
       );
 
-      if (!existingItem) {
-        state.items.push(newItem);
-      } else {
-        existingItem.quantity += newItem.quantity; // Direct mutation of existingItem, Immer handles it
-        existingItem.price = newItem.price; // Ensure price is up-to-date
-      }
       state.totalQuantity += newItem.quantity;
       state.totalAmount += newItem.price * newItem.quantity;
+
+      if (!existingItem) {
+        state.items.push(newItem);
+        toast.success(`${newItem.quantity} x ${newItem.name} added to cart!`);
+      } else {
+        const potentialQuantity = existingItem.quantity + newItem.quantity;
+        const maxStock = newItem.stock;
+
+        if (potentialQuantity > maxStock) {
+          const quantityToAdd = maxStock - existingItem.quantity;
+          if (quantityToAdd > 0) {
+            existingItem.quantity += quantityToAdd;
+            state.totalQuantity -= newItem.quantity - quantityToAdd;
+            state.totalAmount -=
+              newItem.price * (newItem.quantity - quantityToAdd);
+            toast.warning(
+              `Only ${quantityToAdd} more of ${newItem.name} added. Reached maximum stock.`
+            );
+          } else {
+            state.totalQuantity -= newItem.quantity;
+            state.totalAmount -= newItem.price * newItem.quantity;
+            toast.warning(
+              `Cannot add more ${newItem.name}. Already at maximum stock.`
+            );
+          }
+        } else {
+          existingItem.quantity = potentialQuantity;
+          toast.success(`${newItem.quantity} x ${newItem.name} added to cart!`);
+        }
+
+        existingItem.price = newItem.price;
+      }
     },
 
     removeItemFromCart: (state, action) => {

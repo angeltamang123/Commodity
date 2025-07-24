@@ -89,7 +89,7 @@ export function SearchBar() {
       <form onSubmit={handleFormSubmit}>
         <Command
           shouldFilter={false}
-          className="z-20 rounded-lg border shadow-sm border-gray-400 bg-gray-100 overflow-visible"
+          className="z-20 rounded-lg border shadow-xs border-gray-400 bg-gray-100 overflow-visible"
         >
           <CommandInput
             placeholder="Search for products"
@@ -137,7 +137,7 @@ export function SearchBar() {
                       setIsOpen(false);
                       setQuery("");
                     }}
-                    className="relative flex gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none bg-[#AF0000] hover:bg-[#730000] data-[selected]:bg-[#730000] text-white data-[selected]:text-white cursor-pointer"
+                    className="relative flex gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none bg-[#AF0000] hover:bg-[#730000] data-selected:bg-[#730000] text-white data-selected:text-white cursor-pointer"
                   >
                     View all Results
                   </div>
