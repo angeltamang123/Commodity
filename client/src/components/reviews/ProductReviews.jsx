@@ -46,7 +46,7 @@ export default function ProductReviews({ productId, productRating }) {
   const [currentRatingSummary, setCurrentRatingSummary] =
     useState(productRating);
 
-  const { isLoggedIn } = useSelector((state) => state.user);
+  const { isLoggedIn } = useSelector((state) => state.persisted.user);
 
   useEffect(() => {
     setCurrentRatingSummary(productRating);

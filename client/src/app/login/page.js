@@ -17,7 +17,7 @@ const LoginPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from");
-  const { isLoggedIn } = useSelector((state) => state.user);
+  const { isLoggedIn } = useSelector((state) => state.persisted.user);
 
   // Re-direct if user data in local storage
   useEffect(() => {

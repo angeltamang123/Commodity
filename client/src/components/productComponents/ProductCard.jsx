@@ -5,25 +5,30 @@ import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import LoginAlert from "./loginAlert";
-import QuantityPickerModal from "./BuyNowQuantityPicker";
+import QuantityPickerModal from "./QuantityPicker";
 import CheckoutDialog from "./CheckoutDialog";
 import api from "@/lib/axiosInstance";
 import { toast } from "sonner";
+import { addItemToCart } from "@/redux/reducerSlices/cartSlice";
 
 export default function ProductCard({ product }) {
   const [loginDialog, setLoginDialog] = useState(false);
   const [showQuantityPicker, setShowQuantityPicker] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [buyNowItemDetails, setBuyNowItemDetails] = useState(null);
+  const [isBuyNow, setIsBuyNow] = useState(false);
 
   const discount =
     ((product.price - product.discountPrice) / product.price) * 100;
+
+  const dispatch = useDispatch();
   const router = useRouter();
-  const { isLoggedIn } = useSelector((state) => state.user);
   const pathname = usePathname();
+
+  const { isLoggedIn } = useSelector((state) => state.persisted.user);
 
   const handleClick = () => {
     router.push("/products/" + product._id);
@@ -34,6 +39,20 @@ export default function ProductCard({ product }) {
       setLoginDialog(true);
       return;
     }
+    setIsBuyNow(true);
+    setShowQuantityPicker(true);
+  };
+
+  const handleAddToCart = () => {
+    if (!isLoggedIn) {
+      setLoginDialog(true);
+      return;
+    }
+    if (product.stock === 0) {
+      toast.error("This product is out of stock.");
+      return;
+    }
+    setIsBuyNow(false);
     setShowQuantityPicker(true);
   };
 
@@ -46,10 +65,18 @@ export default function ProductCard({ product }) {
       name: product.name,
       price: effectivePrice,
       quantity: quantity,
+      image: product.image,
+      stock: product.stock,
     };
-    setBuyNowItemDetails(itemDetails);
+
     setShowQuantityPicker(false);
-    setShowCheckout(true);
+    if (isBuyNow) {
+      setBuyNowItemDetails(itemDetails);
+      setShowCheckout(true);
+    } else {
+      dispatch(addItemToCart(itemDetails));
+      toast.success(`${quantity} x ${product.name} added to cart!`);
+    }
   };
 
   const handlePlaceOrder = async (items, deliveryAddress) => {
@@ -114,7 +141,9 @@ export default function ProductCard({ product }) {
               src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.image}`}
               alt={product.name}
               className="object-contain rounded-md w-full"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               fill
+              priority
             />
           </div>
           {product.status === "inactive" ? (
@@ -166,15 +195,14 @@ export default function ProductCard({ product }) {
           <Button
             disabled={product.status === "inactive"}
             className="w-full bg-[#FFFFFA] text-[#AF0000] border-1 rounded-2xl border-[#AF0000] hover:border-[#00232A] hover:bg-[#00232A] hover:text-[#FFFFFA]"
+            onClick={handleAddToCart}
           >
             Add to Cart
           </Button>
           <Button
             disabled={product.status === "inactive"}
             className="w-full bg-[#AF0000] rounded-2xl hover:bg-[#730000]"
-            onClick={() => {
-              handleBuyNow();
-            }}
+            onClick={handleBuyNow}
           >
             Buy now
           </Button>
@@ -198,7 +226,10 @@ export default function ProductCard({ product }) {
         <CheckoutDialog
           cartItems={[buyNowItemDetails]}
           totalAmount={buyNowItemDetails.price * buyNowItemDetails.quantity}
-          onClose={() => setShowCheckout(false)}
+          onClose={() => {
+            setShowCheckout(false);
+            setBuyNowItemDetails(null);
+          }}
           onPlaceOrder={handlePlaceOrder}
         />
       )}

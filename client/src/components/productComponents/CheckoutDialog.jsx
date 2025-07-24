@@ -2,13 +2,11 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { toast } from "sonner";
 import { MapPin } from "lucide-react";
 import LocationPicker from "@/components/LocationPicker";
 import { Button } from "../ui/button";
 import { useSelector } from "react-redux";
 import { Checkbox } from "../ui/checkbox";
-import { useSelect } from "@nextui-org/react";
 import { Label } from "../ui/label";
 
 const locationSchema = Yup.object().shape({
@@ -39,7 +37,7 @@ const checkoutValidationSchema = Yup.object().shape({
 const CheckoutDialog = ({ cartItems, totalAmount, onClose, onPlaceOrder }) => {
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [selectDefaultLocation, setSelectDefaultLocation] = useState(false);
-  const { location } = useSelector((state) => state.user);
+  const { location, isLoggedIn } = useSelector((state) => state.persisted.user);
 
   const formik = useFormik({
     initialValues: {
@@ -118,16 +116,18 @@ const CheckoutDialog = ({ cartItems, totalAmount, onClose, onPlaceOrder }) => {
                 {formik.errors.deliveryAddress}
               </p>
             )}
-          <div className="flex items-center gap-3 mt-2">
-            <Checkbox
-              id="terms"
-              checked={selectDefaultLocation}
-              onCheckedChange={(checked) => {
-                handleSelectDefault(checked);
-              }}
-            />
-            <Label htmlFor="terms">Use your default location</Label>
-          </div>
+          {isLoggedIn && location?.formattedAddress && (
+            <div className="flex items-center gap-3 mt-2">
+              <Checkbox
+                id="terms"
+                checked={selectDefaultLocation}
+                onCheckedChange={(checked) => {
+                  handleSelectDefault(checked);
+                }}
+              />
+              <Label htmlFor="terms">Use your default location</Label>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -141,7 +141,7 @@ const CheckoutDialog = ({ cartItems, totalAmount, onClose, onPlaceOrder }) => {
           </Button>
           <Button
             onClick={formik.handleSubmit}
-            color="primary" // Assuming NextUI primary color
+            color="primary"
             className="px-6 py-2 rounded-lg bg-[#AF0000] text-white hover:bg-[#730000]"
             disabled={!formik.isValid || formik.isSubmitting}
           >

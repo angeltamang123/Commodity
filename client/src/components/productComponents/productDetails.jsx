@@ -46,7 +46,9 @@ export default function ProductDetail({ product }) {
   const [loginDialog, setLoginDialog] = useState(false);
   const [inWishList, setInWishList] = useState(false);
 
-  const { isLoggedIn, wishlist, userId } = useSelector((state) => state.user);
+  const { isLoggedIn, wishlist, userId } = useSelector(
+    (state) => state.persisted.user
+  );
   const dispatch = useDispatch();
 
   let averageRating;

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export default function ReviewCard({ review, onLike }) {
   const { user } = review;
   const { userId: currentUserId, isLoggedIn } = useSelector(
-    (state) => state.user
+    (state) => state.persisted.user
   );
 
   const isLikedByCurrentUser = review.likes.includes(currentUserId);

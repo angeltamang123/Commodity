@@ -20,6 +20,14 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import CommodityLogo from "./commodityLogo";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -27,14 +35,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/redux/reducerSlices/userSlice";
 import { useEffect } from "react";
 import { SearchBar } from "./search/searchBar";
+import CartSheet from "./productComponents/CartSheet";
 
 export default function CustomNavbar() {
   const dispatch = useDispatch();
   const router = useRouter();
   const pathName = usePathname();
 
-  const { phoneNumber, address } = useSelector((state) => state.user);
-  const { isLoggedIn } = useSelector((state) => state.user);
+  const { isLoggedIn, phoneNumber, location } = useSelector(
+    (state) => state.persisted.user
+  );
+
+  const totalCartQuantity = useSelector((state) => state.cart.totalQuantity);
 
   return (
     <div className="max-w-screen overflow-visible relative z-10">
@@ -55,8 +67,10 @@ export default function CustomNavbar() {
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          {isLoggedIn && <MapPin size={16} />}
-          <span>{address}</span>
+          {isLoggedIn && (location?.suburb || location?.city) && (
+            <MapPin size={16} />
+          )}
+          <span>{location?.suburb || location?.city}</span>
         </div>
       </div>
       {/* Main Navbar */}
@@ -121,23 +135,34 @@ export default function CustomNavbar() {
 
         <NavbarContent className={`ml-16 ${isLoggedIn ? "gap-1" : "gap-4"}`}>
           <NavbarItem className="lg:flex w-64 font-normal">
-            {/* <Input
-              placeholder="Search Product"
-              startContent={<Search />}
-              type="search"
-            /> */}
             <SearchBar />
           </NavbarItem>
           <NavbarItem className="ml-16">
-            <Button
-              className={`text-default-600 ${!isLoggedIn && "hidden"}`}
-              href="/cart"
-              as={Link}
-              variant="light"
-              startContent={<ShoppingCart size={20} />}
-            >
-              Cart
-            </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  className={`text-default-600 ${!isLoggedIn && "hidden"}`}
+                  variant="light"
+                  startContent={<ShoppingCart size={20} />}
+                >
+                  Cart
+                  {totalCartQuantity > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#AF0000] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                      {totalCartQuantity}
+                    </span>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Your Shopping Cart</SheetTitle>
+                  <SheetDescription>
+                    Review your items before checkout.
+                  </SheetDescription>
+                </SheetHeader>
+                <CartSheet />
+              </SheetContent>
+            </Sheet>
           </NavbarItem>
           {isLoggedIn ? (
             <Dropdown>

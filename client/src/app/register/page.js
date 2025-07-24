@@ -20,7 +20,7 @@ const SignupForm = () => {
   const router = useRouter();
   let [emailTaken, setEmailTaken] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
-  const { isLoggedIn } = useSelector((state) => state.user);
+  const { isLoggedIn } = useSelector((state) => state.persisted.user);
 
   // Re-direct if user data in local storage
   useEffect(() => {
