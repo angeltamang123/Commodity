@@ -8,6 +8,7 @@ import reduxLogger from "redux-logger";
 
 const persistedRootReducer = combineReducers({
   user: userSlice,
+  cart: cartSlice,
 });
 
 const persistConfig = {
@@ -19,7 +20,7 @@ const pReducer = persistReducer(persistConfig, persistedRootReducer);
 
 const rootReducer = combineReducers({
   persisted: pReducer,
-  cart: cartSlice,
+  // If any reducer slice that do not need persistence can be added here
 });
 
 export const store = configureStore({

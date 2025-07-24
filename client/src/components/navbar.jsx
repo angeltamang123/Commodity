@@ -46,7 +46,9 @@ export default function CustomNavbar() {
     (state) => state.persisted.user
   );
 
-  const totalCartQuantity = useSelector((state) => state.cart.totalQuantity);
+  const totalCartQuantity = useSelector(
+    (state) => state.persisted.cart.totalQuantity
+  );
 
   return (
     <div className="max-w-screen overflow-visible relative z-10">

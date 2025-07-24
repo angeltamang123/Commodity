@@ -96,8 +96,11 @@ export default function ProductCard({ product }) {
       console.error("Order placement failed:", error);
       toast.error("Order Failed", {
         description:
-          error.message || "An error occurred while placing your order.",
+          error.response.data.message ||
+          "An error occurred while placing your order.",
       });
+    } finally {
+      window.location.reload();
     }
   };
 

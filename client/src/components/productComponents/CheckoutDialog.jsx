@@ -141,6 +141,7 @@ const CheckoutDialog = ({ cartItems, totalAmount, onClose, onPlaceOrder }) => {
           </Button>
           <Button
             onClick={formik.handleSubmit}
+            type="button"
             color="primary"
             className="px-6 py-2 rounded-lg bg-[#AF0000] text-white hover:bg-[#730000] cursor-pointer"
             disabled={!formik.isValid || formik.isSubmitting}

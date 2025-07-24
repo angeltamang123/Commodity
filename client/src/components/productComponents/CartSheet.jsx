@@ -13,14 +13,13 @@ import {
   clearCart,
 } from "@/redux/reducerSlices/cartSlice";
 import CheckoutDialog from "./CheckoutDialog";
+import api from "@/lib/axiosInstance";
 
 const CartSheet = () => {
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
-  const totalAmount = useSelector((state) => state.cart.totalAmount);
-  const { isLoggedIn, location: userLocation } = useSelector(
-    (state) => state.persisted.user
-  );
+  const cartItems = useSelector((state) => state.persisted.cart.items);
+  const totalAmount = useSelector((state) => state.persisted.cart.totalAmount);
+  const { isLoggedIn } = useSelector((state) => state.persisted.user);
 
   const [showCheckoutDialog, setShowCheckoutDialog] = useState(false);
 
@@ -39,7 +38,7 @@ const CartSheet = () => {
     // For a real app, you might fetch product details including stock here or on add to cart.
     // For simplicity, let's assume `item.stock` is available or you have a max limit.
     // If not, you'd need to fetch product.stock from backend.
-    const maxStock = currentItem.stock || 999; // Placeholder, replace with actual stock
+    const maxStock = currentItem.stock;
     quantity = Math.min(quantity, maxStock);
 
     const quantityDifference = quantity - currentItem.quantity;
@@ -71,8 +70,6 @@ const CartSheet = () => {
   const handleCheckoutClick = () => {
     if (!isLoggedIn) {
       toast.error("Please log in to proceed to checkout.");
-      // Optionally redirect to login page
-      // router.push('/login?from=/cart');
       return;
     }
     if (cartItems.length === 0) {
@@ -85,40 +82,26 @@ const CartSheet = () => {
   const handlePlaceOrder = async (items, deliveryAddress) => {
     try {
       // This is the API call to your backend
-      const response = await fetch(
+      const response = await api.post(
         `${process.env.NEXT_PUBLIC_API_URL}/orders`,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming JWT token
-          },
-          body: JSON.stringify({
-            cartItems: items,
-            deliveryAddress: deliveryAddress,
-          }),
+          cartItems: items,
+          deliveryAddress: deliveryAddress,
         }
       );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to place order");
-      }
-
       toast.success("Order Placed Successfully!");
-      dispatch(clearCart()); // Clear cart after successful order
-      setShowCheckoutDialog(false); // Close checkout dialog
-      // You might want to close the CartSheet here too,
-      // but it's often handled by the parent component that triggers the Sheet.
-      // If needed, you could pass a prop like `onOrderPlaced` from Navbar to CartSheet
-      // and then call `onClose` for the sheet.
+      dispatch(clearCart());
+      setShowCheckoutDialog(false);
     } catch (error) {
       console.error("Order placement failed:", error);
       toast.error("Order Failed", {
         description:
-          error.message || "An error occurred while placing your order.",
+          error.response.data.message ||
+          "An error occurred while placing your order.",
       });
+    } finally {
+      window.location.reload();
     }
   };
 
