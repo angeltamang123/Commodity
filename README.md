@@ -78,9 +78,9 @@
 - ✅ Display product list on landing page
 - ✅ View product detail page
 - ✅ Admin login/authentication
-- ⬜ Add-to-cart and cart management
+- ✅ Add-to-cart and cart management
 - ✅ Admin: Add/Edit/Delete products
-- ⬜ Inventory count update, post-order
+- ✅ Inventory count update, post-order
 
 ---
 
@@ -93,8 +93,8 @@
 
 **Planned**:
 
-- ⬜ Simulate Payment
-- ⬜ Interactive maps for delivery address input (e.g., Google Maps API)
+- ✅ Simulate Payment
+- ✅ Interactive maps for delivery address input (Leaflet and GeoApify)
 - ✅ Advanced search with filters (category, price, etc.)
 
 ---

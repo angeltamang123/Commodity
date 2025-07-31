@@ -25,7 +25,7 @@ export default function RatingSummary({ rating }) {
   let numFullStars;
   let hasHalfStar;
   if (rating.average) {
-    averageRating = parseFloat(rating?.average.toFixed(1));
+    averageRating = parseFloat(rating?.average?.toFixed(1));
     numFullStars = Math.floor(averageRating);
     hasHalfStar = averageRating % 1 !== 0;
   }
@@ -59,7 +59,9 @@ export default function RatingSummary({ rating }) {
             }
           })}
         </div>
-        <span className="text-3xl font-bold">{rating.average.toFixed(1)}</span>
+        <span className="text-3xl font-bold">
+          {rating?.average?.toFixed(1)}
+        </span>
       </div>
       <div className="space-y-2">
         {ratingDistribution.map(({ star, count }) => (

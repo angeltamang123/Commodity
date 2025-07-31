@@ -122,7 +122,7 @@ export default function ProductCard({ product }) {
                 <p>{Math.round(discount * 10) / 10}% Off</p>
               </div>
             )}
-            {product.rating.average && (
+            {product?.rating?.average && (
               <div className="w-16 z-10">
                 <div className="flex border w-auto justify-center border-[#AF0000] bg-[#AF0000] rounded-lg gap-1">
                   <Star className="text-[#AF0000] fill-yellow-500 size-4" />
@@ -136,7 +136,7 @@ export default function ProductCard({ product }) {
           </div>
           <div
             className={`h-52 relative mx-auto mb-4 ${
-              !product.rating.average && !product.isOnSale && "mt-5"
+              !product?.rating?.average && !product.isOnSale && "mt-5"
             }`}
           >
             <Image

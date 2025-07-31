@@ -15,7 +15,7 @@ const New = async ({ searchParams }) => {
     return (
       <main>
         <CustomNavbar />
-        <ProductList data={data.products} />
+        <ProductList data={data.products} category={"new"} />
         <div className="mt-1">
           <ProductPagination totalPages={data.pagination.totalPages} />
         </div>

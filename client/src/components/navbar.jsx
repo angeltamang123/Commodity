@@ -101,21 +101,47 @@ export default function CustomNavbar() {
             </NavbarItem>
             <DropdownMenu
               aria-label="Categories"
-              className="w-[200px]"
+              className="w-[200px] bg-white"
               itemClasses={{
                 base: "gap-4",
               }}
             >
-              <DropdownItem href="/categories/Electronics">
+              <DropdownItem
+                className="hover:scale-105 hover:text-[#AF0000]"
+                href="/categories/Electronics"
+              >
                 Electronics
               </DropdownItem>
-              <DropdownItem href="/categories/Clothing">Clothing</DropdownItem>
-              <DropdownItem href="/categories/Books">Books</DropdownItem>
-              <DropdownItem href="/categories/Sports">Sports</DropdownItem>
-              <DropdownItem href="/categories/Furnitures">
+              <DropdownItem
+                className="hover:scale-105 hover:text-[#AF0000]"
+                href="/categories/Clothing"
+              >
+                Clothing
+              </DropdownItem>
+              <DropdownItem
+                className="hover:scale-105 hover:text-[#AF0000]"
+                href="/categories/Books"
+              >
+                Books
+              </DropdownItem>
+              <DropdownItem
+                className="hover:scale-105 hover:text-[#AF0000]"
+                href="/categories/Sports"
+              >
+                Sports
+              </DropdownItem>
+              <DropdownItem
+                className="hover:scale-105 hover:text-[#AF0000]"
+                href="/categories/Furnitures"
+              >
                 Furnitures
               </DropdownItem>
-              <DropdownItem href="/categories/Others">Others</DropdownItem>
+              <DropdownItem
+                className="hover:scale-105 hover:text-[#AF0000]"
+                href="/categories/Others"
+              >
+                Others
+              </DropdownItem>
             </DropdownMenu>
           </Dropdown>
           <NavbarItem>

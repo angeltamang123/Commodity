@@ -2,12 +2,12 @@ import ProductCard from "./ProductCard";
 
 const ProductList = ({ data, category }) => {
   const categories = {
-    electronics: "Electronics",
-    clothing: "Clothing",
-    books: "Books",
-    sports: "Sports",
-    furniture: "Furniture",
-    other: "Other",
+    Electronics: "Electronics",
+    Clothing: "Clothing",
+    Books: "Books",
+    Sports: "Sports",
+    Furnitures: "Furnitures",
+    Others: "Others",
     new: "What's New",
     hot: "Hot Deals",
   };

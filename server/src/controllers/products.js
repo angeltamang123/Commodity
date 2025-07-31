@@ -202,70 +202,144 @@ const getAllProducts = async (req, res) => {
     const skip = (page - 1) * limit;
 
     // Master Filter Object
-    let filters = {};
+    const matchStage = {};
+    const exprConditions = [];
 
     // Text Search
     if (req.query.q) {
-      filters.$text = { $search: req.query.q };
+      matchStage.$text = { $search: req.query.q };
     }
-
-    // Category Filter
     if (req.query.category) {
-      filters.category = req.query.category;
+      matchStage.category = req.query.category;
     }
-
-    // Price Range Filter
-    if (req.query.minPrice || req.query.maxPrice) {
-      const priceCondition = {};
-      if (req.query.minPrice) {
-        priceCondition.$gte = parseFloat(req.query.minPrice);
-      }
-      if (req.query.maxPrice) {
-        priceCondition.$lte = parseFloat(req.query.maxPrice);
-      }
-
-      // $or to check against the effective price
-      filters.$or = [
-        // Case A: The product is on sale, so check its discountPrice
-        { discountPrice: priceCondition, discountTill: { $gt: new Date() } },
-
-        // Case B: The product is NOT on sale, so check its regular price
-        {
-          price: priceCondition,
-          $or: [
-            { discountPrice: { $in: [null, undefined] } },
-            { discountTill: { $lte: new Date() } },
-          ],
-        },
-      ];
+    if (req.query.stock === "0") {
+      matchStage.stock = 0;
     }
-
-    // "Has Discount" Filter
-    if (req.query.hasDiscount === "true") {
-      filters.discountPrice = { $exists: true, $ne: null, $gt: 0 };
+    if (req.query.status === "inactive") {
+      matchStage.status = "inactive";
     }
-
-    // Minimum Rating Filter
     if (req.query.minRating) {
-      filters["rating.average"] = { $gte: parseFloat(req.query.minRating) };
+      matchStage["rating.average"] = { $gte: parseFloat(req.query.minRating) };
     }
 
-    const totalProducts = await Product.countDocuments(filters);
+    // 'hasDiscount' filter
+    if (req.query.hasDiscount === "true") {
+      exprConditions.push({
+        $and: [
+          { $ne: ["$discountPrice", null] },
+          { $gt: ["$discountTill", new Date()] },
+        ],
+      });
+    }
 
-    const findOptions = {};
+    // 'Price Range' filter on the EFFECTIVE PRICE
+    const priceConditions = [];
+    if (req.query.minPrice) {
+      priceConditions.push({
+        $gte: ["$$effectivePrice", parseFloat(req.query.minPrice)],
+      });
+    }
+    if (req.query.maxPrice) {
+      priceConditions.push({
+        $lte: ["$$effectivePrice", parseFloat(req.query.maxPrice)],
+      });
+    }
+
+    if (priceConditions.length > 0) {
+      exprConditions.push({
+        // Temporary 'effectivePrice' variable available only within this expression
+        $let: {
+          vars: {
+            effectivePrice: {
+              $cond: {
+                if: {
+                  $and: [
+                    { $ne: ["$discountPrice", null] },
+                    { $gt: ["$discountTill", new Date()] },
+                  ],
+                },
+                then: "$discountPrice",
+                else: "$price",
+              },
+            },
+          },
+          in: { $and: priceConditions },
+        },
+      });
+    }
+
+    // Combining all $expr conditions if any exist
+    if (exprConditions.length > 0) {
+      matchStage.$expr = { $and: exprConditions };
+    }
+
+    let sortStage = {};
 
     // Only include text score when actually searching
     if (req.query.q) {
-      findOptions.projection = { score: { $meta: "textScore" } };
-      findOptions.sort = { score: { $meta: "textScore" } };
-    } else {
-      findOptions.sort = { createdAt: 1 }; // Default sort
+      sortStage.score = { $meta: "textScore" };
     }
 
-    const products = await Product.find(filters, findOptions.projection)
-      .sort(findOptions.sort)
-      .skip(skip)
-      .limit(limit);
+    // Sorting
+    if (req.query.sort) {
+      const sortPairs = req.query.sort.split(",");
+      for (const pair of sortPairs) {
+        const [field, order] = pair.split(":");
+        if (field && order) {
+          sortStage[field.trim()] = order.trim() === "desc" ? -1 : 1;
+        }
+      }
+    }
+    if (Object.keys(sortStage).length === 0) {
+      sortStage = { createdAt: 1 }; // Default sort
+    }
+
+    // Aggregation
+    const pipeline = [
+      // Filtering the documents
+      { $match: matchStage },
+
+      // Adding the 'effectivePrice' and 'isOnSale' fields for sorting and display
+      {
+        $addFields: {
+          isOnSale: {
+            $and: [
+              { $ne: ["$discountPrice", null] },
+              { $gt: ["$discountTill", new Date()] },
+            ],
+          },
+          effectivePrice: {
+            $cond: {
+              if: {
+                $and: [
+                  { $ne: ["$discountPrice", null] },
+                  { $gt: ["$discountTill", new Date()] },
+                ],
+              },
+              then: "$discountPrice",
+              else: "$price",
+            },
+          },
+        },
+      },
+
+      // Sort the results
+      { $sort: sortStage },
+
+      // $facet to get both total count and paginated data in one go
+      {
+        $facet: {
+          metadata: [{ $count: "totalProducts" }],
+          data: [{ $skip: skip }, { $limit: limit }],
+        },
+      },
+    ];
+
+    const results = await Product.aggregate(pipeline);
+
+    const products = results[0].data;
+    console.log(products);
+    const totalProducts = results[0].metadata[0]?.totalProducts || 0;
 
     res.status(200).json({
       products: products,

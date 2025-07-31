@@ -16,7 +16,7 @@ const Deals = async ({ searchParams }) => {
     return (
       <main>
         <CustomNavbar />
-        <ProductList data={data.products} />
+        <ProductList data={data.products} category={"hot"} />
         <div className="mt-1">
           <ProductPagination totalPages={data.pagination.totalPages} />
         </div>
