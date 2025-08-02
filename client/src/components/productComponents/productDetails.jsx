@@ -54,8 +54,8 @@ export default function ProductDetail({ product }) {
   let averageRating;
   let numFullStars;
   let hasHalfStar;
-  if (product.rating.average) {
-    averageRating = parseFloat(product?.rating?.average.toFixed(1));
+  if (product?.rating?.average) {
+    averageRating = parseFloat(product?.rating?.average?.toFixed(1));
     numFullStars = Math.floor(averageRating);
     hasHalfStar = averageRating % 1 !== 0;
   }
@@ -214,9 +214,9 @@ export default function ProductDetail({ product }) {
 
           {/* Rating */}
           <div className="flex items-center gap-2">
-            {product.rating.average !== null &&
-            product.rating.average !== undefined &&
-            product.rating.average > 0 ? (
+            {product?.rating?.average !== null &&
+            product?.rating?.average !== undefined &&
+            product?.rating?.average > 0 ? (
               <>
                 <div className="flex items-center">
                   {Array.from({ length: 5 }).map((_, i) => {
@@ -248,10 +248,10 @@ export default function ProductDetail({ product }) {
                   })}
                 </div>
                 <span className="text-sm text-gray-600">
-                  {product?.rating?.average.toFixed(1)} (
-                  {product.rating.count > 1
-                    ? `${product.rating.count} reviews`
-                    : `${product.rating.count} review`}
+                  {product?.rating?.average?.toFixed(1)} (
+                  {product?.rating?.count > 1
+                    ? `${product?.rating?.count} reviews`
+                    : `${product?.rating?.count} review`}
                   )
                 </span>
               </>

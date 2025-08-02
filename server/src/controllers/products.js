@@ -338,7 +338,6 @@ const getAllProducts = async (req, res) => {
     const results = await Product.aggregate(pipeline);
 
     const products = results[0].data;
-    console.log(products);
     const totalProducts = results[0].metadata[0]?.totalProducts || 0;
 
     res.status(200).json({
