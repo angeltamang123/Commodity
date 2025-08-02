@@ -1,3 +1,4 @@
+import { clearCart } from "@/redux/reducerSlices/cartSlice";
 import { logoutUser } from "@/redux/reducerSlices/userSlice";
 import { store } from "@/redux/store";
 import axios from "axios";
@@ -33,6 +34,7 @@ api.interceptors.response.use(
     ) {
       console.error("Authentication error:", error.response.data.message);
       store.dispatch(logoutUser());
+      store.dispatch(clearCart());
       toast.error(`Authentication error: ${error.response.data.message}`);
     }
     return Promise.reject(error);

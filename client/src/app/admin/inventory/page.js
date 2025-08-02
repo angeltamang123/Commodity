@@ -140,6 +140,7 @@ export default function InventoryPage() {
 
   const products = data?.products ?? [];
   const pageCount = data?.pagination?.totalPages ?? 0;
+  const totalProducts = data?.pagination?.totalProducts ?? 0;
 
   const triggerRefetch = () =>
     queryClient.invalidateQueries(["admin-products"]);
@@ -242,11 +243,13 @@ export default function InventoryPage() {
           const { price, effectivePrice, isOnSale } = row.original;
           return (
             <div className="flex flex-col items-start">
-              <span className="font-medium">${effectivePrice?.toFixed(2)}</span>
+              <span className="font-medium">
+                NPR {effectivePrice?.toFixed(2)}
+              </span>
               {isOnSale && (
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <TagIcon className="h-3 w-3 text-green-500" />
-                  <span className="line-through">${price?.toFixed(2)}</span>
+                  <span className="line-through">NPR {price?.toFixed(2)}</span>
                 </div>
               )}
             </div>
@@ -499,10 +502,13 @@ export default function InventoryPage() {
                     Delete Selected
                   </Button>
                 )}
-                <div className="py-4">
+                <div>
                   <DataTablePagination table={table} />
                 </div>
               </div>
+              <p className="text-sm font-semibold font-sans">
+                Total Products: {totalProducts}
+              </p>
             </CardContent>
           </Card>
         </TabsContent>

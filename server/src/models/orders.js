@@ -19,7 +19,7 @@ const orderSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.ObjectId,
-      ref: "User",
+      ref: "Register",
       required: true,
     },
     items: [orderItemSchema], // An array of items in the order

@@ -36,6 +36,7 @@ import { logoutUser } from "@/redux/reducerSlices/userSlice";
 import { useEffect } from "react";
 import { SearchBar } from "./search/searchBar";
 import CartSheet from "./productComponents/CartSheet";
+import { clearCart } from "@/redux/reducerSlices/cartSlice";
 
 export default function CustomNavbar() {
   const dispatch = useDispatch();
@@ -220,6 +221,7 @@ export default function CustomNavbar() {
                 <DropdownItem
                   onPress={() => {
                     dispatch(logoutUser());
+                    dispatch(clearCart());
                     window.location.reload();
                   }}
                 >
