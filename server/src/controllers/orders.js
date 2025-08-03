@@ -147,10 +147,10 @@ const getAllOrders = async (req, res) => {
     const initialMatch = {};
 
     // Check if the search query is a valid ObjectId
-    const isObjectId = mongoose.Types.ObjectId.isValid(req.query.q);
+    const isObjectId = mongoose.Types.ObjectId.isValid(`${req.query.q}`);
 
     if (req.query.q && isObjectId) {
-      initialMatch._id = new mongoose.ObjectId(req.query.q);
+      initialMatch._id = new mongoose.Types.ObjectId(`${req.query.q}`);
     }
 
     if (req.query.status) {
@@ -288,6 +288,131 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+const getRevenueData = async (req, res) => {
+  const { period = "month" } = req.query;
+  let startDate, groupByFormat;
+
+  const now = new Date();
+  switch (period) {
+    case "day":
+      startDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() - 1
+      ); // Last 24 hours
+      groupByFormat = "%d-%H";
+      break;
+    case "week":
+      startDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() - 7
+      );
+      groupByFormat = "%m-%d";
+      break;
+    case "year":
+      startDate = new Date(
+        now.getFullYear() - 1,
+        now.getMonth(),
+        now.getDate()
+      );
+      groupByFormat = "%Y-%m";
+      break;
+    case "month":
+    default:
+      startDate = new Date(
+        now.getFullYear(),
+        now.getMonth() - 1,
+        now.getDate()
+      );
+      groupByFormat = "%m-%d";
+  }
+
+  try {
+    const revenueData = await Order.aggregate([
+      {
+        $match: {
+          "paymentDetails.status": "completed",
+          createdAt: { $gte: startDate },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: groupByFormat,
+              date: "$createdAt",
+              timezone: period === "day" ? "Asia/Kathmandu" : "UTC",
+            },
+          },
+          totalRevenue: { $sum: "$totalAmount" },
+        },
+      },
+      { $sort: { _id: 1 } },
+      { $project: { _id: 0, date: "$_id", revenue: "$totalRevenue" } },
+    ]);
+
+    res.status(200).json({ status: "success", data: revenueData });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch revenue data." });
+  }
+};
+
+const getRevenueByCategory = async (req, res) => {
+  const { period = "all" } = req.query;
+  let startDate;
+
+  const now = new Date();
+  switch (period) {
+    case "day":
+      startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      break;
+    case "week":
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      break;
+    case "month":
+      startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      break;
+    case "year":
+      startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+      break;
+  }
+
+  const matchStage = { status: "delivered" };
+  if (startDate) {
+    matchStage.createdAt = { $gte: startDate };
+  }
+
+  try {
+    const revenueByCategory = await Order.aggregate([
+      { $match: matchStage },
+      { $unwind: "$items" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      { $unwind: "$productDetails" },
+      {
+        $group: {
+          _id: "$productDetails.category",
+          revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } },
+        },
+      },
+      { $project: { _id: 0, category: "$_id", revenue: "$revenue" } },
+      { $sort: { revenue: -1 } },
+    ]);
+
+    res.status(200).json({ status: "success", data: revenueByCategory });
+  } catch (error) {
+    console.error("Error fetching category revenue:", error);
+    res.status(500).json({ message: "Failed to fetch category revenue." });
+  }
+};
+
 module.exports = {
   createOrder,
   cancelOrder,
@@ -295,4 +420,6 @@ module.exports = {
   getOrderById,
   getAllOrders,
   updateOrderStatus,
+  getRevenueByCategory,
+  getRevenueData,
 };

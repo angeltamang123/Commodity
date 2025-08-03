@@ -9,6 +9,8 @@ const {
   toggleStatus,
   getLatest,
   getDiscountedProducts,
+  getStatsCards,
+  getProductCountByCategory,
 } = require("../controllers/products");
 
 const authMiddleware = require("../utils/authMiddleware");
@@ -35,6 +37,13 @@ router.get("/products", (req, res) => {
   }
   return getAllProducts(req, res);
 });
+router.get("/products/stats-cards", authMiddleware.protect, getStatsCards);
+
+router.get(
+  "/products/product-count-by-category",
+  authMiddleware.protect,
+  getProductCountByCategory
+);
 router.get("/products/:productId", getProductById);
 router.patch(
   "/products/:productId",

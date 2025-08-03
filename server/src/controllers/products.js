@@ -357,8 +357,12 @@ const getAllProducts = async (req, res) => {
 };
 
 const getProductById = async (req, res) => {
-  const data = await Product.findById(req.params.productId);
-  res.send(data);
+  try {
+    const data = await Product.findById(req.params.productId);
+    res.send(data);
+  } catch (error) {
+    res.send(error.message);
+  }
 };
 
 const deleteProduct = async (req, res) => {
@@ -471,6 +475,61 @@ const getDiscountedProducts = async (req, res) => {
   }
 };
 
+const getStatsCards = async (req, res) => {
+  try {
+    const productStats = await Product.aggregate([
+      {
+        $group: {
+          _id: null, // Group all documents into one
+          totalProducts: { $sum: 1 },
+          activeProducts: {
+            $sum: { $cond: [{ $eq: ["$status", "active"] }, 1, 0] },
+          },
+          inactiveProducts: {
+            $sum: { $cond: [{ $eq: ["$status", "inactive"] }, 1, 0] },
+          },
+          outOfStockProducts: {
+            $sum: { $cond: [{ $eq: ["$stock", 0] }, 1, 0] },
+          },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      data: productStats[0] || {
+        totalProducts: 0,
+        activeProducts: 0,
+        inactiveProducts: 0,
+        outOfStockProducts: 0,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching stats cards:", error);
+    res.status(500).json({ message: "Failed to fetch stats cards data." });
+  }
+};
+
+const getProductCountByCategory = async (req, res) => {
+  try {
+    const productsByCategory = await Product.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          count: { $sum: 1 },
+        },
+      },
+      { $project: { _id: 0, category: "$_id", count: "$count" } },
+      { $sort: { count: -1 } },
+    ]);
+
+    res.status(200).json({ status: "success", data: productsByCategory });
+  } catch (error) {
+    console.error("Error fetching product counts by category:", error);
+    res.status(500).json({ message: "Failed to fetch product counts." });
+  }
+};
+
 module.exports = {
   registerNewProduct,
   getAllProducts,
@@ -480,4 +539,6 @@ module.exports = {
   toggleStatus,
   getLatest,
   getDiscountedProducts,
+  getProductCountByCategory,
+  getStatsCards,
 };

@@ -263,13 +263,19 @@ export default function ProductDetail({ product }) {
           {/* Price */}
           <div className="flex items-baseline gap-2">
             <span className="text-3xl md:text-4xl font-bold text-[#111B25]">
-              NPR {displayPrice.toLocaleString()}
+              NPR{" "}
+              {displayPrice.toLocaleString("en-IN", {
+                maximumFractionDigits: 2,
+              })}
             </span>
             {product.discountPrice !== null &&
               product.discountPrice !== undefined &&
               new Date(product.discountTill) > new Date() && (
                 <span className="text-lg md:text-xl text-[#730000] line-through">
-                  NPR {product.price.toLocaleString()}
+                  NPR{" "}
+                  {product.price.toLocaleString("en-IN", {
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
               )}
           </div>

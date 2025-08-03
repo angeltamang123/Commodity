@@ -308,7 +308,10 @@ export default function AdminOrdersPage() {
                       <div className="flex-1">
                         <p className="font-medium text-sm">{item.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {item.quantity} x NPR {item.price.toFixed(2)}
+                          {item.quantity} x NPR{" "}
+                          {item.price.toLocaleString("en-IN", {
+                            maximumFractionDigits: 2,
+                          })}
                         </p>
                       </div>
                     </div>
@@ -361,7 +364,10 @@ export default function AdminOrdersPage() {
         header: () => <div className="text-right">Total</div>,
         cell: ({ row }) => (
           <div className="text-right font-semibold">
-            NPR {row.getValue("totalAmount").toFixed(2)}
+            NPR{" "}
+            {row.getValue("totalAmount").toLocaleString("en-IN", {
+              maximumFractionDigits: 2,
+            })}
           </div>
         ),
       },
