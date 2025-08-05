@@ -121,10 +121,150 @@ const cancelOrder = async (req, res) => {
 
 const getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user.id });
-    res.status(200).json({ status: "success", data: orders });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 15;
+    const skip = (page - 1) * limit;
+
+    const pipeline = [];
+
+    pipeline.push({
+      $match: { user: new mongoose.Types.ObjectId(`${req.user.id}`) },
+    });
+
+    if (req.query.status) {
+      pipeline.push({ $match: { status: req.query.status } });
+    }
+
+    const isObjectId = mongoose.Types.ObjectId.isValid(`${req.query.q}`);
+
+    if (req.query.q && isObjectId) {
+      pipeline.push({
+        $match: { _id: new mongoose.Types.ObjectId(`${req.query.q}`) },
+      });
+    }
+
+    if (req.query.q && !isObjectId) {
+      pipeline.push({ $unwind: "$items" });
+
+      pipeline.push({
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      });
+
+      pipeline.push({ $unwind: "$productDetails" });
+
+      pipeline.push({
+        $group: {
+          _id: "$_id",
+          user: { $first: "$user" },
+          totalAmount: { $first: "$totalAmount" },
+          deliveryAddress: { $first: "$deliveryAddress" },
+          paymentDetails: { $first: "$paymentDetails" },
+          status: { $first: "$status" },
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
+          items: {
+            $push: {
+              product: "$items.product",
+              name: "$items.name",
+              price: "$items.price",
+              quantity: "$items.quantity",
+              productDetails: "$productDetails",
+            },
+          },
+          hasMatchingProduct: {
+            $max: {
+              $cond: {
+                if: {
+                  $regexMatch: {
+                    input: "$productDetails.name",
+                    regex: req.query.q,
+                    options: "i",
+                  },
+                },
+                then: true,
+                else: false,
+              },
+            },
+          },
+        },
+      });
+
+      pipeline.push({ $match: { hasMatchingProduct: true } });
+      pipeline.push({ $project: { hasMatchingProduct: 0 } });
+    }
+
+    if (!req.query.q || isObjectId) {
+      pipeline.push({ $unwind: "$items" });
+
+      pipeline.push({
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      });
+
+      pipeline.push({ $unwind: "$productDetails" });
+
+      pipeline.push({
+        $group: {
+          _id: "$_id",
+          user: { $first: "$user" },
+          totalAmount: { $first: "$totalAmount" },
+          deliveryAddress: { $first: "$deliveryAddress" },
+          paymentDetails: { $first: "$paymentDetails" },
+          status: { $first: "$status" },
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
+          items: {
+            $push: {
+              product: "$items.product",
+              name: "$items.name",
+              price: "$items.price",
+              quantity: "$items.quantity",
+              productDetails: "$productDetails",
+            },
+          },
+        },
+      });
+    }
+
+    let sortStage = {};
+    if (req.query.sort) {
+      const [field, order] = req.query.sort.split(":");
+      sortStage[field] = order === "desc" ? -1 : 1;
+    } else {
+      sortStage = { updatedAt: -1 };
+    }
+    pipeline.push({ $sort: sortStage });
+
+    const countPipeline = [...pipeline];
+    countPipeline.push({ $count: "totalOrders" });
+    const countResult = await Order.aggregate(countPipeline);
+    const totalOrders = countResult[0]?.totalOrders || 0;
+
+    pipeline.push({ $skip: skip });
+    pipeline.push({ $limit: limit });
+
+    const orders = await Order.aggregate(pipeline);
+
+    res.status(200).json({
+      orders: orders,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalOrders / limit),
+        totalOrders: totalOrders,
+      },
+    });
   } catch (error) {
-    res.status(400).json({ status: "fail", message: error.message });
+    console.error("Error fetching user's orders:", error);
+    res.status(500).json({ message: "Failed to fetch orders" });
   }
 };
 

@@ -217,10 +217,11 @@ export default function CustomNavbar() {
                   base: "gap-4",
                 }}
               >
-                <DropdownItem href="/settings/profile">Settings</DropdownItem>
                 {role === "admin" && (
                   <DropdownItem href="/admin/dashboard">Dashboard</DropdownItem>
                 )}
+                <DropdownItem href="/orders">Orders</DropdownItem>
+                <DropdownItem href="/settings/profile">Settings</DropdownItem>
                 <DropdownItem
                   onPress={() => {
                     dispatch(logoutUser());
