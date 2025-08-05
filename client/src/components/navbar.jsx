@@ -43,7 +43,7 @@ export default function CustomNavbar() {
   const router = useRouter();
   const pathName = usePathname();
 
-  const { isLoggedIn, phoneNumber, location } = useSelector(
+  const { isLoggedIn, phoneNumber, role, location } = useSelector(
     (state) => state.persisted.user
   );
 
@@ -212,12 +212,15 @@ export default function CustomNavbar() {
               </NavbarItem>
               <DropdownMenu
                 aria-label="Categories"
-                className="w-[200px]"
+                className="w-[200px] bg-white"
                 itemClasses={{
                   base: "gap-4",
                 }}
               >
-                <DropdownItem href="/account">Settings</DropdownItem>
+                <DropdownItem href="/settings/profile">Settings</DropdownItem>
+                {role === "admin" && (
+                  <DropdownItem href="/admin/dashboard">Dashboard</DropdownItem>
+                )}
                 <DropdownItem
                   onPress={() => {
                     dispatch(logoutUser());

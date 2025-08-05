@@ -26,8 +26,8 @@ const registerSchema = new Schema(
       result_type: { type: String }, // e.g., 'suburb', 'amenity', 'street', 'house'
       place_id: { type: String }, // Unique ID from Geoapify
     },
-    emailId: { type: String, trim: true },
-    phoneNumber: Number,
+    emailId: { type: String, trim: true, unique: true },
+    phoneNumber: { type: Number, unique: true },
     password: {
       type: String,
       required: [true, "Password is required"],

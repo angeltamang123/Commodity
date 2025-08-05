@@ -6,6 +6,7 @@ const initialState = {
   isLoggedIn: false,
   fullName: "",
   location: {},
+  role: "user",
   phoneNumber: null,
   gender: "",
   userId: null,
@@ -26,6 +27,7 @@ export const userSlice = createSlice({
         phoneNumber,
         gender,
         location,
+        role,
         _id,
         wishlist,
       } = action.payload.user;
@@ -38,6 +40,7 @@ export const userSlice = createSlice({
         token: token,
         wishlist: wishlist,
         isLoggedIn: isLoggedIn,
+        role: role,
         location: location,
         fullName: fullName,
         phoneNumber: phoneNumber,
@@ -55,6 +58,11 @@ export const userSlice = createSlice({
         return item !== action.payload;
       });
     },
+
+    updateUserDetails: (state, action) => {
+      const { fieldName, value } = action.payload;
+      state[fieldName] = value;
+    },
   },
 });
 
@@ -63,6 +71,7 @@ export const {
   addLoginDetails,
   addToWishList,
   removeFromWishList,
+  updateUserDetails,
 } = userSlice.actions;
 
 export default userSlice.reducer;

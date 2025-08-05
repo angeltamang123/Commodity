@@ -25,20 +25,20 @@ api.interceptors.request.use(
 );
 
 // Response with error handling in case of auth errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (
-      error.response &&
-      (error.response.status === 401 || error.response.status === 403)
-    ) {
-      console.error("Authentication error:", error.response.data.message);
-      store.dispatch(logoutUser());
-      store.dispatch(clearCart());
-      toast.error(`Authentication error: ${error.response.data.message}`);
-    }
-    return Promise.reject(error);
-  }
-);
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (
+//       error.response &&
+//       (error.response.status === 401 || error.response.status === 403)
+//     ) {
+//       console.error("Authentication error:", error.response.data.message);
+//       store.dispatch(logoutUser());
+//       store.dispatch(clearCart());
+//       toast.error(`Authentication error: ${error.response.data.message}`);
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 export default api;

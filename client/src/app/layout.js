@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
         <ReduxProvider>
           <QueryProvider>{children}</QueryProvider>
         </ReduxProvider>
-        <Toaster />
+        <Toaster richColors />
       </body>
     </html>
   );
