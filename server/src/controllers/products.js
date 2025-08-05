@@ -1,6 +1,7 @@
 const Product = require("../models/products");
 const fs = require("fs");
 const path = require("path");
+const Register = require("../models/users");
 
 // Helper function to delete a single file
 const deleteFile = (filename) => {
@@ -356,6 +357,63 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getWishlistProducts = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 15;
+    const skip = (page - 1) * limit;
+
+    const user = await Register.findById(userId).select("wishlist").lean();
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "fail", message: "User not found." });
+    }
+
+    const wishlistProductIds = user.wishlist;
+
+    if (!wishlistProductIds || wishlistProductIds.length === 0) {
+      return res.status(200).json({
+        status: "success",
+        data: [],
+        pagination: {
+          currentPage: page,
+          totalPages: 0,
+          totalProducts: 0,
+        },
+      });
+    }
+
+    const totalProducts = await Product.countDocuments({
+      _id: { $in: wishlistProductIds },
+    });
+
+    const wishlistProducts = await Product.find({
+      _id: { $in: wishlistProductIds },
+    })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      status: "success",
+      data: wishlistProducts,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalProducts / limit),
+        totalProducts: totalProducts,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching wishlist products:", error);
+    res
+      .status(500)
+      .json({ status: "fail", message: "Failed to fetch wishlist products." });
+  }
+};
+
 const getProductById = async (req, res) => {
   try {
     const data = await Product.findById(req.params.productId);
@@ -480,7 +538,7 @@ const getStatsCards = async (req, res) => {
     const productStats = await Product.aggregate([
       {
         $group: {
-          _id: null, // Group all documents into one
+          _id: null,
           totalProducts: { $sum: 1 },
           activeProducts: {
             $sum: { $cond: [{ $eq: ["$status", "active"] }, 1, 0] },
@@ -541,4 +599,5 @@ module.exports = {
   getDiscountedProducts,
   getProductCountByCategory,
   getStatsCards,
+  getWishlistProducts,
 };

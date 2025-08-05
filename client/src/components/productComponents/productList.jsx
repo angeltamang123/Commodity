@@ -10,6 +10,7 @@ const ProductList = ({ data, category }) => {
     Others: "Others",
     new: "What's New",
     hot: "Hot Deals",
+    wishlist: "Your Wishlist",
   };
   return (
     <div className="container w-full mx-auto px-4 py-8">

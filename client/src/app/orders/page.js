@@ -51,14 +51,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"; // Import DropdownMenu components
+} from "@/components/ui/dropdown-menu";
 
 import {
   Search,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  MoreHorizontal, // Import MoreHorizontal icon
+  MoreHorizontal,
 } from "lucide-react";
 
 import api from "@/lib/axiosInstance";
@@ -76,9 +76,6 @@ const fetchOrders = async (tableState) => {
   }
   if (tableState.globalFilter) {
     params.append("q", tableState.globalFilter);
-  }
-  if (tableState.statusFilter && tableState.statusFilter !== "all") {
-    params.append("status", tableState.statusFilter);
   }
   const { data } = await api.get(`/orders/my-orders/?${params.toString()}`);
   return data;
@@ -171,7 +168,6 @@ export default function OrdersPage() {
       });
   };
 
-  // Define columns before table initialization
   const columns = React.useMemo(
     () => [
       {
@@ -394,7 +390,7 @@ export default function OrdersPage() {
         },
       },
     ],
-    [] // No dependencies here, as table is not used directly in column def
+    []
   );
 
   const table = useReactTable({
@@ -412,7 +408,6 @@ export default function OrdersPage() {
     manualFiltering: true,
   });
 
-  // This hook needs to be defined AFTER the table instance
   const areAllSelectedOrdersCancellable = React.useMemo(() => {
     const selectedRows = table.getFilteredSelectedRowModel().rows;
     if (selectedRows.length === 0) return false;
@@ -430,8 +425,8 @@ export default function OrdersPage() {
       );
       if (!allCancellable) {
         toast.error("Some selected orders cannot be cancelled.");
-        setIsCancelling(false); // Ensure loading state is reset
-        setIsBulkCancelDialogOpen(false); // Close dialog
+        setIsCancelling(false);
+        setIsBulkCancelDialogOpen(false);
         return;
       }
 
@@ -554,7 +549,6 @@ export default function OrdersPage() {
           </CardContent>
         </Card>
 
-        {/* Dialog for single order cancellation */}
         <AlertDialog
           open={isCancelDialogOpen}
           onOpenChange={(value) => {
@@ -590,8 +584,6 @@ export default function OrdersPage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-
-        {/* Dialog for bulk order cancellation */}
         <AlertDialog
           open={isBulkCancelDialogOpen}
           onOpenChange={(value) => {

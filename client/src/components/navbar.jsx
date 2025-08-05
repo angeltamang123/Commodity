@@ -156,8 +156,8 @@ export default function CustomNavbar() {
             </Link>
           </NavbarItem>
           <NavbarItem>
-            <Link href="/delivery" className="text-default-600">
-              Delivery
+            <Link href="/wishlist" className="text-default-600">
+              Wishlist
             </Link>
           </NavbarItem>
         </NavbarContent>
