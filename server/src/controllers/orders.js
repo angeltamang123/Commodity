@@ -2,8 +2,10 @@ const Order = require("../models/orders");
 const Product = require("../models/products");
 const mongoose = require("mongoose");
 const { randomUUID } = require("crypto");
+const { notifyAllAdmins, notifyUser } = require("../utils/notificationHelpers");
 
 const createOrder = async (req, res) => {
+  const io = req.app.get("io");
   const { cartItems, deliveryAddress } = req.body; // Buy now can be a single item in cartItems array
   const userId = req.user.id;
 
@@ -57,8 +59,12 @@ const createOrder = async (req, res) => {
     });
 
     await order.save({ session });
-
     await session.commitTransaction();
+
+    notifyAllAdmins(io, {
+      message: `Order placed by user ${userId}`,
+      type: "New Order",
+    });
 
     res.status(201).json({ status: "success", data: order });
   } catch (error) {
@@ -79,7 +85,7 @@ const createOrder = async (req, res) => {
 const cancelOrder = async (req, res) => {
   const { orderId } = req.params;
   const userId = req.user.id;
-
+  const io = req.app.get("io");
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -110,6 +116,19 @@ const cancelOrder = async (req, res) => {
     await order.save({ session });
 
     await session.commitTransaction();
+
+    const sockets = global.connectedUsers.get(userId);
+
+    const isAdmin = sockets?.some((socket) =>
+      global.connectedAdmins.has(socket)
+    );
+
+    if (!isAdmin) {
+      notifyAllAdmins(io, {
+        message: `Order placed by user ${userId} cancelled !!`,
+        type: "Order Cancelled",
+      });
+    }
     res.status(200).json({ status: "success", data: order });
   } catch (error) {
     await session.abortTransaction();
@@ -398,6 +417,7 @@ const getAllOrders = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
+  const io = req.app.get("io");
 
   if (!Order.schema.path("status").enumValues.includes(status)) {
     return res.status(400).json({ message: "Invalid status value." });
@@ -414,9 +434,15 @@ const updateOrderStatus = async (req, res) => {
 
     const updatedOrder = await Order.findById(orderId).populate(
       "user",
-      "fullName emailId phoneNumber"
+      "_id fullName emailId phoneNumber"
     );
 
+    if (status === "departed") {
+      notifyUser(io, updatedOrder.user._id, {
+        message: `Your Order ${updatedOrder._id} has departed`,
+        type: "Order Update",
+      });
+    }
     res.status(200).json({
       status: "success",
       message: `Order status updated to ${status}`,

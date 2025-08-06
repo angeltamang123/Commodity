@@ -14,6 +14,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -26,10 +27,15 @@ import {
 import CommodityLogo from "../commodityLogo";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { Button } from "../ui/button";
+import { useDispatch } from "react-redux";
+import { logoutUser } from "@/redux/reducerSlices/userSlice";
 
 export function AdminSidebar() {
   const pathName = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch();
   // Menu items.
   const items = [
     {
@@ -83,6 +89,7 @@ export function AdminSidebar() {
             >
               <CommodityLogo className="text-[#730000] size-16" />
             </Link>
+
             <SidebarTrigger className="text-white text-2xl" />
           </div>
         ) : (
@@ -130,6 +137,19 @@ export function AdminSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="bg-[#111B25]">
+        <Button
+          className="bg-[#730000] hover:bg-[#AF0000] hover:cursor-pointer"
+          onClick={() => {
+            router.push("/");
+            setTimeout(() => {
+              dispatch(logoutUser());
+            }, 1000);
+          }}
+        >
+          Logout
+        </Button>
+      </SidebarFooter>
     </Sidebar>
   );
 }

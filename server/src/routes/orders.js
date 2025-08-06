@@ -1,4 +1,3 @@
-// /routes/orders.js
 const { Router } = require("express");
 const authMiddleware = require("../utils/authMiddleware");
 const {

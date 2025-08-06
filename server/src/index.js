@@ -1,18 +1,34 @@
 const express = require("express");
-const app = express();
+const http = require("http");
+const socketIO = require("socket.io");
+
 const cors = require("cors");
 
 const dotenv = require("dotenv");
 // dot env config
 dotenv.config();
+
 const port = process.env.PORT || 7000;
 
-app.use(cors());
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
+app.set("io", io);
+
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form-urlencoded
 
 app.use("/uploads", express.static("uploads"));
+
+// Setup Socket.IO
+const socketSetup = require("./socket");
+socketSetup(io); // Passing io to socket file
 
 const productRoute = require("./routes/products");
 app.use(productRoute);
@@ -26,6 +42,6 @@ app.use(orderRoute);
 const connect = require("./db/connection"); //importing db
 connect(); //function for connecting db
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });
