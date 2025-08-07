@@ -2,7 +2,10 @@ import { Inter, Roboto } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/redux/reduxProvider";
 import { Toaster } from "sonner";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import QueryProvider from "@/components/QueryProvider";
+import NotificationSocket from "@/lib/NotificationSocket";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,9 +25,12 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${roboto.variable}`}>
       <body className={inter.className}>
         <ReduxProvider>
+          <NotificationSocket />
           <QueryProvider>{children}</QueryProvider>
         </ReduxProvider>
         <Toaster richColors />
+        {/* Using React-toastify for real time notification toast as two Toasters with ids from sonner isn't working */}
+        <ToastContainer position="top-center" autoClose={5000} />
       </body>
     </html>
   );

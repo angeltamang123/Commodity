@@ -109,7 +109,7 @@
 
 - ⬜ Real-time chat between users and sellers/support
 - ⬜ OAuth 2.0 login (Google, Facebook, etc.)
-- ⬜ In-app notifications (optional enhancement)
+- ✅ In-app notifications (optional enhancement)
 
 ---
 

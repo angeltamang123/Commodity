@@ -149,7 +149,9 @@ export default function InventoryPage() {
     try {
       await api.delete(`/products/${id}`);
       triggerRefetch();
-      toast.success("Product deleted successfully.");
+      toast.success("Product deleted successfully.", {
+        toasterId: "generalToaster",
+      });
       setIsDeleteDialogOpen(false);
     } catch (error) {
       toast.error("Failed to delete product.");

@@ -19,6 +19,7 @@ import {
   ShoppingCart,
   Phone,
   MapPin,
+  Bell,
 } from "lucide-react";
 import {
   Sheet,
@@ -33,15 +34,22 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/redux/reducerSlices/userSlice";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SearchBar } from "./search/searchBar";
 import CartSheet from "./productComponents/CartSheet";
 import { clearCart } from "@/redux/reducerSlices/cartSlice";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
+import api from "@/lib/axiosInstance";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { markAllSeen } from "@/redux/reducerSlices/notificationSlice";
 
 export default function CustomNavbar() {
   const dispatch = useDispatch();
   const router = useRouter();
   const pathName = usePathname();
+
+  const notifiactionCardRef = useRef(null);
 
   const { isLoggedIn, phoneNumber, role, location } = useSelector(
     (state) => state.persisted.user
@@ -50,6 +58,30 @@ export default function CustomNavbar() {
   const totalCartQuantity = useSelector(
     (state) => state.persisted.cart.totalQuantity
   );
+
+  const { unseenCount } = useSelector((state) => state.notification);
+
+  const markAllAsSeen = async () => {
+    try {
+      await api.post("/notifications/mark-all-seen");
+      dispatch(markAllSeen());
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ??
+        "Failed Marking notifications as seen";
+      toast.error(errorMessage);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    const { data } = await api.get("/notifications?limit=5");
+    return data;
+  };
+
+  const { data: notifications } = useQuery({
+    queryKey: ["notifications", unseenCount],
+    queryFn: fetchNotifications,
+  });
 
   return (
     <div className="max-w-screen overflow-visible relative z-10">
@@ -60,14 +92,7 @@ export default function CustomNavbar() {
           <span>{phoneNumber}</span>
         </div>
         <div className="flex items-center gap-4">
-          <span>Get 50% Off on Selected Items</span>
-          <Button
-            size="xs"
-            variant="bordered"
-            className="text-[#FFFFFA] text-xs -p-2 h-7 border-white hover:bg-white/20"
-          >
-            Shop Now
-          </Button>
+          <span>Commodity AI Comming Soon | Stay Tuned !! </span>
         </div>
         <div className="flex items-center gap-2">
           {isLoggedIn && (location?.suburb || location?.city) && (
@@ -78,14 +103,14 @@ export default function CustomNavbar() {
       </div>
       {/* Main Navbar */}
       <Navbar className="border-b flex w-full justify-between overflow-visible bg-[#FEFEFE] ">
-        <NavbarBrand className="ml-4">
+        <NavbarBrand className="ml-2">
           <Link href="/" className="flex justify-start items-center gap-2">
             <CommodityLogo className="text-[#730000]" />
             <span className="font-bold text-xl text-[#AF0000]">Commodity</span>
           </Link>
         </NavbarBrand>
 
-        <NavbarContent className="flex ml-56 justify-between gap-4">
+        <NavbarContent className="flex ml-22 justify-between gap-4">
           <Dropdown>
             <NavbarItem>
               <DropdownTrigger>
@@ -155,7 +180,7 @@ export default function CustomNavbar() {
               What&apos;s New
             </Link>
           </NavbarItem>
-          <NavbarItem>
+          <NavbarItem className={`${!isLoggedIn && "hidden"}`}>
             <Link href="/wishlist" className="text-default-600">
               Wishlist
             </Link>
@@ -166,7 +191,60 @@ export default function CustomNavbar() {
           <NavbarItem className="lg:flex w-64 font-normal">
             <SearchBar />
           </NavbarItem>
-          <NavbarItem className="ml-12">
+          <NavbarItem className={`ml-12 ${!isLoggedIn && "hidden"}`}>
+            <HoverCard
+              openDelay={200}
+              onOpenChange={(value) => {
+                !value && markAllAsSeen();
+              }}
+            >
+              <HoverCardTrigger>
+                <Button
+                  disableRipple
+                  className="p-0 bg-transparent data-[hover=true]:bg-transparent cursor-pointer"
+                  radius="sm"
+                  startContent={<Bell size={20} />}
+                  variant="light"
+                  onPress={() => {
+                    role === "admin"
+                      ? router.push("/admin/notifications")
+                      : router.push("/notifications");
+                  }}
+                >
+                  Notifications
+                  {unseenCount > 0 && (
+                    <span className="absolute top-0 left-2 bg-[#AF0000] text-white text-xs rounded-4xl h-4.5 w-4.5 flex items-center justify-center">
+                      {unseenCount}
+                    </span>
+                  )}
+                </Button>
+              </HoverCardTrigger>
+              <HoverCardContent
+                ref={notifiactionCardRef}
+                className=" overflow-clip truncate"
+              >
+                {notifications?.length > 0 ? (
+                  notifications?.map((notification) => (
+                    <div
+                      id={notification?._id}
+                      key={notification?._id}
+                      className={`border-b w-full ${
+                        !notification.seen && "bg-blue-200"
+                      }`}
+                    >
+                      <p>
+                        <span className="font-bold">{notification.type}:</span>{" "}
+                        {notification.message}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm">No new Notifications !!</p>
+                )}
+              </HoverCardContent>
+            </HoverCard>
+          </NavbarItem>
+          <NavbarItem className="">
             <Sheet>
               <SheetTrigger asChild>
                 <Button
@@ -236,7 +314,7 @@ export default function CustomNavbar() {
           ) : (
             <Button
               disableRipple
-              className="p-0 -ml-16 bg-transparent border-1 rounded-md w-56 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent cursor-pointer"
+              className="p-0 ml-44 bg-transparent border-1 rounded-md w-56 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent cursor-pointer"
               radius="sm"
               onPress={() => {
                 if (pathName === "/") {

@@ -23,10 +23,8 @@ module.exports = function (io) {
       const userId = socketToUser.get(socket.id);
 
       if (userId && connectedUsers.has(userId)) {
-        const sockets = connectedUsers.get(userId);
-        sockets.delete(socket.id);
-
-        if (sockets.size === 0) {
+        connectedUsers.get(userId).delete(socket.id);
+        if (connectedUsers.get(userId).size === 0) {
           connectedUsers.delete(userId);
         }
       }
@@ -41,4 +39,5 @@ module.exports = function (io) {
   // Making global for use in routes
   global.connectedUsers = connectedUsers;
   global.connectedAdmins = connectedAdmins;
+  global.socketToUser = socketToUser;
 };

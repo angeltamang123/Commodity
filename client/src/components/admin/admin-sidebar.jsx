@@ -29,13 +29,14 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/redux/reducerSlices/userSlice";
 
 export function AdminSidebar() {
   const pathName = usePathname();
   const router = useRouter();
   const dispatch = useDispatch();
+  const { unseenCount } = useSelector((state) => state.notification);
   // Menu items.
   const items = [
     {
@@ -130,6 +131,11 @@ export function AdminSidebar() {
                   <Link href={"/admin/notifications"}>
                     <Bell />
                     <span>Notifications</span>
+                    {unseenCount > 0 && (
+                      <span className="absolute right-0 mr-5 bg-[#AF0000] text-white text-xs rounded-4xl h-4.5 w-20 flex items-center justify-center">
+                        {unseenCount}
+                      </span>
+                    )}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

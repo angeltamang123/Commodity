@@ -2,6 +2,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import userSlice from "./reducerSlices/userSlice";
 import cartSlice from "./reducerSlices/cartSlice";
+import notificationSLice from "./reducerSlices/notificationSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import reduxLogger from "redux-logger";
@@ -20,7 +21,7 @@ const pReducer = persistReducer(persistConfig, persistedRootReducer);
 
 const rootReducer = combineReducers({
   persisted: pReducer,
-  // If any reducer slice that do not need persistence can be added here
+  notification: notificationSLice,
 });
 
 export const store = configureStore({

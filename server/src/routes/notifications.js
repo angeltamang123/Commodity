@@ -1,13 +1,12 @@
 const { Router } = require("express");
 const router = Router();
 const authMiddleware = require("../utils/authMiddleware");
-const notifications = require("../models/notifications");
+const Notification = require("../models/notifications");
 
 router.get("/notifications", authMiddleware.protect, async (req, res) => {
   try {
     const { limit = 10, skip = 0 } = req.query;
-    const notifs = await notifications
-      .find({ userId: req.user.id })
+    const notifs = await Notification.find({ userId: req.user.id })
       .sort({ createdAt: -1 })
       .limit(Number(limit))
       .skip(Number(skip));

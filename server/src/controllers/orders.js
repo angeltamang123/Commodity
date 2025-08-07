@@ -82,6 +82,7 @@ const createOrder = async (req, res) => {
   }
 };
 
+// order controller
 const cancelOrder = async (req, res) => {
   const { orderId } = req.params;
   const userId = req.user.id;
@@ -117,10 +118,19 @@ const cancelOrder = async (req, res) => {
 
     await session.commitTransaction();
 
+    res.status(200).json({ status: "success", data: order });
+  } catch (error) {
+    await session.abortTransaction();
+    res.status(400).json({ status: "fail", message: error.message });
+  } finally {
+    session.endSession();
+  }
+
+  try {
     const sockets = global.connectedUsers.get(userId);
 
-    const isAdmin = sockets?.some((socket) =>
-      global.connectedAdmins.has(socket)
+    const isAdmin = Array.from(sockets || []).some((socketId) =>
+      global.connectedAdmins.has(socketId)
     );
 
     if (!isAdmin) {
@@ -129,12 +139,13 @@ const cancelOrder = async (req, res) => {
         type: "Order Cancelled",
       });
     }
-    res.status(200).json({ status: "success", data: order });
-  } catch (error) {
-    await session.abortTransaction();
-    res.status(400).json({ status: "fail", message: error.message });
-  } finally {
-    session.endSession();
+
+    notifyUser(io, userId, {
+      message: `Your order (${orderId}) has been successfully cancelled.`,
+      type: "Order Update",
+    });
+  } catch (notificationError) {
+    console.error("Error sending notification:", notificationError);
   }
 };
 
@@ -438,7 +449,7 @@ const updateOrderStatus = async (req, res) => {
     );
 
     if (status === "departed") {
-      notifyUser(io, updatedOrder.user._id, {
+      notifyUser(io, updatedOrder.user._id.toString(), {
         message: `Your Order ${updatedOrder._id} has departed`,
         type: "Order Update",
       });

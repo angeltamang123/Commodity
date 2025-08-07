@@ -39,6 +39,9 @@ app.use(userRoute);
 const orderRoute = require("./routes/orders");
 app.use(orderRoute);
 
+const notificationsRoute = require("./routes/notifications");
+app.use(notificationsRoute);
+
 const connect = require("./db/connection"); //importing db
 connect(); //function for connecting db
 

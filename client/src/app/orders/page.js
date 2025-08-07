@@ -145,27 +145,30 @@ export default function OrdersPage() {
     status === "pending" || status === "processing";
 
   const handleCancelOrder = async () => {
-    if (!orderToCancel || !isCancellable(orderToCancel.status)) return;
+    if (!orderToCancel || !isCancellable(orderToCancel.status)) {
+      return;
+    }
+
     setIsCancelling(true);
-    toast
-      .promise(
-        api.patch(`/orders/${orderToCancel._id}/status`, {
-          status: "cancelled",
-        }),
-        {
-          loading: "Cancelling order...",
-          success: () => {
-            queryClient.invalidateQueries({ queryKey: ["my-orders"] });
-            setOrderToCancel(null);
-            setIsCancelDialogOpen(false);
-            return "Order has been cancelled successfully.";
-          },
-          error: "Failed to cancel order.",
-        }
-      )
-      .finally(() => {
-        setIsCancelling(false);
+
+    const toastId = toast.loading("Cancelling order...");
+
+    try {
+      await api.patch(`/orders/${orderToCancel._id}/cancel`);
+
+      queryClient.invalidateQueries({ queryKey: ["my-orders"] });
+      setOrderToCancel(null);
+      setIsCancelDialogOpen(false);
+      toast.success("Order has been cancelled successfully.", {
+        id: toastId,
       });
+    } catch (error) {
+      toast.error("Failed to cancel order.", {
+        id: toastId,
+      });
+    } finally {
+      setIsCancelling(false);
+    }
   };
 
   const columns = React.useMemo(
