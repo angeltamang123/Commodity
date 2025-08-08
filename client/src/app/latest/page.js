@@ -3,6 +3,7 @@ import CustomNavbar from "@/components/navbar";
 import ProductList from "@/components/productComponents/productList";
 import axios from "axios";
 import { ProductPagination } from "@/components/productComponents/productPagination";
+import Footer from "@/components/Footer";
 
 const New = async ({ searchParams }) => {
   searchParams = await searchParams;
@@ -19,6 +20,7 @@ const New = async ({ searchParams }) => {
         <div className="mt-1">
           <ProductPagination totalPages={data.pagination.totalPages} />
         </div>
+        <Footer />
       </main>
     );
   } catch (error) {

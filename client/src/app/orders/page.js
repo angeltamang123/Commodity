@@ -65,6 +65,7 @@ import api from "@/lib/axiosInstance";
 import { DataTablePagination } from "@/components/DataTablePagination";
 import { cn } from "@/lib/utils";
 import CustomNavbar from "@/components/navbar";
+import Footer from "@/components/Footer";
 
 const fetchOrders = async (tableState) => {
   const params = new URLSearchParams();
@@ -452,7 +453,7 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full">
       <CustomNavbar />
       <div className="h-full flex-1 flex flex-col gap-6 w-full">
         <Card className="h-full rounded-none px-0">
@@ -623,6 +624,7 @@ export default function OrdersPage() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
+      <Footer />
     </div>
   );
 }

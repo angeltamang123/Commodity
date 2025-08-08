@@ -3,6 +3,7 @@ import CustomNavbar from "@/components/navbar";
 import ProductCard from "@/components/productComponents/ProductCard";
 import { ProductPagination } from "@/components/productComponents/productPagination";
 import axios from "axios";
+import Footer from "@/components/Footer";
 
 export default async function SearchPage({ searchParams }) {
   searchParams = await searchParams;
@@ -87,6 +88,7 @@ export default async function SearchPage({ searchParams }) {
             </main>
           </div>
         </div>
+        <Footer />
       </div>
     );
   } catch (error) {

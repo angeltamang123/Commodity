@@ -338,21 +338,34 @@ export default function CustomNavbar() {
               </DropdownMenu>
             </Dropdown>
           ) : (
-            <Button
-              disableRipple
-              className="p-0 ml-44 bg-transparent border-1 rounded-md w-56 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent cursor-pointer"
-              radius="sm"
-              onPress={() => {
-                if (pathName === "/") {
-                  router.push("/login");
-                } else {
-                  router.push(`/login?from=${pathName}`);
-                }
-              }}
-              variant="bordered"
-            >
-              Login
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                disableRipple
+                className="p-0 bg-transparent border-1 rounded-md w-52 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent cursor-pointer"
+                radius="sm"
+                onPress={() => {
+                  router.push("/register");
+                }}
+                variant="bordered"
+              >
+                Register
+              </Button>
+              <Button
+                disableRipple
+                className="p-0 bg-transparent border-1 rounded-md w-52 border-[#730000] text-[#730000] data-[hover=true]:bg-transparent cursor-pointer"
+                radius="sm"
+                onPress={() => {
+                  if (pathName === "/") {
+                    router.push("/login");
+                  } else {
+                    router.push(`/login?from=${pathName}`);
+                  }
+                }}
+                variant="bordered"
+              >
+                Login
+              </Button>
+            </div>
           )}
         </NavbarContent>
       </Navbar>

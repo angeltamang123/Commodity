@@ -7,6 +7,7 @@ import { ProductPagination } from "@/components/productComponents/productPaginat
 import api from "@/lib/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
+import Footer from "@/components/Footer";
 
 const fetchWishlistProducts = async (page, limit) => {
   const params = new URLSearchParams();
@@ -56,6 +57,7 @@ export default function Wishlist() {
             </p>
           )}
         </div>
+        <Footer />
       </main>
     );
   }
@@ -71,6 +73,7 @@ export default function Wishlist() {
       <div className="mt-8">
         <ProductPagination totalPages={pagination.totalPages} />
       </div>
+      <Footer />
     </main>
   );
 }
