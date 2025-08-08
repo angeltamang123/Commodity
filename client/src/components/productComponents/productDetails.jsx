@@ -25,13 +25,15 @@ import ShareLinkDialog from "./shareLinkDialog";
 import { useDispatch, useSelector } from "react-redux";
 import LoginAlert from "./loginAlert";
 import { toast } from "sonner";
-import axios from "axios";
 import {
   addToWishList,
   removeFromWishList,
 } from "@/redux/reducerSlices/userSlice";
 import api from "@/lib/axiosInstance";
 import ProductReviews from "../reviews/ProductReviews";
+import QuantityPickerModal from "./QuantityPicker";
+import CheckoutDialog from "./CheckoutDialog";
+import { addItemToCart } from "@/redux/reducerSlices/cartSlice";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -43,8 +45,12 @@ export default function ProductDetail({ product }) {
   const [displayPrice, setDisplayPrice] = useState(product.price);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [fullUrl, setFullUrl] = useState("");
-  const [loginDialog, setLoginDialog] = useState(false);
   const [inWishList, setInWishList] = useState(false);
+  const [loginDialog, setLoginDialog] = useState(false);
+  const [showQuantityPicker, setShowQuantityPicker] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [buyNowItemDetails, setBuyNowItemDetails] = useState(null);
+  const [isBuyNow, setIsBuyNow] = useState(false);
 
   const { isLoggedIn, wishlist, userId } = useSelector(
     (state) => state.persisted.user
@@ -86,23 +92,73 @@ export default function ProductDetail({ product }) {
     }
   }, [pathname]);
 
-  // Placeholder for add to cart / buy item logic
   const handleAddToCart = () => {
     if (!isLoggedIn) {
       setLoginDialog(true);
       return;
     }
-    console.log("Added to cart:", product.name, selectedColor, selectedSize);
-    // Implement actual add to cart logic here
+    if (product.stock === 0) {
+      toast.error("This product is out of stock.");
+      return;
+    }
+    setIsBuyNow(false);
+    setShowQuantityPicker(true);
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!isLoggedIn) {
       setLoginDialog(true);
       return;
     }
-    console.log("Buying item:", product.name, selectedColor, selectedSize);
-    // Implement actual buy now logic here
+    setIsBuyNow(true);
+    setShowQuantityPicker(true);
+  };
+
+  const handleQuantityConfirmed = (quantity) => {
+    const effectivePrice = product.isOnSale
+      ? product.discountPrice
+      : product.price;
+    const itemDetails = {
+      productId: product._id,
+      name: product.name,
+      price: effectivePrice,
+      quantity: quantity,
+      image: product.image,
+      stock: product.stock,
+    };
+
+    setShowQuantityPicker(false);
+    if (isBuyNow) {
+      setBuyNowItemDetails(itemDetails);
+      setShowCheckout(true);
+    } else {
+      dispatch(addItemToCart(itemDetails));
+    }
+  };
+
+  const handlePlaceOrder = async (items, deliveryAddress) => {
+    try {
+      const response = await api.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
+        {
+          cartItems: items,
+          deliveryAddress: deliveryAddress,
+        }
+      );
+
+      toast.success("Order Placed Successfully!");
+      setShowCheckout(false);
+      setBuyNowItemDetails(null);
+    } catch (error) {
+      console.error("Order placement failed:", error);
+      toast.error("Order Failed", {
+        description:
+          error.response.data.message ||
+          "An error occurred while placing your order.",
+      });
+    } finally {
+      window.location.reload();
+    }
   };
 
   const handleWishlist = async () => {
@@ -419,6 +475,26 @@ export default function ProductDetail({ product }) {
         onOpenChange={setLoginDialog}
         from={pathname}
       />
+
+      {showQuantityPicker && (
+        <QuantityPickerModal
+          product={product}
+          onClose={() => setShowQuantityPicker(false)}
+          onConfirm={handleQuantityConfirmed}
+        />
+      )}
+
+      {showCheckout && buyNowItemDetails && (
+        <CheckoutDialog
+          cartItems={[buyNowItemDetails]}
+          totalAmount={buyNowItemDetails.price * buyNowItemDetails.quantity}
+          onClose={() => {
+            setShowCheckout(false);
+            setBuyNowItemDetails(null);
+          }}
+          onPlaceOrder={handlePlaceOrder}
+        />
+      )}
     </div>
   );
 }

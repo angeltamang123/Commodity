@@ -117,7 +117,7 @@ const Notifications = () => {
                     className={cn(
                       `p-4 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-md`,
                       !notif.seen
-                        ? "bg-white border border-blue-200 shadow-sm"
+                        ? "bg-white border border-[#AF0000] shadow-sm"
                         : "bg-gray-100 border border-gray-200 text-gray-700"
                     )}
                   >
