@@ -20,6 +20,10 @@ import {
   Phone,
   MapPin,
   Bell,
+  LayoutDashboard,
+  Package,
+  Settings,
+  LogOut,
 } from "lucide-react";
 import {
   Sheet,
@@ -221,25 +225,34 @@ export default function CustomNavbar() {
               </HoverCardTrigger>
               <HoverCardContent
                 ref={notifiactionCardRef}
-                className=" overflow-clip truncate"
+                className="p-4 w-80 overflow-y-auto max-h-[300px] bg-white rounded-lg shadow-xl"
               >
                 {notifications?.length > 0 ? (
-                  notifications?.map((notification) => (
+                  notifications.map((notification) => (
                     <div
-                      id={notification?._id}
-                      key={notification?._id}
-                      className={`border-b w-full ${
-                        !notification.seen && "bg-blue-200"
-                      }`}
+                      key={notification._id}
+                      id={notification._id}
+                      className={`p-3 rounded-md mb-2 transition-all duration-200 ease-in-out cursor-pointer hover:bg-gray-100 
+                        ${
+                          !notification.seen
+                            ? "bg-blue-50 border-l-4 border-blue-500"
+                            : "bg-gray-50"
+                        }`}
                     >
-                      <p>
-                        <span className="font-bold">{notification.type}:</span>{" "}
+                      <p className="text-sm text-gray-800">
+                        <span className="font-semibold text-blue-700">
+                          {notification.type}:
+                        </span>{" "}
                         {notification.message}
                       </p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm">No new Notifications !!</p>
+                  <div className="flex items-center justify-center h-24">
+                    <p className="text-sm text-gray-500">
+                      No new notifications!
+                    </p>
+                  </div>
                 )}
               </HoverCardContent>
             </HoverCard>
@@ -296,16 +309,29 @@ export default function CustomNavbar() {
                 }}
               >
                 {role === "admin" && (
-                  <DropdownItem href="/admin/dashboard">Dashboard</DropdownItem>
+                  <DropdownItem
+                    href="/admin/dashboard"
+                    startContent={<LayoutDashboard />}
+                  >
+                    Dashboard
+                  </DropdownItem>
                 )}
-                <DropdownItem href="/orders">Orders</DropdownItem>
-                <DropdownItem href="/settings/profile">Settings</DropdownItem>
+                <DropdownItem href="/orders" startContent={<Package />}>
+                  Orders
+                </DropdownItem>
+                <DropdownItem
+                  href="/settings/profile"
+                  startContent={<Settings />}
+                >
+                  Settings
+                </DropdownItem>
                 <DropdownItem
                   onPress={() => {
                     dispatch(logoutUser());
                     dispatch(clearCart());
                     window.location.reload();
                   }}
+                  startContent={<LogOut />}
                 >
                   Logout
                 </DropdownItem>

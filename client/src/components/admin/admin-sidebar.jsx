@@ -54,11 +54,6 @@ export function AdminSidebar() {
       url: "/admin/orders",
       icon: NotebookText,
     },
-    {
-      title: "Payments",
-      url: "/admin/payments",
-      icon: WalletCards,
-    },
   ];
 
   const {
@@ -126,7 +121,12 @@ export function AdminSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
+              <SidebarMenuItem
+                className={cn(
+                  pathName.includes("/admin/notifications") &&
+                    `bg-[#730000] border-[#730000] rounded-md`
+                )}
+              >
                 <SidebarMenuButton asChild>
                   <Link href={"/admin/notifications"}>
                     <Bell />

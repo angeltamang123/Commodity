@@ -7,10 +7,37 @@ import api from "@/lib/axiosInstance";
 import { cn } from "@/lib/utils";
 import { useDispatch } from "react-redux";
 import { markAllSeen } from "@/redux/reducerSlices/notificationSlice";
+import { Bell, ShoppingCart, AlertTriangle, XCircle } from "lucide-react";
 
 const fetchNotifications = async ({ pageParam = 0 }) => {
   const res = await api.get(`/notifications?limit=20&skip=${pageParam}`);
   return res.data;
+};
+
+const getNotificationTypeProps = (type) => {
+  switch (type) {
+    case "Order Cancelled":
+      return {
+        label: "bg-red-500",
+        icon: <XCircle className="h-4 w-4" />,
+      };
+    case "New Order":
+      return {
+        label: "bg-green-500",
+        icon: <ShoppingCart className="h-4 w-4" />,
+      };
+    case "Order Update":
+      return {
+        label: "bg-orange-500",
+        icon: <AlertTriangle className="h-4 w-4" />,
+      };
+    case "System":
+    default:
+      return {
+        label: "bg-gray-500",
+        icon: <Bell className="h-4 w-4" />,
+      };
+  }
 };
 
 const Notifications = () => {
@@ -22,9 +49,8 @@ const Notifications = () => {
       queryKey: ["notifications"],
       queryFn: fetchNotifications,
       getNextPageParam: (lastPage, allPages) => {
-        // Return the 'skip' value for the next page
         if (lastPage.length === 0) {
-          return undefined; // No more pages
+          return undefined;
         }
         return allPages.length * 20;
       },
@@ -58,7 +84,6 @@ const Notifications = () => {
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  // Handle loading and error states
   if (status === "loading") {
     return (
       <div className="p-8 text-center">
@@ -79,40 +104,59 @@ const Notifications = () => {
       <h1 className="text-2xl font-bold">Notifications</h1>
       <Card
         ref={cardRef}
-        className="overflow-y-auto h-[700px] flex flex-col justify-between p-4"
+        className="p-4 h-[700px] overflow-y-auto bg-gray-50 rounded-xl shadow-lg"
       >
-        <ul className="flex flex-col gap-4">
+        <ul className="flex flex-col gap-3">
           {data?.pages.map((page, i) => (
             <React.Fragment key={i}>
-              {page.map((notif) => (
-                <li
-                  key={notif._id}
-                  className={cn(
-                    `p-3 bg-gray-50 rounded-md`,
-                    !notif.seen && "bg-blue-200"
-                  )}
-                >
-                  <div className="w-full flex justify-between">
-                    <div>
-                      <p className="font-semibold">{notif.type}</p>
-                      <p className="text-sm text-gray-600">{notif.message}</p>
+              {page.map((notif) => {
+                const { label, icon } = getNotificationTypeProps(notif.type);
+                return (
+                  <li
+                    key={notif._id}
+                    className={cn(
+                      `p-4 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-md`,
+                      !notif.seen
+                        ? "bg-white border border-blue-200 shadow-sm"
+                        : "bg-gray-100 border border-gray-200 text-gray-700"
+                    )}
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        {/* Status Icon */}
+                        <div
+                          className={cn("p-2 rounded-full text-white", label)}
+                        >
+                          {icon}
+                        </div>
+                        {/* Notification Details */}
+                        <div>
+                          <p className="font-semibold text-gray-900">
+                            {notif.type}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {notif.message}
+                          </p>
+                        </div>
+                      </div>
+                      {/* Timestamp */}
+                      <p className="text-xs text-gray-500 whitespace-nowrap pt-1">
+                        {new Date(notif.createdAt).toLocaleString()}
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {new Date(notif.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </React.Fragment>
           ))}
         </ul>
         {isFetchingNextPage && (
-          <div className="text-center py-4">
+          <div className="flex justify-center py-6">
             <Spinner />
           </div>
         )}
         {!hasNextPage && (
-          <div className="text-center py-4 text-gray-500">
+          <div className="text-center py-6 text-gray-500">
             You've reached the end of your notifications.
           </div>
         )}
