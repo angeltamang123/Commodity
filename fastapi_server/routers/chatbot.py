@@ -1,5 +1,6 @@
 import os
 import asyncio
+import json
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import StreamingResponse
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -70,15 +71,50 @@ async def chat_stream(request: Request):
     config = {"configurable": {"thread_id": session_id}}
     
     async def event_generator():
+        current_phase = "initial"
+        buffer = ""
+
+        def create_json_event(message, state):
+            return f"data: {json.dumps({'message': message, 'state': state})}\n\n"
+
         async for token, metadata in agent_executor.astream(
-            {"messages": [{"role": "user", "content": user_message}]}, config, stream_mode="messages"
+            {"messages": [{"role": "user", "content": user_message}]},
+            config,
+            stream_mode="messages"
         ):
-            if hasattr(token, "content"):  # it's a BaseMessage
-                yield f"data: {token.content}\n\n"
-            elif isinstance(token, dict):
-                # fallback if it's a dict
-                messages = token.get("messages", [])
-                if messages:
-                    yield f"data: {messages[-1].content}\n\n"
+            content = token.content
+            buffer += content
+            
+            # Initial phase
+            if current_phase == "initial":
+                if "Thought:" in buffer:
+                    current_phase = "tool_use"
+                    yield create_json_event("Agent is thinking...", "thinking")
+                    buffer = "" 
+                elif "Action:" in buffer:
+                    yield create_json_event("Agent is using a tool...", "using_tool")
+                    buffer = "" 
+                elif len(buffer) > 15: # Arbitrary threshold to detect non-tool-use
+                    # If a certain amount of non-tool-use tokens have arrived,
+                    # assume it's a direct answer and stream everything.
+                    current_phase = "direct_answer"
+                    yield create_json_event(buffer, "answering")
+                    buffer = ""
+            
+            # Tool-use phase
+            elif current_phase == "tool_use":
+                if "Thought:" in buffer:
+                    yield create_json_event("Agent is thinking...", "thinking")
+                    buffer = "" 
+                elif "Action:" in buffer:
+                    yield create_json_event("Agent is using a tool...", "using_tool")
+                    buffer = "" 
+                elif "Final Answer:" in buffer:
+                    current_phase = "direct_answer"
+                    buffer = ""
+            
+            # Tokens Streamed to User
+            elif current_phase == "direct_answer":
+                yield create_json_event(content, "answering")
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
