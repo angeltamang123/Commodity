@@ -117,4 +117,6 @@ async def chat_stream(request: Request):
             elif current_phase == "direct_answer":
                 yield create_json_event(content, "answering")
 
+        yield create_json_event('[DONE]', "final")
+
     return StreamingResponse(event_generator(), media_type="text/event-stream")
