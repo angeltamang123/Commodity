@@ -94,8 +94,8 @@ const ChatCard = () => {
   };
 
   return (
-    <div className="relative -mt-10 flex grow w-[900px] justify-center">
-      <Card className=" flex justify-center items-center w-full mt-12 h-[500px]">
+    <div className="relative flex grow w-full justify-center">
+      <Card className=" flex mt-1 justify-center items-center w-full h-[500px]">
         <div className="flex gap-0 w-full border-[#00232A] border-2 shadow-md shadow-[#00232A] rounded-xl h-full overflow-hidden">
           <Sidebar users={userDetails} userClicked={userClicked} />
           <div className="h-full w-full">

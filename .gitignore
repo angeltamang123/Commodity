@@ -129,4 +129,29 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+*.env
+*.venv/
+venv/
+env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Pytest cache
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# VS Code
+.vscode/
+
+
 server/uploads/

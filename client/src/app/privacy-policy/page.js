@@ -99,11 +99,10 @@ const PrivacyPolicyPage = () => {
               Your Rights
             </h2>
             <p className="leading-relaxed">
-              If you are a European resident, you have the right to access
-              personal information we hold about you and to ask that your
-              personal information be corrected, updated, or deleted. If you
-              would like to exercise this right, please contact us through the
-              contact information below.
+              You have the right to access personal information we hold about
+              you and to ask that your personal information be corrected,
+              updated, or deleted. If you would like to exercise this right,
+              please contact us through the contact information below.
             </p>
           </div>
 
