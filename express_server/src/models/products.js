@@ -91,6 +91,10 @@ const productSchema = new Schema(
       },
       default: null,
     },
+    embedding: {
+      type: [Number],
+      default: null,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

@@ -3,6 +3,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import chatbot  # , vectorizer
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(
     title="Commodity AI Backend",
@@ -26,4 +29,4 @@ async def root():
     return {"message": "Commodity AI API is running."}
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT")), reload=True)
