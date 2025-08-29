@@ -6,8 +6,6 @@ from langchain_huggingface import HuggingFaceEmbeddings
 load_dotenv()
 
 MONGO_URI = f"mongodb+srv://{os.getenv("MONGODB_USER")}:{os.getenv("MONGODB_PASSWORD")}@{os.getenv("MONGODB_CLUSTER")}/?retryWrites=true&w=majority&appName=Cluster0" 
-if not MONGO_URI:
-    raise ValueError("MONGO_URI environment variables is not set.")
 
 client = MongoClient(MONGO_URI)
 db = client[os.getenv("MONGODB_DB")]
