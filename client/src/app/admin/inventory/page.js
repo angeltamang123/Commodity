@@ -68,7 +68,7 @@ import ProductDelete from "@/components/admin/product-delete";
 import ProductDetailsDialog from "@/components/admin/productDetailsDialog";
 import { DataTablePagination } from "@/components/DataTablePagination";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_EXPRESS_API_URL;
 
 const fetchProducts = async (tableState) => {
   const params = new URLSearchParams();
@@ -149,9 +149,7 @@ export default function InventoryPage() {
     try {
       await api.delete(`/products/${id}`);
       triggerRefetch();
-      toast.success("Product deleted successfully.", {
-        toasterId: "generalToaster",
-      });
+      toast.success("Product deleted successfully.");
       setIsDeleteDialogOpen(false);
     } catch (error) {
       toast.error("Failed to delete product.");

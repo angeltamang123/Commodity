@@ -11,7 +11,7 @@ const New = async ({ searchParams }) => {
 
   try {
     const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/products?latest=true&page=${page}`
+      `${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/products?latest=true&page=${page}`
     );
     return (
       <main>

@@ -298,7 +298,7 @@ export default function AdminOrdersPage() {
                       {item.productDetails?.image && (
                         <div className="relative w-12 h-12 flex-shrink-0">
                           <Image
-                            src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.productDetails.image}`}
+                            src={`${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/uploads/${item.productDetails.image}`}
                             alt={item.name}
                             layout="fill"
                             objectFit="contain"

@@ -160,7 +160,7 @@ To run the app locally:
    Create a `.env` file in the `backend` folder with:
 
    ```env
-   NEXT_PUBLIC_API_URL="http://localhost:7000"
+   NEXT_PUBLIC_EXPRESS_API_URL="http://localhost:7000"
    ```
 
    Start the frontend dev server:

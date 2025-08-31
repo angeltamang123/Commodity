@@ -25,7 +25,7 @@ export default async function SearchPage({ searchParams }) {
   queryParts.push(`limit=${encodeURIComponent(limit)}`);
 
   const queryString = queryParts.join("&");
-  const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/products${
+  const apiUrl = `${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/products${
     queryString ? `?${queryString}` : ""
   }`;
 

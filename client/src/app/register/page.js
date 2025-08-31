@@ -117,7 +117,7 @@ const SignupForm = () => {
 
   const registerUser = async (values) => {
     const { data } = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/register`,
+      `${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/register`,
       values
     );
 

@@ -35,7 +35,7 @@ import QuantityPickerModal from "./QuantityPicker";
 import CheckoutDialog from "./CheckoutDialog";
 import { addItemToCart } from "@/redux/reducerSlices/cartSlice";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_EXPRESS_API_URL;
 
 export default function ProductDetail({ product }) {
   const pathname = usePathname();
@@ -139,7 +139,7 @@ export default function ProductDetail({ product }) {
   const handlePlaceOrder = async (items, deliveryAddress) => {
     try {
       const response = await api.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
+        `${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/orders`,
         {
           cartItems: items,
           deliveryAddress: deliveryAddress,

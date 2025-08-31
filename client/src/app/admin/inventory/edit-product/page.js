@@ -172,7 +172,7 @@ export default function EditProductForm() {
         const initialMainImage = product.image
           ? [
               {
-                source: `${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.image}`,
+                source: `${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/uploads/${product.image}`,
                 options: { type: "local" }, // 'local' tells FilePond this is an existing file
               },
             ]
@@ -180,7 +180,7 @@ export default function EditProductForm() {
 
         const initialAdditionalImages = product.images
           ? product.images.map((img) => ({
-              source: `${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`,
+              source: `${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/uploads/${img}`,
               options: { type: "local" },
             }))
           : [];

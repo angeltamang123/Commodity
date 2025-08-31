@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 
 const connect = async () => {
   try {
-    const MONGODB_URI = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_CLUSTER}/${process.env.MONGODB_DB}?retryWrites=true&w=majority&appName=Cluster0`;
+    const Cluster =
+      process.env.MONGODB_CLUSTER.charAt(0).toUpperCase() +
+      process.env.MONGODB_CLUSTER.slice(1);
+    const MONGODB_URI = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_CLUSTER}/${process.env.MONGODB_DB}?retryWrites=true&w=majority&appName=${Cluster}`;
     const opts = {
       serverSelectionTimeoutMS: 15000,
     };

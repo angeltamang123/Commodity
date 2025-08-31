@@ -51,7 +51,7 @@ export default function NotificationSocket() {
 
   useEffect(() => {
     if (userId) {
-      socketRef.current = io(process.env.NEXT_PUBLIC_API_URL);
+      socketRef.current = io(process.env.NEXT_PUBLIC_EXPRESS_API_URL);
 
       const socket = socketRef.current;
 

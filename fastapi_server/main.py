@@ -2,7 +2,7 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import chatbot  # , vectorizer
+from routers import chatbot , vectorizer
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,7 +22,7 @@ app.add_middleware(
 )
 
 app.include_router(chatbot.router, prefix="/chat", tags=["Chatbot"])
-# app.include_router(vectorizer.router, prefix="/api/v1/products", tags=["Vectorizer"])
+app.include_router(vectorizer.router, prefix="/products", tags=["Vectorizer"])
 
 @app.get("/")
 async def root():

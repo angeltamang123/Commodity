@@ -6,7 +6,7 @@ import time
 
 load_dotenv()
 
-uri = f"mongodb+srv://{os.getenv("MONGODB_USER")}:{os.getenv("MONGODB_PASSWORD")}@{os.getenv("MONGODB_CLUSTER")}/?retryWrites=true&w=majority&appName=Cluster0" 
+uri = f"mongodb+srv://{os.getenv("MONGODB_USER")}:{os.getenv("MONGODB_PASSWORD")}@{os.getenv("MONGODB_CLUSTER")}/?retryWrites=true&w=majority&appName={os.getenv("MONGODB_CLUSTER")[:8].capitalize()}" 
 
 client = MongoClient(uri)
 

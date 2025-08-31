@@ -35,7 +35,7 @@ export function SearchBar() {
       setIsOpen(true);
       try {
         const { data } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/products?q=${query}&limit=5`
+          `${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/products?q=${query}&limit=5`
         );
         setResults(data.products);
       } catch (error) {
@@ -115,7 +115,7 @@ export function SearchBar() {
                     >
                       <div className="relative w-10 h-10">
                         <Image
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.image}`}
+                          src={`${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/uploads/${product.image}`}
                           alt={product.name}
                           fill
                           unoptimized

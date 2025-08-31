@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import ReactMarkdown from "react-markdown";
 
-// The URL for your FastAPI chatbot server
-const CHATBOT_API_URL = "http://localhost:8001/chat/stream";
+const CHATBOT_API_URL = `${process.env.NEXT_PUBLIC_FASTAPI_URL}/chat/stream`;
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([]);
@@ -11,6 +13,7 @@ export default function Chatbot() {
   const [sessionId, setSessionId] = useState("");
   const messagesEndRef = useRef(null);
   const [status, setStatus] = useState("");
+  const [streaming, setStreaming] = useState(false);
 
   // Use a ref to store the cumulative streaming text
   const streamingTextRef = useRef("");
@@ -34,7 +37,7 @@ export default function Chatbot() {
     setMessages((prev) => [...prev, userMessage, botMessagePlaceholder]);
     const currentInput = inputMessage;
     setInputMessage("");
-    setStatus("Bot is thinking...");
+    setStatus("...");
 
     // Reset the ref at the start of a new stream
     streamingTextRef.current = "";
@@ -52,10 +55,14 @@ export default function Chatbot() {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      setStreaming(true);
 
       while (true) {
         const { value, done } = await reader.read();
-        if (done) break;
+        if (done) {
+          setStreaming(false);
+          break;
+        }
 
         const chunk = decoder.decode(value, { stream: true });
         const sseMessages = chunk.split("\n\n").filter(Boolean);
@@ -94,6 +101,7 @@ export default function Chatbot() {
     } catch (error) {
       console.error("Streaming failed:", error);
       setStatus("Sorry, an error occurred. Please try again.");
+      setStreaming(false);
       setMessages((prev) => {
         const newMessages = [...prev];
         const lastMessage = newMessages[newMessages.length - 1];
@@ -128,7 +136,7 @@ export default function Chatbot() {
                   : "bg-white text-gray-800"
               }`}
             >
-              <p>{msg.text}</p>
+              <ReactMarkdown>{msg.text}</ReactMarkdown>
             </div>
           </div>
         ))}
@@ -146,19 +154,21 @@ export default function Chatbot() {
         onSubmit={handleSendMessage}
         className="p-4 bg-white border-t border-gray-200 flex space-x-2"
       >
-        <input
+        <Input
           type="text"
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
+          disabled={streaming}
           placeholder="Type your message..."
-          className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 p-3 border h-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button
+        <Button
           type="submit"
-          className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          className="p-3 bg-blue-500 h-full text-white rounded-lg hover:bg-blue-600 transition-colors"
+          disabled={streaming}
         >
           Send
-        </button>
+        </Button>
       </form>
     </div>
   );

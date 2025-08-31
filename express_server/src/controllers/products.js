@@ -2,6 +2,7 @@ const Product = require("../models/products");
 const fs = require("fs");
 const path = require("path");
 const Register = require("../models/users");
+const axios = require("axios");
 
 // Helper function to delete a single file
 const deleteFile = (filename) => {
@@ -14,6 +15,19 @@ const deleteFile = (filename) => {
       console.log(`Successfully deleted file: ${filename}`);
     }
   });
+};
+
+const generateEmbedding = async (id, name, description) => {
+  try {
+    await axios.post(`${process.env.FASTAPI_URL}/products/vectorize`, {
+      productId: id,
+      name: name,
+      description: description,
+    });
+  } catch (err) {
+    console.error("Failed to upsert embedding for product", id, err.message);
+    // Future: push to a retry queue (bull, bee, etc.)
+  }
 };
 
 const registerNewProduct = async (req, res) => {
@@ -68,6 +82,8 @@ const registerNewProduct = async (req, res) => {
       ...(parsedDiscountTill !== null && { discountTill: parsedDiscountTill }),
     });
 
+    // Fire and Forget: intentionally non awaited so it doesn't block
+    generateEmbedding(newProduct.id, name, description);
     res
       .status(201)
       .json({ message: "Product created successfully!!", product: newProduct });
@@ -149,7 +165,7 @@ const updateProduct = async (req, res) => {
     // Set additional images field
     existingProduct.images = newAdditionalImageFilenames;
 
-    // --- Type Conversions for other fields ---
+    // Type Conversions for other fields
     if (updates.hasOwnProperty("price")) {
       existingProduct.price = parseFloat(updates.price);
     }
@@ -175,6 +191,12 @@ const updateProduct = async (req, res) => {
 
     // Perform the Mongoose update
     const updatedProduct = await existingProduct.save();
+
+    generateEmbedding(
+      existingProduct.id,
+      existingProduct.name,
+      existingProduct.description
+    );
 
     res.status(200).json({
       message: "Product updated successfully!!",
@@ -331,7 +353,7 @@ const getAllProducts = async (req, res) => {
       {
         $facet: {
           metadata: [{ $count: "totalProducts" }],
-          data: [{ $skip: skip }, { $limit: limit }],
+          data: [{ $skip: skip }, { $limit: limit }, { $unset: "embedding" }],
         },
       },
     ];

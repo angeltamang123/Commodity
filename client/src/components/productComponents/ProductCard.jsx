@@ -81,7 +81,7 @@ export default function ProductCard({ product }) {
   const handlePlaceOrder = async (items, deliveryAddress) => {
     try {
       const response = await api.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
+        `${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/orders`,
         {
           cartItems: items,
           deliveryAddress: deliveryAddress,
@@ -140,7 +140,7 @@ export default function ProductCard({ product }) {
             }`}
           >
             <Image
-              src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.image}`}
+              src={`${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/uploads/${product.image}`}
               alt={product.name}
               className="object-contain rounded-md w-full"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

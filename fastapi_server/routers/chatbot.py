@@ -84,6 +84,7 @@ async def chat_stream(request: Request):
         ):
             content = token.content
             buffer += content
+            print(content)
             
             # Initial phase
             if current_phase == "initial":

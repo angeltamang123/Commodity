@@ -83,7 +83,7 @@ const CartSheet = () => {
     try {
       // This is the API call to your backend
       const response = await api.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
+        `${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/orders`,
         {
           cartItems: items,
           deliveryAddress: deliveryAddress,
@@ -129,7 +129,7 @@ const CartSheet = () => {
               >
                 <div className="relative w-20 h-20 shrink-0">
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
+                    src={`${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/uploads/${item.image}`}
                     alt={item.name}
                     fill
                     className="object-contain rounded-md"

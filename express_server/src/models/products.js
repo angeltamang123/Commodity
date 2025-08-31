@@ -94,6 +94,7 @@ const productSchema = new Schema(
     embedding: {
       type: [Number],
       default: null,
+      select: false,
     },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }

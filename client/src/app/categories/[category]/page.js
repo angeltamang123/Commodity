@@ -12,7 +12,7 @@ const Category = async ({ params, searchParams }) => {
   const page = searchParams?.page || "1";
   try {
     const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/products?category=${category}&page=${page}`
+      `${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/products?category=${category}&page=${page}`
     );
 
     return (

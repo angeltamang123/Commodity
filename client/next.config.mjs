@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-const backEnd = new URL(process.env.NEXT_PUBLIC_API_URL);
+const backEnd = new URL(process.env.NEXT_PUBLIC_EXPRESS_API_URL);
 const nextConfig = {
   images: {
     remotePatterns: [
