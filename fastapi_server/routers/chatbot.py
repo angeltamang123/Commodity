@@ -7,54 +7,51 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_ollama import ChatOllama
 from langchain.prompts import PromptTemplate
 from langgraph.prebuilt import create_react_agent
+from langchain_core.tracers import ConsoleCallbackHandler
 from langgraph.checkpoint.memory import MemorySaver
 from contextlib import asynccontextmanager
-
-# # LangGraph agent instance
-# agent_executor = None
-# @asynccontextmanager
-# async def lifespan(app: APIRouter):
-#     global agent_executor
-#     tools = await mcp_client.get_tools()
-#     agent_executor = create_react_agent(
-#         model=llm,
-#         tools=tools,
-#         prompt=PromptTemplate(template=SYSTEM_PROMPT, input_variables=["messages"]),
-#         checkpointer=MemorySaver(),
-#     )
-#     yield
-
-router = APIRouter()
-
-# --- Agent Initialization (Simplified for this example) ---
-# In a production app, you'd use a dependency injection system for the agent
-# and its tools to manage resources more effectively.
 
 # Load system prompt
 with open("system_prompt.txt", "r") as f:
     SYSTEM_PROMPT = f.read()
 
-# Initialize LLM
-llm = ChatOllama(model="commodity-ai", temperature=0, top_k=15, top_p=0.6)
+llm = ChatOllama(model="commodity-ai", temperature=0, top_k=15, top_p=0.6, callbacks=[ConsoleCallbackHandler()])
 
-# # Connect to the FastMCP server, ensuring the path is correct
-# mcp_client = MultiServerMCPClient({
-#     "ecommerce": {
-#         "command": "python",
-#         "args": ["./mcp_server/mcp_server.py"], # Path relative to the main.py file
-#         "transport": "stdio",
-#     }
-# })
+mcp_client = MultiServerMCPClient({
+    "ecommerce": {
+        "command": "python",
+        "args": ["mcp_server/mcp_server.py"], 
+        "transport": "stdio",
+    }
+})
 
-tools = []
+# LangGraph agent instance
+agent_executor = None
+@asynccontextmanager
+async def lifespan(app: APIRouter):
+    global agent_executor
+    tools = await mcp_client.get_tools()
+    agent_executor = create_react_agent(
+        model=llm,
+        tools=tools,
+        prompt=PromptTemplate(template=SYSTEM_PROMPT, input_variables=["messages"]),
+        checkpointer=MemorySaver(),
+    )
+    yield
+    
 
-agent_executor = create_react_agent(
-    model=llm,
-    tools=tools,
-    prompt=PromptTemplate(template=SYSTEM_PROMPT, input_variables=["messages"]),
-    checkpointer=MemorySaver(),
-)
 
+
+# tools = []
+
+# agent_executor = create_react_agent(
+#     model=llm,
+#     tools=tools,
+#     prompt=PromptTemplate(template=SYSTEM_PROMPT, input_variables=["messages"]),
+#     checkpointer=MemorySaver(),
+# )
+
+router = APIRouter(lifespan=lifespan)
 
 
 # The core streaming endpoint
@@ -81,7 +78,10 @@ async def chat_stream(request: Request):
             {"messages": [{"role": "user", "content": user_message}]},
             config,
             stream_mode="messages"
-        ):
+        ):  
+            print(token)
+            print("\n----\n")
+            print(metadata)
             content = token.content
             buffer += content
             print(content)
@@ -90,10 +90,10 @@ async def chat_stream(request: Request):
             if current_phase == "initial":
                 if "Thought:" in buffer:
                     current_phase = "tool_use"
-                    yield create_json_event("Agent is thinking...", "thinking")
+                    yield create_json_event("Comma is thinking...", "thinking")
                     buffer = "" 
                 elif "Action:" in buffer:
-                    yield create_json_event("Agent is using a tool...", "using_tool")
+                    yield create_json_event("Comma is using a tool...", "using_tool")
                     buffer = "" 
                 elif len(buffer) > 15: # Arbitrary threshold to detect non-tool-use
                     # If a certain amount of non-tool-use tokens have arrived,
@@ -105,10 +105,10 @@ async def chat_stream(request: Request):
             # Tool-use phase
             elif current_phase == "tool_use":
                 if "Thought:" in buffer:
-                    yield create_json_event("Agent is thinking...", "thinking")
+                    yield create_json_event("Comma is thinking...", "thinking")
                     buffer = "" 
                 elif "Action:" in buffer:
-                    yield create_json_event("Agent is using a tool...", "using_tool")
+                    yield create_json_event("Comma is using a tool...", "using_tool")
                     buffer = "" 
                 elif "Final Answer:" in buffer:
                     current_phase = "direct_answer"

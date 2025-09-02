@@ -4,6 +4,9 @@ from pydantic import BaseModel
 from pymongo import MongoClient
 from langchain_huggingface import HuggingFaceEmbeddings
 from bson.objectid import ObjectId
+from dotenv import load_dotenv
+
+load_dotenv()
 
 router = APIRouter()
 
@@ -24,7 +27,7 @@ products_collection = db[collection_name]
 # Embedding model
 embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2",
                                          encode_kwargs={'normalize_embeddings': True},
-                                         show_progress= True)
+                                         )
 
 @router.post("/vectorize")
 def create_embedding_for_product(data: ProductData):
@@ -37,7 +40,7 @@ def create_embedding_for_product(data: ProductData):
         
         result = products_collection.update_one(
             {"_id": ObjectId(data.productId)},
-            {"$set": {"embedding": embedding_vector}}
+            {"$set": {"embedding": embedding_vector, "search_text": text_to_embed }}
         )
         
         if result.modified_count == 0:
