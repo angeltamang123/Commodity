@@ -1,6 +1,7 @@
 import os
 import requests
 import asyncio
+from playwright.async_api import async_playwright
 from dotenv import load_dotenv
 from bson.objectid import ObjectId
 from bs4 import BeautifulSoup
@@ -38,8 +39,8 @@ product_vector_store = MongoDBAtlasVectorSearch(
 )
 
 
-@mcp.resource("website://{page}")
-def website_page_resource(page: str) -> str:
+@mcp.tool()
+async def website_page_resource(page: str) -> str:
     """
     Provides the text content of a specific website page by scraping it.
     Pages include: 'about', 'faq', 'privacy-policy', and 'terms-and-conditions'.
@@ -47,10 +48,19 @@ def website_page_resource(page: str) -> str:
     url_to_scrape = f"{WEBSITE_URL}/{page}"
     
     try:
-        response = requests.get(url_to_scrape)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, "html.parser")
-        
+        async with async_playwright() as p:
+            browser = await p.chromium.launch()
+            page = await browser.new_page()
+ 
+            await page.goto(url_to_scrape)
+            
+            await page.wait_for_selector('h1.text-3xl.md\\:text-4xl')
+            
+            rendered_content = await page.content()
+            await browser.close()
+            
+        soup = BeautifulSoup(rendered_content, "html.parser")
+            
         text_chunks = []
         for tag in soup.find_all(["h1", "h2", "h3", "p", "li"]):
             text_chunks.append(tag.get_text(" ", strip=True))
