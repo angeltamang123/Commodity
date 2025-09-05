@@ -120,7 +120,10 @@ export default function Chatbot() {
   }, [messages, status]);
 
   return (
-    <div className="flex flex-col h-full bg-gray-100">
+    <div className="flex flex-1 flex-col min-h-screen bg-gray-100">
+      <div className="bg-gray-800 text-white p-4 text-center">
+        <h1 className="text-xl font-bold">Commodity Chatbot</h1>
+      </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg, index) => (
           <div

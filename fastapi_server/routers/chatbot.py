@@ -1,5 +1,3 @@
-import os
-import asyncio
 import json
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import StreamingResponse
@@ -38,18 +36,6 @@ async def lifespan(app: APIRouter):
         checkpointer=MemorySaver(),
     )
     yield
-    
-
-
-
-# tools = []
-
-# agent_executor = create_react_agent(
-#     model=llm,
-#     tools=tools,
-#     prompt=PromptTemplate(template=SYSTEM_PROMPT, input_variables=["messages"]),
-#     checkpointer=MemorySaver(),
-# )
 
 router = APIRouter(lifespan=lifespan)
 
@@ -68,8 +54,6 @@ async def chat_stream(request: Request):
     config = {"configurable": {"thread_id": session_id}}
     
     async def event_generator():
-        current_phase = "initial"
-        buffer = ""
 
         def create_json_event(message, state):
             return f"data: {json.dumps({'message': message, 'state': state})}\n\n"
@@ -79,44 +63,14 @@ async def chat_stream(request: Request):
             config,
             stream_mode="messages"
         ):  
-            print(token)
-            print("\n----\n")
-            print(metadata)
-            content = token.content
-            buffer += content
-            print(content)
-            
-            # Initial phase
-            if current_phase == "initial":
-                if "Thought:" in buffer:
-                    current_phase = "tool_use"
-                    yield create_json_event("Comma is thinking...", "thinking")
-                    buffer = "" 
-                elif "Action:" in buffer:
-                    yield create_json_event("Comma is using a tool...", "using_tool")
-                    buffer = "" 
-                elif len(buffer) > 15: # Arbitrary threshold to detect non-tool-use
-                    # If a certain amount of non-tool-use tokens have arrived,
-                    # assume it's a direct answer and stream everything.
-                    current_phase = "direct_answer"
-                    yield create_json_event(buffer, "answering")
-                    buffer = ""
-            
-            # Tool-use phase
-            elif current_phase == "tool_use":
-                if "Thought:" in buffer:
-                    yield create_json_event("Comma is thinking...", "thinking")
-                    buffer = "" 
-                elif "Action:" in buffer:
-                    yield create_json_event("Comma is using a tool...", "using_tool")
-                    buffer = "" 
-                elif "Final Answer:" in buffer:
-                    current_phase = "direct_answer"
-                    buffer = ""
-            
-            # Tokens Streamed to User
-            elif current_phase == "direct_answer":
-                yield create_json_event(content, "answering")
+            node = metadata.get("langgraph_node")
+            content = token.content      
+
+            if node == "tools":
+                yield create_json_event("Comma is using a tool...", "using_tool")
+            elif node == "agent":
+                if content:
+                    yield create_json_event(content, "answering")
 
         yield create_json_event('[DONE]', "final")
 

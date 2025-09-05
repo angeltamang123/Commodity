@@ -40,12 +40,12 @@ product_vector_store = MongoDBAtlasVectorSearch(
 
 
 @mcp.tool()
-async def website_page_resource(page: str) -> str:
+async def website_page_resource(page_name: str) -> str:
     """
     Provides the text content of a specific website page by scraping it.
     Pages include: 'about', 'faq', 'privacy-policy', and 'terms-and-conditions'.
     """
-    url_to_scrape = f"{WEBSITE_URL}/{page}"
+    url_to_scrape = f"{WEBSITE_URL}/{page_name}"
     
     try:
         async with async_playwright() as p:
@@ -54,7 +54,10 @@ async def website_page_resource(page: str) -> str:
  
             await page.goto(url_to_scrape)
             
-            await page.wait_for_selector('h1.text-3xl.md\\:text-4xl')
+            if page_name == 'faq':
+                await page.wait_for_selector('h1.text-4xl.md\\:text-5xl')
+            else:
+                await page.wait_for_selector('h1.text-3xl.md\\:text-4xl')
             
             rendered_content = await page.content()
             await browser.close()

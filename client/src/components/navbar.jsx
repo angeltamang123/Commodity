@@ -96,7 +96,15 @@ export default function CustomNavbar() {
           <span>{phoneNumber}</span>
         </div>
         <div className="flex items-center gap-4">
-          <span>Commodity AI Comming Soon | Stay Tuned !! </span>
+          <span>Commodity's AI Comma is Here | </span>
+          <Button
+            className="h-full border rounded-3xl cursor-pointer p-1"
+            onPress={() => {
+              router.push("/chatbot");
+            }}
+          >
+            Try now !!
+          </Button>
         </div>
         <div className="flex items-center gap-2">
           {isLoggedIn && (location?.suburb || location?.city) && (
