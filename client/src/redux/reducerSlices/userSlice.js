@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
+import { toast } from "sonner";
 
 const initialState = {
   emailId: "",
-  token: "",
   isLoggedIn: false,
   fullName: "",
   location: {},
-  role: "user",
   phoneNumber: null,
   gender: "",
   userId: null,
@@ -27,20 +27,17 @@ export const userSlice = createSlice({
         phoneNumber,
         gender,
         location,
-        role,
         _id,
         wishlist,
       } = action.payload.user;
-      const { token, isLoggedIn } = action.payload;
+      const { isLoggedIn } = action.payload;
 
       return {
         ...state,
         userId: _id,
         emailId: emailId,
-        token: token,
         wishlist: wishlist,
         isLoggedIn: isLoggedIn,
-        role: role,
         location: location,
         fullName: fullName,
         phoneNumber: phoneNumber,

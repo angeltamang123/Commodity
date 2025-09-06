@@ -15,7 +15,7 @@ export default function Chatbot() {
   const [status, setStatus] = useState("");
   const [streaming, setStreaming] = useState(false);
 
-  // Use a ref to store the cumulative streaming text
+  // Ref to store the cumulative streaming text
   const streamingTextRef = useRef("");
 
   const scrollToBottom = () => {

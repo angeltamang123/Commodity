@@ -1,10 +1,13 @@
+"use client";
 import React from "react";
 import CustomNavbar from "@/components/navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import { Mail, Phone, MessageSquare } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const HelpCenterPage = () => {
+  const router = useRouter();
   return (
     <main className="min-h-screen flex flex-col bg-gray-100">
       <CustomNavbar />
@@ -23,17 +26,22 @@ const HelpCenterPage = () => {
 
         {/* AI Notice Section */}
         <section className="text-center mb-12">
-          <div className="p-8 bg-[#AF0000] text-white rounded-xl shadow-lg transform transition-transform hover:scale-105 duration-300">
+          <div
+            onClick={() => {
+              router.push("/chatbot");
+            }}
+            className="p-8 bg-[#AF0000] text-white rounded-xl shadow-lg transform transition-transform cursor-pointer hover:scale-105 duration-300"
+          >
             <div className="flex justify-center mb-4">
               <MessageSquare size={50} strokeWidth={1.5} />
             </div>
             <h2 className="text-3xl font-bold mb-2">
-              ✨ Commodity AI: Coming Soon!
+              ✨ Commodity AI: Comma is here!
             </h2>
             <p className="text-xl leading-relaxed max-w-3xl mx-auto">
-              We're building an advanced AI agent to provide you with instant,
+              We've built an advanced AI agent to provide you with instant,
               intelligent customer support. Get ready for a seamless,
-              conversational help experience, tailored just for you!
+              conversational help experience, Try now!
             </p>
           </div>
         </section>

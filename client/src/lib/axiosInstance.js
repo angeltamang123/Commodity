@@ -6,23 +6,24 @@ import { toast } from "sonner";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_EXPRESS_API_URL,
+  withCredentials: true,
 });
 
 // Request interceptor to add the JWT token to headers
-api.interceptors.request.use(
-  (config) => {
-    const state = store.getState();
-    const token = state.persisted.user.token;
+// api.interceptors.request.use(
+//   (config) => {
+//     const state = store.getState();
+//     const token = state.persisted.user.token;
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 // Response with error handling in case of auth errors
 // api.interceptors.response.use(

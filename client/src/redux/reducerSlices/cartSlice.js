@@ -69,7 +69,7 @@ const cartSlice = createSlice({
     },
 
     updateItemQuantity: (state, action) => {
-      const { productId, quantityChange } = action.payload; // quantityChange can be +1 or -1
+      const { productId, quantityChange } = action.payload; // quantityChange can be + or -
       const existingItem = state.items.find(
         (item) => item.productId === productId
       );

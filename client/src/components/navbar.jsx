@@ -47,6 +47,7 @@ import api from "@/lib/axiosInstance";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { markAllSeen } from "@/redux/reducerSlices/notificationSlice";
+import axios from "axios";
 
 export default function CustomNavbar() {
   const dispatch = useDispatch();
@@ -55,7 +56,7 @@ export default function CustomNavbar() {
 
   const notifiactionCardRef = useRef(null);
 
-  const { isLoggedIn, phoneNumber, role, location } = useSelector(
+  const { isLoggedIn, phoneNumber, location } = useSelector(
     (state) => state.persisted.user
   );
 
@@ -64,6 +65,17 @@ export default function CustomNavbar() {
   );
 
   const { unseenCount } = useSelector((state) => state.notification);
+
+  const fetchUserRole = async () => {
+    const { data } = await axios.get("/api/user/role");
+    return data.role;
+  };
+
+  const { data: role, isLoading } = useQuery({
+    queryKey: ["userRole"],
+    queryFn: fetchUserRole,
+    enabled: isLoggedIn,
+  });
 
   const markAllAsSeen = async () => {
     try {
@@ -98,7 +110,7 @@ export default function CustomNavbar() {
         <div className="flex items-center gap-4">
           <span>Commodity's AI Comma is Here | </span>
           <Button
-            className="h-full border rounded-3xl cursor-pointer p-1"
+            className="h-full border-2 shadow-4xl shadow-black rounded-3xl cursor-pointer p-1"
             onPress={() => {
               router.push("/chatbot");
             }}
@@ -334,10 +346,10 @@ export default function CustomNavbar() {
                   Settings
                 </DropdownItem>
                 <DropdownItem
-                  onPress={() => {
+                  onPress={async () => {
+                    await axios.post("/api/logout");
                     dispatch(logoutUser());
                     dispatch(clearCart());
-                    window.location.reload();
                   }}
                   startContent={<LogOut />}
                 >

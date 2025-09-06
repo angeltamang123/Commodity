@@ -25,8 +25,10 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${roboto.variable}`}>
       <body className={inter.className}>
         <ReduxProvider>
-          <NotificationSocket />
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <NotificationSocket />
+            {children}
+          </QueryProvider>
         </ReduxProvider>
         <Toaster richColors />
         {/* Using React-toastify for real time notification toast as two Toasters with ids from sonner isn't working */}

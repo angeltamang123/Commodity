@@ -4,6 +4,7 @@ import {
   addNotification,
   fetchNotifications,
 } from "@/redux/reducerSlices/notificationSlice";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,7 +14,18 @@ import { io } from "socket.io-client";
 export default function NotificationSocket() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const { userId, role } = useSelector((state) => state.persisted.user);
+  const { userId, isLoggedIn } = useSelector((state) => state.persisted.user);
+
+  const fetchUserRole = async () => {
+    const { data } = await axios.get("/api/user/role");
+    return data.role;
+  };
+
+  const { data: role, isLoading } = useQuery({
+    queryKey: ["userRole"],
+    queryFn: fetchUserRole,
+    enabled: isLoggedIn,
+  });
 
   const socketRef = useRef(null);
 

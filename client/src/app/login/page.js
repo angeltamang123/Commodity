@@ -76,8 +76,7 @@ const LoginPage = () => {
   });
 
   const loginUser = async (values) => {
-    const apiUrl = process.env.NEXT_PUBLIC_EXPRESS_API_URL;
-    const response = await axios.post(`${apiUrl}/login`, values);
+    const response = await axios.post(`/api/login`, values);
     return response.data;
   };
 
