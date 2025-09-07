@@ -17,14 +17,14 @@ WEBSITE_URL = os.getenv("CLIENT_URL")
 
 MONGO_URI = f"mongodb+srv://{os.getenv("MONGODB_USER")}:{os.getenv("MONGODB_PASSWORD")}@{os.getenv("MONGODB_CLUSTER")}/?retryWrites=true&w=majority&appName={os.getenv("MONGODB_CLUSTER")[:8].capitalize()}" 
 DB_NAME = os.getenv("MONGODB_DB")
-COLLECTION_NAME = "products"
 ATLAS_VECTOR_SEARCH_INDEX_NAME = "vector_index"
 
 mcp = FastMCP("EcommerceTools")
 
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
-products_collection = db[COLLECTION_NAME]
+products_collection = db["products"]
+orders_collection = db["orders"]
 
 # Embedding model
 embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2",
@@ -102,6 +102,61 @@ async def semantic_product_search_tool(query: str) -> List[Dict[str, Any]]:
             "description": doc.page_content,
         })
     return products
+
+def convert_object_ids(data):
+    """
+    Recursively converts ObjectId instances to strings in a dictionary or list.
+    """
+    if isinstance(data, dict):
+        return {k: convert_object_ids(v) for k, v in data.items()}
+    if isinstance(data, list):
+        return [convert_object_ids(item) for item in data]
+    if isinstance(data, ObjectId):
+        return str(data)
+    return data
+
+@mcp.tool()
+async def order_search_tool(userId: str, status: str) -> Dict[str, Any]:
+    """
+    Searches for a user's latest orders by status.
+    
+    Args:
+        userId: The unique ID of the user.
+        status: The status of the orders to search for.
+                Valid statuses are: "pending", "processing", "departed", "delivered", "cancelled".
+    
+    Returns:
+        A dictionary containing a list of the 5 latest orders and the total count of orders
+        matching the criteria.
+    """
+    valid_statuses = ["pending", "processing", "departed", "delivered", "cancelled"]
+    if status.lower() not in valid_statuses:
+        return {"error": f"Invalid status provided. Valid statuses are: {', '.join(valid_statuses)}"}
+
+    try:
+        user_object_id = ObjectId(userId)
+
+        search_query = {
+            "user": user_object_id,
+            "status": status.lower()
+        }
+
+        latest_orders = list(orders_collection.find(search_query)
+                                               .sort("updatedAt", -1)
+                                               .limit(5))
+
+        # Getting the total count of orders for the user and status
+        total_count = orders_collection.count_documents(search_query)
+
+        # Converting the ObjectIds to strings for JSON serialization
+        return convert_object_ids({
+            "latest_orders": latest_orders,
+            "total_orders": total_count
+        })
+
+    except Exception as e:
+        print(f"Error searching for orders: {e}")
+        return {"error": f"An error occurred while searching for orders: {e}"}
 
 if __name__ == "__main__":
     mcp.run()
