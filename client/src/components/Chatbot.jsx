@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import ReactMarkdown from "react-markdown";
+import { useSelector } from "react-redux";
 
 const CHATBOT_API_URL = `${process.env.NEXT_PUBLIC_FASTAPI_URL}/chat/stream`;
 
@@ -13,6 +14,7 @@ export default function Chatbot() {
   const [sessionId, setSessionId] = useState("");
   const [status, setStatus] = useState("");
   const [streaming, setStreaming] = useState(false);
+  const { userId } = useSelector((state) => state.persisted.user);
 
   // Ref to store the cumulative streaming text
   const streamingTextRef = useRef("");
@@ -61,7 +63,11 @@ export default function Chatbot() {
       const response = await fetch(CHATBOT_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: currentInput, sessionId: sessionId }),
+        body: JSON.stringify({
+          message: currentInput,
+          sessionId: sessionId,
+          userId: userId,
+        }),
       });
 
       if (!response.ok) {
@@ -133,8 +139,8 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="flex flex-1 flex-col min-h-screen bg-gray-100">
-      <div className="bg-gray-800 text-white p-4 text-center">
+    <div className="flex flex-1 flex-col min-h-screen max-h-screen bg-gray-100">
+      <div className="bg-[#111B25] text-white p-4 text-center">
         <h1 className="text-xl font-bold">Commodity Chatbot</h1>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">

@@ -115,7 +115,7 @@ export default function CustomNavbar() {
               router.push("/chatbot");
             }}
           >
-            Try now !!
+            Try now
           </Button>
         </div>
         <div className="flex items-center gap-2">

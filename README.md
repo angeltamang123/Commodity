@@ -163,7 +163,7 @@ To run the app locally:
 1.  Start the Express.js backend server:
 
     ```bash
-    cd server
+    cd express_server
     npm run dev
     ```
 
@@ -181,11 +181,12 @@ To run the app locally:
 3.  Start the Next.js frontend server:
 
     ```bash
-    cd express_server
+    cd client
     npm run dev
     ```
 
-Open your browser to `http://localhost:3000` where nextjs should runs by default.
+Open your browser to `http://localhost:3000` where nextjs should runs by default. \
+To give a user "admin" role, there's an option in user settings.
 
 ## AI Features Setup
 
