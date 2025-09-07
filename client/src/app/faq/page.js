@@ -8,7 +8,7 @@ const FAQPage = () => {
     {
       question: "How do I create an account?",
       answer:
-        "To create an account, simply click the 'Register' button in the top right corner of the page and follow the on-screen instructions.",
+        "To create an account, simply click the Register button in the top right corner of the page and follow the on-screen instructions.",
     },
     {
       question: "What kind of data does the platform use?",

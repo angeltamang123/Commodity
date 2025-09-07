@@ -108,7 +108,7 @@ export default function CustomNavbar() {
           <span>{phoneNumber}</span>
         </div>
         <div className="flex items-center gap-4">
-          <span>Commodity's AI Comma is Here | </span>
+          <span>Commodity&apos;s AI Comma is Here | </span>
           <Button
             className="h-full border-2 shadow-4xl shadow-black rounded-3xl cursor-pointer p-1"
             onPress={() => {

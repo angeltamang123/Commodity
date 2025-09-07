@@ -80,6 +80,29 @@ const AboutPage = () => {
           </p>
         </section>
 
+        {/* AI Chatbot Integration Section */}
+        <section className="bg-gray-50 p-8 rounded-lg shadow-sm">
+          <h2 className="text-3xl font-bold mb-4" style={{ color: "#AF0000" }}>
+            AI Chatbot Integration
+          </h2>
+          <p className="text-lg text-gray-700 leading-relaxed">
+            A key feature of this project is the integration of a powerful
+            AI-powered chatbot. This functionality is built as a separate
+            backend microservice using the{" "}
+            <strong className="font-semibold">FastAPI</strong> framework in
+            Python. The chatbot uses advanced techniques like{" "}
+            <strong className="font-semibold">
+              Retrieval-Augmented Generation (RAG)
+            </strong>{" "}
+            to provide accurate and context-aware responses about products and
+            company policies. The chatbot also has the ability to use tools from
+            a separate{" "}
+            <strong className="font-semibold">fast-mcp server</strong>, enabling
+            advanced functionality like web scraping with{" "}
+            <strong className="font-semibold">Playwright</strong>.
+          </p>
+        </section>
+
         {/* Key Technologies Section */}
         <section className="bg-gray-50 p-8 rounded-lg shadow-sm">
           <h2 className="text-3xl font-bold mb-4" style={{ color: "#AF0000" }}>
@@ -118,6 +141,12 @@ const AboutPage = () => {
                 <li>
                   <strong className="font-semibold">Axios:</strong> For making
                   HTTP requests to the backend API.
+                </li>
+                <li>
+                  <strong className="font-semibold">
+                    Server-Sent Events (SSE) & Fetch API:
+                  </strong>{" "}
+                  For real-time data streaming to the chatbot.
                 </li>
                 <li>
                   <strong className="font-semibold">Leaflet & Geoapify:</strong>{" "}
@@ -165,6 +194,28 @@ const AboutPage = () => {
                   <strong className="font-semibold">Socket.io:</strong> For
                   enabling real-time, bidirectional communication between the
                   client and server.
+                </li>
+                <li>
+                  <strong className="font-semibold">
+                    FastAPI (Python), LangChain, & LangGraph:
+                  </strong>{" "}
+                  A dedicated microservice for the AI chatbot.
+                </li>
+                <li>
+                  <strong className="font-semibold">
+                    fast-mcp & Playwright:
+                  </strong>{" "}
+                  Used for tool-enabled functionality, including web scraping.
+                </li>
+                <li>
+                  <strong className="font-semibold">
+                    MongoDB Atlas Vector Search:
+                  </strong>{" "}
+                  For efficient Retrieval-Augmented Generation (RAG).
+                </li>
+                <li>
+                  <strong className="font-semibold">HuggingFace:</strong> For
+                  text-to-vector embedding model and LLM.
                 </li>
               </ul>
             </div>

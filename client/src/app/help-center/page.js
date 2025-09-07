@@ -39,7 +39,7 @@ const HelpCenterPage = () => {
               ✨ Commodity AI: Comma is here!
             </h2>
             <p className="text-xl leading-relaxed max-w-3xl mx-auto">
-              We've built an advanced AI agent to provide you with instant,
+              We&apos;ve built an advanced AI agent to provide you with instant,
               intelligent customer support. Get ready for a seamless,
               conversational help experience, Try now!
             </p>

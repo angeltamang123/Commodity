@@ -29,7 +29,7 @@ const PrivacyPolicyPage = () => {
             <p className="leading-relaxed">
               This Privacy Policy describes how your personal information is
               collected, used, and shared when you visit or make a purchase from
-              this website ("the Site").
+              this website (&quot;the Site&quot;).
             </p>
           </div>
 

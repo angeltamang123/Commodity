@@ -26,10 +26,10 @@ const TermsAndConditionsPage = () => {
               Agreement to Terms
             </h2>
             <p className="leading-relaxed">
-              By accessing or using the services provided by this website ("the
-              Site"), you agree to be bound by these Terms and Conditions. If
-              you do not agree to all of these terms, you are not authorized to
-              use the Site.
+              By accessing or using the services provided by this website
+              (&quot;the Site&quot;), you agree to be bound by these Terms and
+              Conditions. If you do not agree to all of these terms, you are not
+              authorized to use the Site.
             </p>
           </div>
 
@@ -41,9 +41,9 @@ const TermsAndConditionsPage = () => {
             <p className="leading-relaxed">
               You agree to use the Site only for lawful purposes and in a way
               that does not infringe on the rights of, restrict, or inhibit
-              anyone else's use and enjoyment of the Site. Prohibited behavior
-              includes harassing or causing distress or inconvenience to any
-              other user, transmitting obscene or offensive content, or
+              anyone else&apos;s use and enjoyment of the Site. Prohibited
+              behavior includes harassing or causing distress or inconvenience
+              to any other user, transmitting obscene or offensive content, or
               disrupting the normal flow of dialogue within the Site.
             </p>
           </div>
@@ -94,12 +94,12 @@ const TermsAndConditionsPage = () => {
               Disclaimer of Warranties
             </h2>
             <p className="leading-relaxed">
-              The Site is provided on an "as-is" and "as-available" basis. Your
-              use of the Site and our services is at your sole risk. We
-              expressly disclaim all warranties of any kind, whether express or
-              implied, including, but not limited to, the implied warranties of
-              merchantability, fitness for a particular purpose, and
-              non-infringement.
+              The Site is provided on an &quot;as-is&quot; and
+              &quot;as-available&quot; basis. Your use of the Site and our
+              services is at your sole risk. We expressly disclaim all
+              warranties of any kind, whether express or implied, including, but
+              not limited to, the implied warranties of merchantability, fitness
+              for a particular purpose, and non-infringement.
             </p>
           </div>
 
@@ -148,7 +148,7 @@ const TermsAndConditionsPage = () => {
               Contact Us
             </h2>
             <p className="leading-relaxed">
-              If you have any questions about these Terms, please contact us at{" "}
+              If you have any questions about these Terms, please contact us at
               <Link
                 href="mailto:tamangangel2057@gmail.com"
                 className="text-blue-500 hover:underline"

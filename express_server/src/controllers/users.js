@@ -21,14 +21,31 @@ const loginUser = async (req, res) => {
   );
   if (!passwordMatched) return res.status(401).send("Invalid Password");
   const secret = process.env.JWT_SECRET;
-  const token = jwt.sign({ id: user._id }, secret);
+  const payload = {
+    id: user._id,
+    role: user.role,
+  };
+  const token = jwt.sign(payload, secret);
+
+  const tenYearsFromNow = new Date();
+  tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
+
+  // Http only Cookie with long expiry date
+  res.cookie("token", token, {
+    httpOnly: true, // http only, prevents client side access
+    secure: false, // set true in production, for https protocol. Rn, we have http local server
+    expires: tenYearsFromNow,
+    // Check other options in documentation
+  });
+
   const userToSend = user.toObject();
   delete userToSend.password;
+  delete userToSend.role;
+
   res.send({
     message: "logged in successfully",
     user: userToSend,
     isLoggedIn: true,
-    token,
   });
 };
 

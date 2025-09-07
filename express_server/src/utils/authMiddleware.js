@@ -4,7 +4,7 @@ const { promisify } = require("util");
 
 exports.protect = async (req, res, next) => {
   try {
-    let token;
+    const token = req.cookies.token;
 
     if (!process.env.JWT_SECRET) {
       console.error("JWT_SECRET is not defined in environment variables.");
@@ -12,13 +12,6 @@ exports.protect = async (req, res, next) => {
         status: "fail",
         message: "Server configuration error: JWT_SECRET missing",
       });
-    }
-
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
     }
 
     if (!token) {

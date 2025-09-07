@@ -157,7 +157,7 @@ const Notifications = () => {
         )}
         {!hasNextPage && (
           <div className="text-center py-6 text-gray-500">
-            You've reached the end of your notifications.
+            You&apos;ve reached the end of your notifications.
           </div>
         )}
       </Card>

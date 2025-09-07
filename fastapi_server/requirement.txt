@@ -1,0 +1,15 @@
+uvicorn
+python-dotenv
+pymongo
+playwright
+langgraph
+langchain
+langchain-text-splitters
+langchain-ollama
+langchain-mongodb
+langchain-mcp-adapters
+langchain-huggingface
+fastmcp
+fastapi 
+beautifulsoup4
+sentence-transformers

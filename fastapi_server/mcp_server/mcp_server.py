@@ -54,10 +54,10 @@ async def website_page_resource(page_name: str) -> str:
  
             await page.goto(url_to_scrape)
             
-            if page_name == 'faq':
-                await page.wait_for_selector('h1.text-4xl.md\\:text-5xl')
-            else:
+            if page_name == 'about':
                 await page.wait_for_selector('h1.text-3xl.md\\:text-4xl')
+            else:
+                await page.wait_for_selector('h1.text-4xl.md\\:text-5xl')
             
             rendered_content = await page.content()
             await browser.close()

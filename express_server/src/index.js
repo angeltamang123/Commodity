@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const http = require("http");
 const socketIO = require("socket.io");
 
@@ -8,21 +9,30 @@ const dotenv = require("dotenv");
 // dot env config
 dotenv.config();
 
-const port = process.env.PORT || 7000;
+const port = process.env.EXPRESS_PORT || 7000;
 
 const app = express();
+
 const server = http.createServer(app);
 const io = socketIO(server, {
   cors: {
-    origin: "*",
+    origin: process.env.CLIENT_URL,
+    credentials: true,
   },
 });
 
 app.set("io", io);
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form-urlencoded
+app.use(cookieParser());
 
 app.use("/uploads", express.static("uploads"));
 

@@ -11,16 +11,31 @@ export default function Chatbot() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [sessionId, setSessionId] = useState("");
-  const messagesEndRef = useRef(null);
   const [status, setStatus] = useState("");
   const [streaming, setStreaming] = useState(false);
 
   // Ref to store the cumulative streaming text
   const streamingTextRef = useRef("");
 
+  // Ref for the last streamed bot message to enable auto-scrolling
+  const lastBotMessageRef = useRef(null);
+
+  // Ref for the input field to enable auto-focus and scrolling
+  const inputRef = useRef(null);
+
+  // Scroll to the latest message or status update
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    lastBotMessageRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
   };
+
+  // Scroll to the input field on page load
+  useEffect(() => {
+    inputRef.current?.scrollIntoView({ behavior: "smooth" });
+    inputRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     const newSessionId = `session-${Date.now()}`;
@@ -33,13 +48,13 @@ export default function Chatbot() {
 
     const userMessage = { text: inputMessage, sender: "user" };
     const botMessagePlaceholder = { text: "", sender: "bot" };
-    // Optimistic UI update: add both messages to the state at once
+
     setMessages((prev) => [...prev, userMessage, botMessagePlaceholder]);
     const currentInput = inputMessage;
     setInputMessage("");
     setStatus("...");
 
-    // Reset the ref at the start of a new stream
+    // Resetting the ref at the start of a new stream
     streamingTextRef.current = "";
 
     try {
@@ -75,19 +90,20 @@ export default function Chatbot() {
               if (data.state === "thinking" || data.state === "using_tool") {
                 setStatus(data.message);
               } else if (data.state === "answering") {
-                // Append to the ref, not the state
+                // Appending to the ref
                 streamingTextRef.current += data.message;
-                // Update the state with the cumulative content
+                // Updating the state with the cumulative content
                 setMessages((prevMessages) => {
                   const newMessages = [...prevMessages];
                   const lastMessage = newMessages[newMessages.length - 1];
                   if (lastMessage && lastMessage.sender === "bot") {
-                    // This is the key fix: update with the complete accumulated text
                     lastMessage.text = streamingTextRef.current;
                   }
                   return newMessages;
                 });
                 setStatus("");
+                // Scroll to the latest bot message chunk
+                scrollToBottom();
               } else if (data.state === "final") {
                 setStatus("");
               }
@@ -111,13 +127,10 @@ export default function Chatbot() {
         return newMessages;
       });
     } finally {
+      // Final scroll to the bottom after streaming is complete
       scrollToBottom();
     }
   };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, status]);
 
   return (
     <div className="flex flex-1 flex-col min-h-screen bg-gray-100">
@@ -138,6 +151,8 @@ export default function Chatbot() {
                   ? "bg-blue-500 text-white"
                   : "bg-white text-gray-800"
               }`}
+              // Assign a ref to the last streamed bot message
+              ref={msg.sender === "bot" ? lastBotMessageRef : null}
             >
               <ReactMarkdown>{msg.text}</ReactMarkdown>
             </div>
@@ -150,7 +165,6 @@ export default function Chatbot() {
             </div>
           </div>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       <form
@@ -164,6 +178,7 @@ export default function Chatbot() {
           disabled={streaming}
           placeholder="Type your message..."
           className="flex-1 p-3 border h-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          ref={inputRef}
         />
         <Button
           type="submit"
