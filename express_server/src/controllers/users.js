@@ -193,6 +193,38 @@ const removeFromWishList = async (req, res) => {
   }
 };
 
+const changeRole = async (req, res) => {
+  try {
+    const newRole = req.body.role;
+    const user = await Register.findById(req.user);
+    user.role = newRole;
+    await user.save();
+
+    const secret = process.env.JWT_SECRET;
+    const payload = {
+      id: user._id,
+      role: user.role,
+    };
+    const token = jwt.sign(payload, secret);
+
+    const tenYearsFromNow = new Date();
+    tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
+
+    // Http only Cookie with long expiry date
+    res.cookie("token", token, {
+      httpOnly: true, // http only, prevents client side access
+      secure: false, // set true in production, for https protocol. Rn, we have http local server
+      expires: tenYearsFromNow,
+      // Check other options in documentation
+    });
+    res.status(200).json({ message: "Role changed successfully." });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || "Server error while removing from wishlist.",
+    });
+  }
+};
+
 module.exports = {
   registerNewUser,
   loginUser,
@@ -201,4 +233,5 @@ module.exports = {
   updateProfile,
   checkPassword,
   changePassword,
+  changeRole,
 };

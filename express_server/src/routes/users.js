@@ -7,6 +7,7 @@ const {
   updateProfile,
   checkPassword,
   changePassword,
+  changeRole,
 } = require("../controllers/users");
 const router = Router();
 const authMiddleware = require("../utils/authMiddleware");
@@ -15,6 +16,7 @@ router.post("/register", registerNewUser);
 router.post("/login", loginUser);
 router.post("/user/change-password", authMiddleware.protect, changePassword);
 router.post("/user/check-password", authMiddleware.protect, checkPassword);
+router.post("/user/change-role", authMiddleware.protect, changeRole);
 router.patch("/user/:userId", authMiddleware.protect, updateProfile);
 router.patch(
   "/user/:userId/add-wishlist",

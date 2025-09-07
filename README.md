@@ -126,7 +126,7 @@ To run the app locally:
    MONGODB_CLUSTER=<copy paste this part from your string "cluster0.yea60.mongodb.net">
    MONGODB_PASSWORD=<db_password>
    MONGODB_DB=<The name of database for this project>
-   CLIENT_URL=Locally hosted nextjs app. Eg: http://localhost:3000. The port number 3000 is default to nextjs>
+   CLIENT_URL=<Locally hosted nextjs app. Eg: http://localhost:3000. The port number 3000 is default to nextjs>
    ```
 
    The Mongodb variables, CLIENT_URL in express and fastapi directories must match
@@ -151,7 +151,7 @@ To run the app locally:
     ```
 
 3.  **FastAPI/AI Backend Setup**:
-    In another terminal
+    In another terminal and in python virtual environment:
     ```bash
     cd fastapi_server
     pip install -r requirements.txt
@@ -169,6 +169,7 @@ To run the app locally:
 
 2.  Start the FastAPI/AI backend server:
     Before running fastapi server you need to complete setup for [AI, check the section below](#ai-features-setup).
+    And make sure you're in your python virtual environment where the packages are installed.
 
     ```bash
     cd fastapi_server

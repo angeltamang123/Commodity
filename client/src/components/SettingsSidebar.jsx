@@ -10,6 +10,7 @@ import {
   Package,
   Search,
   Settings,
+  ShieldUser,
   User,
   WalletCards,
 } from "lucide-react";
@@ -50,6 +51,11 @@ export function SettingsSidebar() {
       title: "Password",
       url: "/settings/password",
       icon: Lock,
+    },
+    {
+      title: "Admin",
+      url: "/settings/admin",
+      icon: ShieldUser,
     },
   ];
 
